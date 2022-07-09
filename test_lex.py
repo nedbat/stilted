@@ -9,6 +9,7 @@ from lex import lexer
         ("123", [("int", "123")]),
         ("123 456", [("int", "123"), ("int", "456")]),
         ("(hello)", [("string", "(hello)")]),
+        ("(hello 5%)  % five", [("string", "(hello 5%)")]),
         (".314 3.14 314.", [("float", ".314"), ("float", "3.14"), ("float", "314.")]),
         ("% A comment\n123", [("int", "123")]),
     ],
