@@ -34,8 +34,9 @@ def skip(rx):
 
 lexer = Lexer(
     token(r"\(.*?\)", "string"),
-    token(r"\d*(\d\.|\.\d)\d*", "float"),
-    token(r"\d+", "int"),
+    token(r"[-+]?\d*(\d\.|\.\d)\d*", "float"),
+    token(r"[-+]?\d+", "int"),
     skip(r"%.*$"),
     skip(r"\s+"),
+    token(r".", "error"),
 )
