@@ -12,31 +12,45 @@ Names 123ABC $$^&
 
 
 import re
+from dataclasses import dataclass
+from typing import Any, Callable, Iterable, Tuple
 
+
+
+@dataclass
+class Token:
+    rx: str
+    kind: str
+    converter: Callable[[str], Any] = lambda text: text
+
+    def pattern(self):
+        return f"(?P<{self.kind}>{self.rx})"
+
+@dataclass
+class Skip:
+    rx: str
+    kind: None = None
+
+    def pattern(self):
+        return f"({self.rx})"
 
 class Lexer:
     def __init__(self, *tokens):
-        self.rx = "(?m)" + "|".join(tokens)
+        self.rx = "(?m)" + "|".join(t.pattern() for t in tokens)
+        self.converters = {t.kind: t.converter for t in tokens if t.kind}
 
-    def tokens(self, text):
+    def tokens(self, text: str) -> Iterable[Tuple[str, Any]]:
         for match in re.finditer(self.rx, text):
-            if match.lastgroup:
-                yield (match.lastgroup, match[0])
-
-
-def token(rx, kind):
-    return f"(?P<{kind}>{rx})"
-
-
-def skip(rx):
-    return f"({rx})"
+            if kind := match.lastgroup:
+                converter = self.converters[kind]
+                yield (kind, converter(match[0]))
 
 
 lexer = Lexer(
-    token(r"\(.*?\)", "string"),
-    token(r"[-+]?\d*(\d\.|\.\d)\d*", "float"),
-    token(r"[-+]?\d+", "int"),
-    skip(r"%.*$"),
-    skip(r"\s+"),
-    token(r".", "error"),
+    Token(r"\(.*?\)", "string"),
+    Token(r"[-+]?\d*(\d\.|\.\d)\d*", "float", float),
+    Token(r"[-+]?\d+", "int", int),
+    Skip(r"%.*$"),
+    Skip(r"\s+"),
+    Token(r".", "error"),
 )
