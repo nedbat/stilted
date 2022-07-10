@@ -52,10 +52,11 @@ def convert_string(text: str) -> str:
     assert text[-1] == ")"
 
     def do_escape(match):
-        if match[0][1] in "01234567":
-            return chr(int(match[0][1:], 8))
+        esc_text = match[0]
+        if esc_text[1] in "01234567":
+            return chr(int(esc_text[1:], 8))
         else:
-            match match[0]:
+            match esc_text:
                 case r"\n":
                     return "\n"
                 case r"\t":
@@ -63,7 +64,7 @@ def convert_string(text: str) -> str:
                 case "\\\n":
                     return ""
                 case _:
-                    return match[0][1]
+                    return esc_text[1]
 
     return re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
 
