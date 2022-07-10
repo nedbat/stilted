@@ -46,8 +46,29 @@ class Lexer:
                 yield (kind, converter(match[0]))
 
 
+def convert_string(text):
+    assert text[0] == "("
+    assert text[-1] == ")"
+
+    def do_escape(match):
+        match len(match[0]):
+            case 2:
+                match match[0]:
+                    case r"\n":
+                        return "\n"
+                    case r"\t":
+                        return "\t"
+                    case "\\\n":
+                        return ""
+                    case _:
+                        return match[0][1]
+            case 4:
+                return chr(int(match[0][1:], 8))
+
+    return re.sub(r"(?s)\\[0-7]{3}|\\.", do_escape, text[1:-1])
+
 lexer = Lexer(
-    Token(r"\(.*?\)", "string"),
+    Token(r"\((?:\\\[0-7]{3}|\\.|\\\n|.|\n)*?\)", "string", convert_string),
     Token(r"[-+]?\d*(\d\.|\.\d)\d*", "float", float),
     Token(r"[-+]?\d+", "int", int),
     Skip(r"%.*$"),
