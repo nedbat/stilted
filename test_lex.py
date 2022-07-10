@@ -17,6 +17,7 @@ from lex import lexer
         (r"(\nHi\101\)) 123", [("string", "\nHiA)"), ("int", 123)]),
         ("(one\ntwo)", [("string", "one\ntwo")]),
         ("(one\\\nstill one)", [("string", "onestill one")]),
+        (r"(\1\2\34\034\0053)", [("string", "\x01\x02\x1c\x1c\x053")]),
     ],
 )
 def test_lexer(text, toks):
