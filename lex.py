@@ -8,6 +8,7 @@ from typing import Any, Callable, Iterable, Tuple
 @dataclass
 class Token:
     """A token that we want."""
+
     rx: str
     kind: str
     converter: Callable[[str], Any] = lambda text: text
@@ -15,14 +16,17 @@ class Token:
     def pattern(self):
         return f"(?P<{self.kind}>{self.rx})"
 
+
 @dataclass
 class Skip:
     """Characters that can be discarded."""
+
     rx: str
     kind: None = None
 
     def pattern(self):
         return f"({self.rx})"
+
 
 class Lexer:
     """
@@ -30,6 +34,7 @@ class Lexer:
 
     Initialize with a bunch of Token/Skip instances.
     """
+
     def __init__(self, *tokens) -> None:
         self.rx = "(?m)" + "|".join(t.pattern() for t in tokens)
         self.converters = {t.kind: t.converter for t in tokens if t.kind}
@@ -67,6 +72,7 @@ def convert_string(text: str) -> str:
                     return esc_text[1]
 
     return re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
+
 
 lexer = Lexer(
     Token(r"\((?:\\\[0-7]{1,3}|\\.|\\\n|.|\n)*?\)", "string", convert_string),
