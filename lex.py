@@ -1,24 +1,13 @@
-"""
-
-(string(withparens))
-123
-123.23
-2#010101
-Names 123ABC $$^&
-/Literalnames
-%comments
-
-"""
-
+"""Lexical analysis for stilted."""
 
 import re
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
 
 
-
 @dataclass
 class Token:
+    """A token that we want."""
     rx: str
     kind: str
     converter: Callable[[str], Any] = lambda text: text
@@ -28,6 +17,7 @@ class Token:
 
 @dataclass
 class Skip:
+    """Characters that can be discarded."""
     rx: str
     kind: None = None
 
@@ -35,18 +25,29 @@ class Skip:
         return f"({self.rx})"
 
 class Lexer:
-    def __init__(self, *tokens):
+    """
+    A lexical analyzer.
+
+    Initialize with a bunch of Token/Skip instances.
+    """
+    def __init__(self, *tokens) -> None:
         self.rx = "(?m)" + "|".join(t.pattern() for t in tokens)
         self.converters = {t.kind: t.converter for t in tokens if t.kind}
 
     def tokens(self, text: str) -> Iterable[Tuple[str, Any]]:
+        """
+        Yield (kind, value) pairs for the tokens in `text`.
+        """
         for match in re.finditer(self.rx, text):
             if kind := match.lastgroup:
                 converter = self.converters[kind]
                 yield (kind, converter(match[0]))
 
 
-def convert_string(text):
+def convert_string(text: str) -> str:
+    """
+    A converter for raw string text to the string value we want.
+    """
     assert text[0] == "("
     assert text[-1] == ")"
 
