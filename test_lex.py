@@ -1,3 +1,7 @@
+"""Tests of stilted's lexical analyzer."""
+
+import re
+
 import pytest
 
 from lex import lexer, Name
@@ -30,3 +34,15 @@ from lex import lexer, Name
 )
 def test_lexer(text, toks):
     assert list(lexer.tokens(text)) == toks
+
+
+@pytest.mark.parametrize(
+    "text, error",
+    [
+        (")", ")"),
+        ("123)", ")"),
+    ],
+)
+def test_lexer_error(text, error):
+    with pytest.raises(Exception, match=re.escape(f"Lexical error: {error!r}")):
+        list(lexer.tokens(text))
