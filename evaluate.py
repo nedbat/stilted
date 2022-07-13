@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from lex import lexer
+from lex import lexer, Name
 
 
 def evaluate(text: str) -> list[Any]:
@@ -11,6 +11,10 @@ def evaluate(text: str) -> list[Any]:
         match tok:
             case str() | int() | float():
                 stack.append(tok)
+
+            case Name(name, literal=True):
+                stack.append(tok)
+
             case _:
                 raise Exception(f"Buh? {tok!r}")
 
