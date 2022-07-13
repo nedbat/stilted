@@ -94,13 +94,13 @@ class Name:
 
 
 # A look-ahead to only match tokens if they are properly delimited.
-delimited = r"(?=[()<>\[\]{}/%\s]|\Z)"
+DELIMITED = r"(?=[()<>\[\]{}/%\s]|\Z)"
 
 lexer = Lexer(
-    Token(r"[-+]?\d*(\d\.|\.\d)\d*" + delimited, float),
-    Token(r"[-+]?\d+" + delimited, int),
+    Token(r"[-+]?\d*(\d\.|\.\d)\d*" + DELIMITED, float),
+    Token(r"[-+]?\d+" + DELIMITED, int),
     Token(r"/?[\[\]{}]", Name.from_string),
-    Token(r"/?[^()<>\[\]{}/%\s]+" + delimited, Name.from_string),
+    Token(r"/?[^()<>\[\]{}/%\s]+" + DELIMITED, Name.from_string),
     Token(r"\((?:\\\[0-7]{1,3}|\\.|\\\n|.|\n)*?\)", convert_string),
     Skip(r"%.*$"),
     Skip(r"\s+"),
