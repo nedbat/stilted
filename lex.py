@@ -81,13 +81,33 @@ def convert_string(text: str) -> str:
 
     return re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
 
+
 def error(text: str):
     raise Exception(f"Lexical error: {text!r}")
 
+
+@dataclass
+class Name:
+    name: str
+    literal: bool = False
+
+    @classmethod
+    def from_string(cls, text):
+        if text.startswith("/"):
+            return cls(text[1:], literal=True)
+        else:
+            return cls(text, literal=False)
+
+
+# A look-ahead to only match tokens if they are properly delimited.
+delimited = r"(?=[()<>\[\]{}/%\s]|\Z)"
+
 lexer = Lexer(
+    Token(r"[-+]?\d*(\d\.|\.\d)\d*" + delimited, float),
+    Token(r"[-+]?\d+" + delimited, int),
+    Token(r"/?[\[\]{}]", Name.from_string),
+    Token(r"/?[^()<>\[\]{}/%\s]+" + delimited, Name.from_string),
     Token(r"\((?:\\\[0-7]{1,3}|\\.|\\\n|.|\n)*?\)", convert_string),
-    Token(r"[-+]?\d*(\d\.|\.\d)\d*", float),
-    Token(r"[-+]?\d+", int),
     Skip(r"%.*$"),
     Skip(r"\s+"),
     Token(r".", error),

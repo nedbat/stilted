@@ -1,6 +1,6 @@
 import pytest
 
-from lex import lexer
+from lex import lexer, Name
 
 
 @pytest.mark.parametrize(
@@ -18,6 +18,14 @@ from lex import lexer
         ("(one\ntwo)", ["one\ntwo"]),
         ("(one\\\nstill one)", ["onestill one"]),
         (r"(\1\2\34\034\0053)", ["\x01\x02\x1c\x1c\x053"]),
+        ("/Hello there", [Name("Hello", True), Name("there")]),
+        ("/Hello/there", [Name("Hello", True), Name("there", True)]),
+        ("[123]", [Name("["), 123, Name("]")]),
+        ("{abc {foo} if}", list(map(Name, "{ abc { foo } if }".split()))),
+        (
+            "abc Offset $$ 23A 13-456 a.b $MyDict @pattern",
+            list(map(Name, "abc Offset $$ 23A 13-456 a.b $MyDict @pattern".split())),
+        ),
     ],
 )
 def test_lexer(text, toks):
