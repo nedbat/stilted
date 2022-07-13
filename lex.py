@@ -13,9 +13,6 @@ class Token:
     converter: Callable[[str], Any] = lambda text: text
     keep: bool = True
 
-    def pattern(self):
-        return f"(?P<{self.kind}>{self.rx})"
-
 
 @dataclass
 class Skip:
@@ -23,9 +20,6 @@ class Skip:
 
     rx: str
     keep: bool = False
-
-    def pattern(self):
-        return f"({self.rx})"
 
 
 class Lexer:
