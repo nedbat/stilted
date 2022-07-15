@@ -1,4 +1,4 @@
-"""Tests of stack evaluation for stilted."""
+"""Tests of stack operators for stilted."""
 
 import pytest
 

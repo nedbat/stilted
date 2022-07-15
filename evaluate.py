@@ -6,6 +6,7 @@ from typing import Any
 from lex import lexer, Name
 
 from estate import ExecState
+import op_math
 import op_stack
 
 def evaluate(text: str) -> ExecState:

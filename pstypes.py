@@ -1,6 +1,9 @@
 """PostScript-specific types."""
 
+from types import UnionType
 from dataclasses import dataclass
+
+number: UnionType = int|float
 
 @dataclass
 class Name:
