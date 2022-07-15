@@ -36,6 +36,10 @@ class ExecState:
         del self.ostack[-n:]
         return vals
 
+    def opush(self, val) -> None:
+        """Push a value on the operand stack."""
+        self.ostack.append(val)
+
     def ohas(self, n) -> None:
         """Operand stack must have n entries, or stackunderflow."""
         if len(self.ostack) < n:

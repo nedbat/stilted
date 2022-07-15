@@ -19,10 +19,10 @@ def evaluate(text: str) -> ExecState:
 def evaluate_one(obj: Any, estate: ExecState) -> None:
     match obj:
         case str() | int() | float():
-            estate.ostack.append(obj)
+            estate.opush(obj)
 
         case Name(name, literal=True):
-            estate.ostack.append(obj)
+            estate.opush(obj)
 
         case Name(name, literal=False):
             evaluate_one(estate.dstack[name], estate)

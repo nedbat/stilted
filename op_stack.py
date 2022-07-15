@@ -25,11 +25,11 @@ def copy(estate: ExecState) -> None:
 
 @builtin
 def count(estate: ExecState) -> None:
-    estate.ostack.append(len(estate.ostack))
+    estate.opush(len(estate.ostack))
 
 @builtin
 def counttomark(estate: ExecState) -> None:
-    estate.ostack.append(estate.counttomark())
+    estate.opush(estate.counttomark())
 
 @builtin_with_name("def")
 def def_(estate: ExecState) -> None:
@@ -39,7 +39,7 @@ def def_(estate: ExecState) -> None:
 @builtin
 def dup(estate: ExecState) -> None:
     estate.ohas(1)
-    estate.ostack.append(estate.ostack[-1])
+    estate.opush(estate.ostack[-1])
 
 @builtin
 def exch(estate: ExecState) -> None:
@@ -49,15 +49,15 @@ def exch(estate: ExecState) -> None:
 @builtin
 def index(estate: ExecState) -> None:
     n, = estate.opop(1)
-    estate.ostack.append(estate.ostack[-(n + 1)])
+    estate.opush(estate.ostack[-(n + 1)])
 
 @builtin
 def mark(estate: ExecState) -> None:
-    estate.ostack.append(MARK)
+    estate.opush(MARK)
 
 @builtin_with_name("[")
 def mark_(estate: ExecState) -> None:
-    estate.ostack.append(MARK)
+    estate.opush(MARK)
 
 @builtin
 def pop(estate: ExecState) -> None:
