@@ -5,6 +5,8 @@ from collections import ChainMap
 from dataclasses import dataclass
 from typing import Any
 
+from error import Tilted
+
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {}
 
@@ -28,9 +30,15 @@ class ExecState:
 
     def opop(self, n):
         """Remove the top n operands and return them."""
+        self.ohas(n)
         vals = self.ostack[-n:]
         del self.ostack[-n:]
         return vals
+
+    def ohas(self, n):
+        """Operand stack must have n entries, or stackunderflow."""
+        if len(self.ostack) < n:
+            raise Tilted("stackunderflow")
 
 
 def builtin(func):

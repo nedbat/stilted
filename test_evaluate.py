@@ -2,6 +2,7 @@
 
 import pytest
 
+from error import Tilted
 from evaluate import evaluate
 from lex import Name
 
@@ -33,3 +34,27 @@ from lex import Name
 )
 def test_evaluate(text, stack):
     assert evaluate(text).ostack == stack
+
+
+@pytest.mark.parametrize(
+    "text, error",
+    [
+        # copy
+        ("copy", "stackunderflow"),
+        ("(a) (b) 3 copy", "stackunderflow"),
+        # dup
+        ("dup", "stackunderflow"),
+        # exch
+        ("exch", "stackunderflow"),
+        ("1 exch", "stackunderflow"),
+        # pop
+        ("pop", "stackunderflow"),
+        # roll
+        ("1 2 3 4 1 roll", "stackunderflow"),
+        ("roll", "stackunderflow"),
+        ("1 0 roll", "stackunderflow"),
+    ],
+)
+def test_evaluate_error(text, error):
+    with pytest.raises(Tilted, match=error):
+        evaluate(text)

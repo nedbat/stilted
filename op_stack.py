@@ -1,13 +1,16 @@
 """Built-in stack operators for stilted."""
 
+from error import Tilted
 from estate import builtin, builtin_with_name, ExecState
 
 
 @builtin
 def copy(estate: ExecState) -> None:
+    estate.ohas(1)
     if isinstance(estate.ostack[-1], int):
         n, = estate.opop(1)
         if n:
+            estate.ohas(n)
             estate.ostack.extend(estate.ostack[-n:])
 
 @builtin_with_name("def")
@@ -17,13 +20,13 @@ def def_(estate: ExecState) -> None:
 
 @builtin
 def dup(estate: ExecState) -> None:
+    estate.ohas(1)
     estate.ostack.append(estate.ostack[-1])
 
 @builtin
 def exch(estate: ExecState) -> None:
     a, b = estate.opop(2)
-    estate.ostack.append(b)
-    estate.ostack.append(a)
+    estate.ostack.extend([b, a])
 
 @builtin
 def index(estate: ExecState) -> None:
