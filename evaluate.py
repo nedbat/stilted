@@ -3,7 +3,9 @@
 from __future__ import annotations
 from typing import Any
 
-from lex import lexer, Name
+from error import Tilted
+from lex import lexer
+from pstypes import Name
 
 from estate import ExecState
 import op_math
@@ -25,7 +27,11 @@ def evaluate_one(obj: Any, estate: ExecState) -> None:
             estate.opush(obj)
 
         case Name(name, literal=False):
-            evaluate_one(estate.dstack[name], estate)
+            try:
+                obj = estate.dstack[name]
+            except KeyError:
+                raise Tilted("undefined")
+            evaluate_one(obj, estate)
 
         case _ if callable(obj):
             obj(estate)

@@ -4,15 +4,12 @@ import pytest
 
 from error import Tilted
 from evaluate import evaluate
-from lex import Name
 from pstypes import MARK
 
 
 @pytest.mark.parametrize(
     "text, stack",
     [
-        ("123 (hello) 1.25", [123, "hello", 1.25]),
-        ("123 /Hello 1.25", [123, Name("Hello", True), 1.25]),
         # clear
         ("1 2 3 clear", []),
         # cleartomark
