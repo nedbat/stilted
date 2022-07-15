@@ -4,6 +4,8 @@ import re
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
 
+from pstypes import Name
+
 
 @dataclass
 class Token:
@@ -79,19 +81,6 @@ def convert_string(text: str) -> str:
 
 def error(text: str):
     raise Exception(f"Lexical error: {text!r}")
-
-
-@dataclass
-class Name:
-    name: str
-    literal: bool = False
-
-    @classmethod
-    def from_string(cls, text):
-        if text.startswith("/"):
-            return cls(text[1:], literal=True)
-        else:
-            return cls(text, literal=False)
 
 
 # A look-ahead to only match tokens if they are properly delimited.
