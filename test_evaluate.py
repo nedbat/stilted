@@ -14,7 +14,8 @@ from lex import Name
         ("1 123 dup", [1, 123, 123]),
         ("1 123 456 exch", [1, 456, 123]),
         ("1 123 pop", [1]),
+        ("1 /hello (there) def 2 hello", [1, 2, "there"]),
     ],
 )
 def test_evaluate(text, stack):
-    assert evaluate(text) == stack
+    assert evaluate(text).ostack == stack

@@ -11,7 +11,7 @@ help:				## Display this help message
 check: mypy test		## Make sure everything is good
 
 mypy:				## Run mypy to check types
-	mypy *.py
+	mypy --check-untyped-defs *.py
 
 test:				## Run the tests
 	pytest -q

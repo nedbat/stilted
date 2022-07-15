@@ -34,6 +34,7 @@ class Lexer:
         self.converters = {}
         for i, t in enumerate(tokens):
             if t.keep:
+                assert isinstance(t, Token)
                 group_name = f"g{i}"
                 rxes.append(f"(?P<{group_name}>{t.rx})")
                 self.converters[group_name] = t.converter
