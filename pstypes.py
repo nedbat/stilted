@@ -13,3 +13,9 @@ class Name:
             return cls(text[1:], literal=True)
         else:
             return cls(text, literal=False)
+
+
+class Mark:
+    """A mark."""
+
+MARK = Mark()

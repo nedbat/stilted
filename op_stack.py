@@ -2,7 +2,17 @@
 
 from error import Tilted
 from estate import builtin, builtin_with_name, ExecState
+from pstypes import MARK
 
+
+@builtin
+def clear(estate: ExecState) -> None:
+    estate.ostack.clear()
+
+@builtin
+def cleartomark(estate: ExecState) -> None:
+    n = estate.counttomark()
+    del estate.ostack[-(n + 1):]
 
 @builtin
 def copy(estate: ExecState) -> None:
@@ -12,6 +22,14 @@ def copy(estate: ExecState) -> None:
         if n:
             estate.ohas(n)
             estate.ostack.extend(estate.ostack[-n:])
+
+@builtin
+def count(estate: ExecState) -> None:
+    estate.ostack.append(len(estate.ostack))
+
+@builtin
+def counttomark(estate: ExecState) -> None:
+    estate.ostack.append(estate.counttomark())
 
 @builtin_with_name("def")
 def def_(estate: ExecState) -> None:
@@ -32,6 +50,14 @@ def exch(estate: ExecState) -> None:
 def index(estate: ExecState) -> None:
     n, = estate.opop(1)
     estate.ostack.append(estate.ostack[-(n + 1)])
+
+@builtin
+def mark(estate: ExecState) -> None:
+    estate.ostack.append(MARK)
+
+@builtin_with_name("[")
+def mark_(estate: ExecState) -> None:
+    estate.ostack.append(MARK)
 
 @builtin
 def pop(estate: ExecState) -> None:

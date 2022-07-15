@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
+from pstypes import MARK
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {}
@@ -28,18 +29,23 @@ class ExecState:
             userdict=userdict,
         )
 
-    def opop(self, n):
+    def opop(self, n) -> list[Any]:
         """Remove the top n operands and return them."""
         self.ohas(n)
         vals = self.ostack[-n:]
         del self.ostack[-n:]
         return vals
 
-    def ohas(self, n):
+    def ohas(self, n) -> None:
         """Operand stack must have n entries, or stackunderflow."""
         if len(self.ostack) < n:
             raise Tilted("stackunderflow")
 
+    def counttomark(self) -> int:
+        for i, val in enumerate(reversed(self.ostack)):
+            if val is MARK:
+                return i
+        raise Tilted("unmatchedmark")
 
 def builtin(func):
     """Define a function as a builtin name."""
