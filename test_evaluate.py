@@ -11,6 +11,9 @@ from lex import Name
     [
         ("123 (hello) 1.25", [123, "hello", 1.25]),
         ("123 /Hello 1.25", [123, Name("Hello", True), 1.25]),
+        ("1 123 dup", [1, 123, 123]),
+        ("1 123 456 exch", [1, 456, 123]),
+        ("1 123 pop", [1]),
     ],
 )
 def test_evaluate(text, stack):
