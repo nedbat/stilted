@@ -1,12 +1,17 @@
 """Data types for stilted."""
 
 from types import UnionType
+from typing import Any
 from dataclasses import dataclass
 
-Number: UnionType = int|float
+# For type-checking numbers.
+Number: UnionType = int | float
+
 
 @dataclass
 class Name:
+    """A name, either /literal or not."""
+
     name: str
     literal: bool = False
 
@@ -21,4 +26,12 @@ class Name:
 class Mark:
     """A mark. There is only one."""
 
+
 MARK = Mark()
+
+
+@dataclass
+class Procedure:
+    """A procedure in curly braces."""
+
+    objs: list[Any]
