@@ -5,7 +5,7 @@ from typing import Any
 
 from error import Tilted
 from lex import lexer
-from pstypes import Name
+from dtypes import Name
 
 from estate import ExecState
 import op_math

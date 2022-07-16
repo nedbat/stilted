@@ -4,7 +4,7 @@ import pytest
 
 from error import Tilted
 from evaluate import evaluate
-from pstypes import MARK, Name
+from dtypes import MARK, Name
 
 
 @pytest.mark.parametrize(

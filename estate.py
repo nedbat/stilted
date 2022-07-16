@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from pstypes import MARK
+from dtypes import MARK
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {}
@@ -14,7 +14,7 @@ SYSTEMDICT: dict[str, Any] = {}
 
 @dataclass
 class ExecState:
-    """The PostScript execution state."""
+    """The stilted execution state."""
     dstack: ChainMap
     ostack: list[Any]
     userdict: dict[str, Any]

@@ -4,12 +4,12 @@ import math
 
 from error import Tilted
 from estate import builtin, builtin_with_name, ExecState
-from pstypes import number
+from dtypes import Number
 
 def numbers(*vals) -> None:
     """Check that all the arguments are numbers."""
     for val in vals:
-        if not isinstance(val, number):
+        if not isinstance(val, Number):
             raise Tilted("typecheck")
 
 @builtin_with_name("abs")

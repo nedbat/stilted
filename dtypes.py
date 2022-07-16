@@ -1,9 +1,9 @@
-"""PostScript-specific types."""
+"""Data types for stilted."""
 
 from types import UnionType
 from dataclasses import dataclass
 
-number: UnionType = int|float
+Number: UnionType = int|float
 
 @dataclass
 class Name:
@@ -19,6 +19,6 @@ class Name:
 
 
 class Mark:
-    """A mark."""
+    """A mark. There is only one."""
 
 MARK = Mark()

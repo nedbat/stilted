@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
 
 from error import Tilted
-from pstypes import Name
+from dtypes import Name
 
 
 @dataclass

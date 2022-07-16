@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import builtin, builtin_with_name, ExecState
-from pstypes import MARK
+from dtypes import MARK
 
 
 @builtin
