@@ -9,6 +9,12 @@ from evaluate import evaluate
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # and
+        ("true true and", [True]),
+        ("true false and", [False]),
+        ("false false and", [False]),
+        ("99 1 and", [1]),
+        ("52 7 and", [4]),
         # eq
         ("4.0 4 eq", [True]),
         ("4.0 5 eq", [False]),
@@ -53,6 +59,22 @@ from evaluate import evaluate
         ("(abc) (abz) ne", [True]),
         ("(abc) /abc ne", [False]),
         ("(abc) /abz ne", [True]),
+        # not
+        ("true not", [False]),
+        ("false not", [True]),
+        ("52 not", [-53]),
+        ("-53 not", [52]),
+        # or
+        ("true true or", [True]),
+        ("true false or", [True]),
+        ("false false or", [False]),
+        ("17 5 or", [21]),
+        # xor
+        ("true true xor", [False]),
+        ("true false xor", [True]),
+        ("false false xor", [False]),
+        ("7 3 xor", [4]),
+        ("12 3 xor", [15]),
     ],
 )
 def test_evaluate(text, stack):
@@ -60,7 +82,20 @@ def test_evaluate(text, stack):
     assert results == stack
 
 
-OP2 = ["eq", "ge", "gt", "le", "lt", "ne"]
+OP1 = ["not"]
+
+@pytest.mark.parametrize("opname", OP1)
+def test_one_arg_stackunderflow(opname):
+    with pytest.raises(Tilted, match="stackunderflow"):
+        evaluate(opname)
+
+@pytest.mark.parametrize("opname", OP1)
+def test_one_arg_errors(opname):
+    with pytest.raises(Tilted, match="typecheck"):
+        evaluate(f"(a) {opname}")
+
+
+OP2 = ["and", "eq", "ge", "gt", "le", "lt", "ne", "or", "xor"]
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow1(opname):

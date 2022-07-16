@@ -9,7 +9,10 @@ from error import Tilted
 from dtypes import MARK
 
 # The `systemdict` dict for all builtin names.
-SYSTEMDICT: dict[str, Any] = {}
+SYSTEMDICT: dict[str, Any] = {
+    "false": False,
+    "true": True,
+}
 
 
 @dataclass
