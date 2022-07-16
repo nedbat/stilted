@@ -15,6 +15,9 @@ class Name:
     name: str
     literal: bool = False
 
+    def __str__(self):
+        return self.name
+
     @classmethod
     def from_string(cls, text):
         if text.startswith("/"):

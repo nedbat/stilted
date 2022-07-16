@@ -9,6 +9,7 @@ from dtypes import Name, Procedure
 
 from estate import ExecState
 import op_math
+import op_relational
 import op_stack
 
 
