@@ -1,5 +1,6 @@
 """Lexical analysis for stilted."""
 
+import base64
 import re
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
@@ -80,7 +81,20 @@ def convert_string(text: str) -> str:
     return re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
 
 
+def convert_hex_string(text: str) -> str:
+    """
+    Convert a hex string to a string.
+    """
+    assert text[0] == "<"
+    assert text[-1] == ">"
+    text = re.sub(r"\s", "", text[1:-1])
+    if len(text) % 2 == 1:
+        text += "0"
+    return base64.b16decode(text, casefold=True).decode("latin1")
+
+
 def error(text: str):
+    """A "converter" to raise syntaxerror for bad matches."""
     raise Tilted("syntaxerror")
 
 
@@ -93,6 +107,7 @@ lexer = Lexer(
     Token(r"/?[\[\]{}]", Name.from_string),
     Token(r"/?[^()<>\[\]{}/%\s]+" + DELIMITED, Name.from_string),
     Token(r"\((?:\\\[0-7]{1,3}|\\.|\\\n|.|\n)*?\)", convert_string),
+    Token(r"<[0-9a-fA-F\s]+>", convert_hex_string),
     Skip(r"%.*$"),
     Skip(r"\s+"),
     Token(r".", error),

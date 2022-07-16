@@ -31,6 +31,8 @@ from lex import lexer, Name
             "abc Offset $$ 23A 13-456 a.b $MyDict @pattern",
             list(map(Name, "abc Offset $$ 23A 13-456 a.b $MyDict @pattern".split())),
         ),
+        ("<901fa3>", ["\x90\x1f\xa3"]),
+        ("<9 01fa>123", ["\x90\x1f\xa0", 123]),
     ],
 )
 def test_lexer(text, toks):
@@ -42,6 +44,9 @@ def test_lexer(text, toks):
     [
         ")",
         "123)",
+        "<hello there>",
+        "<",
+        ">",
     ],
 )
 def test_lexer_syntaxerror(text):
