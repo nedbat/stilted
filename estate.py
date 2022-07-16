@@ -15,6 +15,7 @@ SYSTEMDICT: dict[str, Any] = {}
 @dataclass
 class ExecState:
     """The stilted execution state."""
+
     dstack: ChainMap
     ostack: list[Any]
     userdict: dict[str, Any]
@@ -51,6 +52,7 @@ class ExecState:
                 return i
         raise Tilted("unmatchedmark")
 
+
 def builtin(func):
     """Define a function as a builtin name."""
     SYSTEMDICT[func.__name__] = func
@@ -59,6 +61,7 @@ def builtin(func):
 
 def builtin_with_name(name: str):
     """Define a builtin function, with a different name."""
+
     def _dec(func):
         SYSTEMDICT[name] = func
         return func

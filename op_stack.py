@@ -1,6 +1,5 @@
 """Built-in stack operators for stilted."""
 
-from error import Tilted
 from estate import builtin, builtin_with_name, ExecState
 from dtypes import MARK
 

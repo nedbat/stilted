@@ -1,7 +1,5 @@
 """Tests of stilted's lexical analyzer."""
 
-import re
-
 import pytest
 
 from error import Tilted

@@ -11,12 +11,14 @@ from estate import ExecState
 import op_math
 import op_stack
 
+
 def evaluate(text: str) -> ExecState:
     estate = ExecState.new()
     for tok in lexer.tokens(text):
         evaluate_one(tok, estate)
 
     return estate
+
 
 def evaluate_one(obj: Any, estate: ExecState) -> None:
     match obj:
