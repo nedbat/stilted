@@ -53,17 +53,25 @@ class ExecState:
         raise Tilted("unmatchedmark")
 
 
-def builtin(func):
-    """Define a function as a builtin name."""
-    SYSTEMDICT[func.__name__] = func
-    return func
+def operator(arg):
+    """
+    @operator
+    def showpage(...):
+        ...
 
+    or:
 
-def builtin_with_name(name: str):
-    """Define a builtin function, with a different name."""
+    @operator("[")
+    def mark(...):
+        ...
 
-    def _dec(func):
-        SYSTEMDICT[name] = func
-        return func
+    Returns None: the decorated function is only available through execution,
+    not under its Python name.
 
-    return _dec
+    """
+    if isinstance(arg, str):
+        def _dec(func):
+            SYSTEMDICT[arg] = func
+        return _dec
+    else:
+        SYSTEMDICT[arg.__name__] = arg

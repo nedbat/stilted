@@ -3,7 +3,7 @@
 import math
 
 from error import Tilted
-from estate import builtin, builtin_with_name, ExecState
+from estate import operator, ExecState
 from dtypes import Number
 
 def numbers(*vals) -> None:
@@ -12,62 +12,62 @@ def numbers(*vals) -> None:
         if not isinstance(val, Number):
             raise Tilted("typecheck")
 
-@builtin_with_name("abs")
+@operator("abs")
 def abs_(estate: ExecState) -> None:
     a, = estate.opop(1)
     numbers(a)
     estate.opush(abs(a))
 
-@builtin
+@operator
 def add(estate: ExecState) -> None:
     a, b = estate.opop(2)
     numbers(a, b)
     estate.opush(a + b)
 
-@builtin
+@operator
 def ceiling(estate: ExecState) -> None:
     a, = estate.opop(1)
     numbers(a)
     estate.opush(type(a)(math.ceil(a)))
 
-@builtin
+@operator
 def div(estate: ExecState) -> None:
     a, b = estate.opop(2)
     numbers(a, b)
     estate.opush(a / b)
 
-@builtin
+@operator
 def floor(estate: ExecState) -> None:
     a, = estate.opop(1)
     numbers(a)
     estate.opush(type(a)(math.floor(a)))
 
-@builtin
+@operator
 def idiv(estate: ExecState) -> None:
     a, b = estate.opop(2)
     numbers(a, b)
     estate.opush(int(a / b))
 
-@builtin
+@operator
 def mod(estate: ExecState) -> None:
     a, b = estate.opop(2)
     numbers(a, b)
     remainder = (-1 if a < 0 else 1) * (abs(a) % abs(b))
     estate.opush(remainder)
 
-@builtin
+@operator
 def mul(estate: ExecState) -> None:
     a, b = estate.opop(2)
     numbers(a, b)
     estate.opush(a * b)
 
-@builtin
+@operator
 def neg(estate: ExecState) -> None:
     a, = estate.opop(1)
     numbers(a)
     estate.opush(-a)
 
-@builtin_with_name("round")
+@operator("round")
 def round_(estate: ExecState) -> None:
     a, = estate.opop(1)
     numbers(a)
@@ -77,13 +77,13 @@ def round_(estate: ExecState) -> None:
         r = round(a)
     estate.opush(type(a)(r))
 
-@builtin
+@operator
 def sub(estate: ExecState) -> None:
     a, b = estate.opop(2)
     numbers(a, b)
     estate.opush(a - b)
 
-@builtin
+@operator
 def truncate(estate: ExecState) -> None:
     a, = estate.opop(1)
     numbers(a)
