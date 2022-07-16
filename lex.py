@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
 
+from error import Tilted
 from pstypes import Name
 
 
@@ -80,7 +81,7 @@ def convert_string(text: str) -> str:
 
 
 def error(text: str):
-    raise Exception(f"Lexical error: {text!r}")
+    raise Tilted("syntaxerror")
 
 
 # A look-ahead to only match tokens if they are properly delimited.

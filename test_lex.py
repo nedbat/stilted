@@ -4,6 +4,7 @@ import re
 
 import pytest
 
+from error import Tilted
 from lex import lexer, Name
 
 
@@ -37,12 +38,12 @@ def test_lexer(text, toks):
 
 
 @pytest.mark.parametrize(
-    "text, error",
+    "text",
     [
-        (")", ")"),
-        ("123)", ")"),
+        ")",
+        "123)",
     ],
 )
-def test_lexer_error(text, error):
-    with pytest.raises(Exception, match=re.escape(f"Lexical error: {error!r}")):
+def test_lexer_syntaxerror(text):
+    with pytest.raises(Tilted, match="syntaxerror"):
         list(lexer.tokens(text))
