@@ -25,6 +25,8 @@ def test_evaluate(text, stack):
         ("1 2 3 xyzzy", "undefined"),
         ("(", "syntaxerror"),
         (")", "syntaxerror"),
+        ("}", "syntaxerror"),
+        ("{{}", "syntaxerror"),
     ],
 )
 def test_evaluate_error(text, error):
