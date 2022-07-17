@@ -9,11 +9,15 @@ from evaluate import evaluate
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # exit
+        ("1 1 10 { dup 3 gt {exit} if } for", [1, 2, 3, 4]),
+        ("1 10 { dup 1 add dup 3 gt {exit} if } repeat", [1, 2, 3, 4]),
         # for
         ("0 1 1 4 {add} for", [10]),
         ("1 2 6 {} for", [1, 3, 5]),
         ("3 -.5 1 {} for", [3.0, 2.5, 2.0, 1.5, 1.0]),
         ("10 1 5 {(a)} for", []),
+        ("1 1 5 { dup 3 gt { dup } if } for", [1, 2, 3, 4, 4, 5, 5]),
         # if
         ("(a) 3 4 lt {(3 < 4)} if", ["a", "3 < 4"]),
         ("(a) 3 4 gt {(3 > 4)} if", ["a"]),
@@ -65,3 +69,12 @@ def test_evaluate(text, stack):
 def test_evaluate_error(text, error):
     with pytest.raises(Tilted, match=error):
         evaluate(text)
+
+
+def test_quit():
+    with pytest.raises(SystemExit):
+        evaluate("quit")
+
+def test_bare_exit():
+    with pytest.raises(SystemExit):
+        evaluate("1 3 lt {exit} if")

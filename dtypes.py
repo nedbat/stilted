@@ -26,6 +26,9 @@ class Name:
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return "<Name " + ("/" if self.literal else "") + self.name + ">"
+
     @classmethod
     def from_string(cls, text):
         if text.startswith("/"):
@@ -46,3 +49,6 @@ class Procedure:
     """A procedure in curly braces."""
 
     objs: list[Any]
+
+    def __repr__(self):
+        return "<Proc {" + " ".join(map(repr, self.objs)) + "}>"

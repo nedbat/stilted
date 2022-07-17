@@ -27,7 +27,7 @@ def evaluate(text: str) -> ExecState:
             except StopIteration:
                 estate.estack.pop()
                 continue
-        evaluate_one(obj, estate, direct=(len(estate.estack) == 1))
+        evaluate_one(obj, estate, direct=True)
 
     return estate
 

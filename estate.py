@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from dtypes import MARK, Procedure
+from dtypes import MARK, Name, Procedure
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {
@@ -54,6 +54,10 @@ class ExecState:
     def run_proc(self, proc: Procedure) -> None:
         """Start running a procedure."""
         self.estack.append(iter(proc.objs))
+
+    def run_name(self, name: str) -> None:
+        """Run a name."""
+        self.estack.append(iter([Name(name)]))
 
     def counttomark(self) -> int:
         """How deep is the nearest mark on the operand stack?"""

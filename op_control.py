@@ -1,9 +1,24 @@
 """Built-in control operators for stilted."""
 
+import sys
+
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import typecheck, Number, Procedure
+from dtypes import typecheck, Name, Number, Procedure
 
+
+@operator
+def exit(estate: ExecState) -> None:
+    # Find the function with .exitable on the stack.
+    while estate.estack and not hasattr(estate.estack[-1], "exitable"):
+        estate.estack.pop()
+    if estate.estack:
+        # Pop the function and its bundle of arguments.
+        estate.estack.pop()
+        estate.estack.pop()
+    else:
+        # No enclosing exitable operator, so "quit".
+        estate.run_name("quit")
 
 @operator("for")
 def for_(estate: ExecState) -> None:
@@ -20,6 +35,7 @@ def for_(estate: ExecState) -> None:
             estate.estack.extend([[control, increment, limit, proc], _do_for])
             estate.run_proc(proc)
 
+    _do_for.exitable = True     # type: ignore
     estate.estack.extend([[initial, increment, limit, proc], _do_for])
 
 @operator("if")
@@ -41,6 +57,10 @@ def ifelse(estate: ExecState) -> None:
         estate.run_proc(proc_else)
 
 @operator
+def quit(estate: ExecState) -> None:
+    sys.exit()
+
+@operator
 def repeat(estate: ExecState) -> None:
     n, proc = estate.opop(2)
     typecheck(Procedure, proc)
@@ -54,4 +74,5 @@ def repeat(estate: ExecState) -> None:
             estate.estack.extend([[n - 1, proc], _do_repeat])
             estate.run_proc(proc)
 
+    _do_repeat.exitable = True     # type: ignore
     estate.estack.extend([[n, proc], _do_repeat])
