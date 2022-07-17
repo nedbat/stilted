@@ -3,10 +3,10 @@
 from __future__ import annotations
 from collections import ChainMap
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterator
 
 from error import Tilted
-from dtypes import MARK
+from dtypes import MARK, Procedure
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {
@@ -21,6 +21,7 @@ class ExecState:
 
     dstack: ChainMap
     ostack: list[Any]
+    estack: list[Iterator[Any]]
     userdict: dict[str, Any]
 
     @classmethod
@@ -30,6 +31,7 @@ class ExecState:
         return cls(
             dstack=ChainMap(userdict, SYSTEMDICT),
             ostack=[],
+            estack=[],
             userdict=userdict,
         )
 
@@ -49,7 +51,12 @@ class ExecState:
         if len(self.ostack) < n:
             raise Tilted("stackunderflow")
 
+    def run_proc(self, proc: Procedure) -> None:
+        """Start running a procedure."""
+        self.estack.append(iter(proc.objs))
+
     def counttomark(self) -> int:
+        """How deep is the nearest mark on the operand stack?"""
         for i, val in enumerate(reversed(self.ostack)):
             if val is MARK:
                 return i

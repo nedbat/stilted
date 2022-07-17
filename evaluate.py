@@ -1,13 +1,14 @@
 """Stack evaluation for stilted."""
 
 from __future__ import annotations
-from typing import Any, Iterable
+from typing import Any, Iterable, Iterator
 
 from error import Tilted
 from lex import lexer
 from dtypes import Name, Procedure
 
 from estate import ExecState
+import op_control
 import op_math
 import op_relational
 import op_stack
@@ -15,14 +16,20 @@ import op_stack
 
 def evaluate(text: str) -> ExecState:
     estate = ExecState.new()
-    tokens = lexer.tokens(text)
-    for obj in collect_objects(tokens):
-        evaluate_one(obj, estate, direct=True)
+    estate.estack.append(collect_objects(lexer.tokens(text)))
+
+    while estate.estack:
+        try:
+            obj = next(estate.estack[-1])
+        except StopIteration:
+            estate.estack.pop()
+            continue
+        evaluate_one(obj, estate, direct=(len(estate.estack) == 1))
 
     return estate
 
 
-def collect_objects(tokens: Iterable[Any]) -> Iterable[Any]:
+def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
     pstack: list[Any] = []
     for obj in tokens:
         match obj:
@@ -50,7 +57,7 @@ def collect_objects(tokens: Iterable[Any]) -> Iterable[Any]:
 
 def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
     match obj:
-        case str() | int() | float():
+        case bool() | int() | float() | str():
             estate.opush(obj)
 
         case Name(name, literal=True):
