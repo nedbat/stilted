@@ -19,11 +19,14 @@ def evaluate(text: str) -> ExecState:
     estate.estack.append(collect_objects(lexer.tokens(text)))
 
     while estate.estack:
-        try:
-            obj = next(estate.estack[-1])
-        except StopIteration:
-            estate.estack.pop()
-            continue
+        if callable(estate.estack[-1]):
+            obj = estate.estack.pop()
+        else:
+            try:
+                obj = next(estate.estack[-1])
+            except StopIteration:
+                estate.estack.pop()
+                continue
         evaluate_one(obj, estate, direct=(len(estate.estack) == 1))
 
     return estate

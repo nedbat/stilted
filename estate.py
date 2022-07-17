@@ -3,7 +3,7 @@
 from __future__ import annotations
 from collections import ChainMap
 from dataclasses import dataclass
-from typing import Any, Iterator
+from typing import Any
 
 from error import Tilted
 from dtypes import MARK, Procedure
@@ -21,7 +21,7 @@ class ExecState:
 
     dstack: ChainMap
     ostack: list[Any]
-    estack: list[Iterator[Any]]
+    estack: list[Any]
     userdict: dict[str, Any]
 
     @classmethod
