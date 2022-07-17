@@ -4,8 +4,16 @@ from types import UnionType
 from typing import Any
 from dataclasses import dataclass
 
+from error import Tilted
+
 # For type-checking numbers.
 Number: UnionType = int | float
+
+def typecheck(a_type, *vals) -> None:
+    """Check that all the arguments are the right type."""
+    for val in vals:
+        if not isinstance(val, a_type):
+            raise Tilted("typecheck")
 
 
 @dataclass
