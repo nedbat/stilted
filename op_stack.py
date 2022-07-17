@@ -20,7 +20,7 @@ def copy(estate: ExecState) -> None:
         n, = estate.opop(1)
         if n:
             estate.ohas(n)
-            estate.ostack.extend(estate.ostack[-n:])
+            estate.opush(*estate.ostack[-n:])
 
 @operator
 def count(estate: ExecState) -> None:
@@ -43,7 +43,7 @@ def dup(estate: ExecState) -> None:
 @operator
 def exch(estate: ExecState) -> None:
     a, b = estate.opop(2)
-    estate.ostack.extend([b, a])
+    estate.opush(b, a)
 
 @operator
 def index(estate: ExecState) -> None:
@@ -66,5 +66,5 @@ def pop(estate: ExecState) -> None:
 def roll(estate: ExecState) -> None:
     n, j = estate.opop(2)
     vals = estate.opop(n)
-    vals = vals[-j:] + vals[:-j]
-    estate.ostack.extend(vals)
+    estate.opush(*vals[-j:])
+    estate.opush(*vals[:-j])
