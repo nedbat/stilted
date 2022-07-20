@@ -14,4 +14,4 @@ mypy:				## Run mypy to check types
 	mypy --check-untyped-defs *.py
 
 test:				## Run the tests
-	pytest -q
+	pytest -q -rfeX
