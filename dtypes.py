@@ -33,13 +33,21 @@ class Float(Obj):
         return cls(True, float(s))
 
 
+@dataclass
+class Bool(Obj):
+    """A boolean."""
+    value: bool
+
+
 # For type-checking numbers.
 Number: UnionType = Int | Float
 
 def from_py(val: Any) -> Any:
     """Convert any Python value into the appropriate Stilted object."""
     match val:
-        case bool() | str():
+        case bool():
+            return Bool(True, val)
+        case str():
             return val
         case int():
             return Int(True, val)

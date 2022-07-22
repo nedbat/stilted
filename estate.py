@@ -6,12 +6,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from dtypes import MARK, Name, Procedure
+from dtypes import Bool, MARK, Name, Procedure
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {
-    "false": False,
-    "true": True,
+    "false": Bool(literal=True, value=False),
+    "true": Bool(literal=True, value=True),
 }
 
 

@@ -5,7 +5,7 @@ from typing import Any, Callable
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, Float, Int, Name
+from dtypes import from_py, Bool, Float, Int, Name
 
 
 def eq_ne(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
@@ -37,12 +37,12 @@ def bool_op(
 ) -> None:
     a, b = estate.opop(2)
     match a, b:
-        case (bool(), bool()):
-            estate.opush(from_py(py_bool_op(a, b)))
+        case (Bool(), Bool()):
+            estate.opush(from_py(py_bool_op(a.value, b.value)))
         case (Int(), Int()):
             estate.opush(from_py(py_int_op(a.value, b.value)))
         case _:
-            raise Tilted("typecheck")
+            raise Tilted(f"typecheck")
 
 
 @operator("and")
@@ -77,8 +77,8 @@ def ne(estate: ExecState) -> None:
 def not_(estate: ExecState) -> None:
     a, = estate.opop(1)
     match a:
-        case bool():
-            estate.opush(from_py(not a))
+        case Bool():
+            estate.opush(from_py(not a.value))
         case Int():
             estate.opush(from_py(-(a.value + 1)))
         case _:
