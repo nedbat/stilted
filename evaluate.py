@@ -10,6 +10,7 @@ from dtypes import Name, Object, Procedure
 from estate import ExecState
 import op_control
 import op_math
+import op_object
 import op_relational
 import op_stack
 

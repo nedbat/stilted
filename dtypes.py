@@ -1,7 +1,7 @@
 """Data types for stilted."""
 
 from types import UnionType
-from typing import Any
+from typing import Any, ClassVar
 from dataclasses import dataclass
 
 from error import Tilted
@@ -14,6 +14,7 @@ class Object:
 @dataclass
 class Integer(Object):
     """An integer."""
+    typename: ClassVar[str] = "integer"
     value: int
 
     @classmethod
@@ -25,6 +26,7 @@ class Integer(Object):
 @dataclass
 class Real(Object):
     """A real (float)."""
+    typename: ClassVar[str] = "real"
     value: float
 
     @classmethod
@@ -36,12 +38,14 @@ class Real(Object):
 @dataclass
 class Boolean(Object):
     """A boolean."""
+    typename: ClassVar[str] = "boolean"
     value: bool
 
 
 @dataclass
 class String(Object):
     """A string."""
+    typename: ClassVar[str] = "string"
     value: str
 
 
@@ -74,6 +78,7 @@ def typecheck(a_type, *vals) -> None:
 class Name(Object):
     """A name, either /literal or not."""
 
+    typename: ClassVar[str] = "name"
     value: str
 
     def __str__(self):
@@ -92,6 +97,7 @@ class Name(Object):
 
 class Mark(Object):
     """A mark. There is only one."""
+    typename: ClassVar[str] = "mark"
 
 
 MARK = Mark(False)

@@ -4,7 +4,7 @@ import pytest
 
 from error import Tilted
 from evaluate import evaluate
-from dtypes import MARK
+from dtypes import Name
 from test_helpers import compare_stacks
 
 
@@ -15,6 +15,13 @@ from test_helpers import compare_stacks
         ("{hello} cvlit xcheck", [False]),
         # cvx
         ("/Hello cvx xcheck", [True]),
+        # type
+        ("true type", [Name(False, "boolean")]),
+        ("123 type", [Name(False, "integer")]),
+        ("mark type", [Name(False, "mark")]),
+        ("/Name type", [Name(False, "name")]),
+        ("12.3 type", [Name(False, "real")]),
+        ("(hello) type", [Name(False, "string")]),
         # xcheck
         ("/Hello xcheck", [False]),
         ("{hello} xcheck", [True]),
@@ -32,6 +39,8 @@ def test_evaluate(text, stack):
         ("cvlit", "stackunderflow"),
         # cvx
         ("cvx", "stackunderflow"),
+        # type
+        ("type", "stackunderflow"),
         # xcheck
         ("xcheck", "stackunderflow"),
     ],
