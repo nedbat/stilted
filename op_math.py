@@ -3,82 +3,87 @@
 import math
 
 from estate import operator, ExecState
-from dtypes import Number, typecheck
+from dtypes import from_py, Number, typecheck
 
 
 @operator("abs")
 def abs_(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop(1)[0]
     typecheck(Number, a)
-    estate.opush(abs(a))
+    estate.opush(from_py(abs(a.value)))
 
 @operator
 def add(estate: ExecState) -> None:
     a, b = estate.opop(2)
     typecheck(Number, a, b)
-    estate.opush(a + b)
+    estate.opush(from_py(a.value + b.value))
 
 @operator
 def ceiling(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop(1)[0]
     typecheck(Number, a)
-    estate.opush(type(a)(math.ceil(a)))
+    av = a.value
+    estate.opush(from_py(type(av)(math.ceil(av))))
 
 @operator
 def div(estate: ExecState) -> None:
     a, b = estate.opop(2)
     typecheck(Number, a, b)
-    estate.opush(a / b)
+    estate.opush(from_py(a.value / b.value))
 
 @operator
 def floor(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop(1)[0]
     typecheck(Number, a)
-    estate.opush(type(a)(math.floor(a)))
+    av = a.value
+    estate.opush(from_py(type(av)(math.floor(av))))
 
 @operator
 def idiv(estate: ExecState) -> None:
     a, b = estate.opop(2)
     typecheck(Number, a, b)
-    estate.opush(int(a / b))
+    estate.opush(from_py(int(a.value / b.value)))
 
 @operator
 def mod(estate: ExecState) -> None:
     a, b = estate.opop(2)
     typecheck(Number, a, b)
-    remainder = (-1 if a < 0 else 1) * (abs(a) % abs(b))
-    estate.opush(remainder)
+    av, bv = a.value, b.value
+    remainder = (-1 if av < 0 else 1) * (abs(av) % abs(bv))
+    estate.opush(from_py(remainder))
 
 @operator
 def mul(estate: ExecState) -> None:
     a, b = estate.opop(2)
     typecheck(Number, a, b)
-    estate.opush(a * b)
+    estate.opush(from_py(a.value * b.value))
 
 @operator
 def neg(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop(1)[0]
     typecheck(Number, a)
-    estate.opush(-a)
+    estate.opush(from_py(-a.value))
 
 @operator("round")
 def round_(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop(1)[0]
     typecheck(Number, a)
-    if a - int(a) == 0.5:
-        r = int(a) + 1
+    av = a.value
+    if av - int(av) == 0.5:
+        r = int(av) + 1
     else:
-        r = round(a)
-    estate.opush(type(a)(r))
+        r = round(av)
+    estate.opush(from_py(type(av)(r)))
 
 @operator
 def sub(estate: ExecState) -> None:
     a, b = estate.opop(2)
     typecheck(Number, a, b)
-    estate.opush(a - b)
+    estate.opush(from_py(a.value - b.value))
 
 @operator
 def truncate(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop(1)[0]
     typecheck(Number, a)
-    estate.opush(type(a)(math.trunc(a)))
+    av = a.value
+    estate.opush(from_py(type(av)(math.trunc(av))))

@@ -5,6 +5,7 @@ import pytest
 from error import Tilted
 from evaluate import evaluate
 
+from test_helpers import compare_stacks
 
 @pytest.mark.parametrize(
     "text, stack",
@@ -78,8 +79,7 @@ from evaluate import evaluate
     ],
 )
 def test_evaluate(text, stack):
-    results = evaluate(text).ostack
-    assert results == stack
+    compare_stacks(evaluate(text).ostack, stack)
 
 
 OP1 = ["not"]

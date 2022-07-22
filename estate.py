@@ -35,7 +35,7 @@ class ExecState:
             userdict=userdict,
         )
 
-    def opop(self, n) -> list[Any]:
+    def opop(self, n: int) -> list[Any]:
         """Remove the top n operands and return them."""
         self.ohas(n)
         vals = self.ostack[-n:]
@@ -46,7 +46,7 @@ class ExecState:
         """Push values on the operand stack."""
         self.ostack.extend(vals)
 
-    def ohas(self, n) -> None:
+    def ohas(self, n: int) -> None:
         """Operand stack must have n entries, or stackunderflow."""
         if len(self.ostack) < n:
             raise Tilted("stackunderflow")
@@ -57,7 +57,7 @@ class ExecState:
 
     def run_name(self, name: str) -> None:
         """Run a name."""
-        self.estack.append(iter([Name(name)]))
+        self.estack.append(iter([Name(False, name)]))
 
     def counttomark(self) -> int:
         """How deep is the nearest mark on the operand stack?"""

@@ -5,7 +5,7 @@ from typing import Any, Iterable, Iterator
 
 from error import Tilted
 from lex import lexer
-from dtypes import Name, Procedure
+from dtypes import Float, Int, Name, Procedure
 
 from estate import ExecState
 import op_control
@@ -36,13 +36,13 @@ def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
     pstack: list[Any] = []
     for obj in tokens:
         match obj:
-            case Name("{", literal=False):
+            case Name(False, "{"):
                 pstack.append([])
 
-            case Name("}", literal=False):
+            case Name(False, "}"):
                 if not pstack:
                     raise Tilted("syntaxerror")
-                proc = Procedure(pstack.pop())
+                proc = Procedure(False, pstack.pop())
                 if pstack:
                     pstack[-1].append(proc)
                 else:
@@ -60,13 +60,13 @@ def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
 
 def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
     match obj:
-        case bool() | int() | float() | str():
+        case bool() | Int() | Float() | str():
             estate.opush(obj)
 
-        case Name(name, literal=True):
+        case Name(True, name):
             estate.opush(obj)
 
-        case Name(name, literal=False):
+        case Name(False, name):
             try:
                 obj = estate.dstack[name]
             except KeyError:

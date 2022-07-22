@@ -1,7 +1,7 @@
 """Built-in stack operators for stilted."""
 
 from estate import operator, ExecState
-from dtypes import MARK
+from dtypes import from_py, Int, MARK
 
 
 @operator
@@ -16,19 +16,19 @@ def cleartomark(estate: ExecState) -> None:
 @operator
 def copy(estate: ExecState) -> None:
     estate.ohas(1)
-    if isinstance(estate.ostack[-1], int):
-        n, = estate.opop(1)
+    if isinstance(estate.ostack[-1], Int):
+        n = estate.opop(1)[0].value
         if n:
             estate.ohas(n)
             estate.opush(*estate.ostack[-n:])
 
 @operator
 def count(estate: ExecState) -> None:
-    estate.opush(len(estate.ostack))
+    estate.opush(from_py(len(estate.ostack)))
 
 @operator
 def counttomark(estate: ExecState) -> None:
-    estate.opush(estate.counttomark())
+    estate.opush(from_py(estate.counttomark()))
 
 @operator("def")
 def def_(estate: ExecState) -> None:
@@ -47,7 +47,7 @@ def exch(estate: ExecState) -> None:
 
 @operator
 def index(estate: ExecState) -> None:
-    n, = estate.opop(1)
+    n = estate.opop(1)[0].value
     estate.opush(estate.ostack[-(n + 1)])
 
 @operator
@@ -65,6 +65,6 @@ def pop(estate: ExecState) -> None:
 @operator
 def roll(estate: ExecState) -> None:
     n, j = estate.opop(2)
-    vals = estate.opop(n)
-    estate.opush(*vals[-j:])
-    estate.opush(*vals[:-j])
+    vals = estate.opop(n.value)
+    estate.opush(*vals[-j.value:])
+    estate.opush(*vals[:-j.value])

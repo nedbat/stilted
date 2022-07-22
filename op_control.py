@@ -4,7 +4,7 @@ import sys
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import typecheck, Name, Number, Procedure
+from dtypes import from_py, typecheck, Int, Number, Procedure
 
 
 @operator
@@ -30,13 +30,14 @@ def for_(estate: ExecState) -> None:
         control, increment, limit, proc = estate.estack.pop()
         terminate = (control > limit) if (increment > 0) else (control < limit)
         if not terminate:
-            estate.opush(control)
+            estate.opush(from_py(control))
             control += increment
             estate.estack.extend([[control, increment, limit, proc], _do_for])
             estate.run_proc(proc)
 
     _do_for.exitable = True     # type: ignore
-    estate.estack.extend([[initial, increment, limit, proc], _do_for])
+    init_val = initial.value + type(increment.value)(0)
+    estate.estack.extend([[init_val, increment.value, limit.value, proc], _do_for])
 
 @operator("if")
 def if_(estate: ExecState) -> None:
@@ -64,15 +65,16 @@ def quit(estate: ExecState) -> None:
 def repeat(estate: ExecState) -> None:
     n, proc = estate.opop(2)
     typecheck(Procedure, proc)
-    typecheck(int, n)
-    if n < 0:
+    typecheck(Int, n)
+    nv = n.value
+    if nv < 0:
         raise Tilted("rangecheck")
 
     def _do_repeat(estate: ExecState) -> None:
-        n, proc = estate.estack.pop()
-        if n > 0:
-            estate.estack.extend([[n - 1, proc], _do_repeat])
+        nv, proc = estate.estack.pop()
+        if nv > 0:
+            estate.estack.extend([[nv - 1, proc], _do_repeat])
             estate.run_proc(proc)
 
     _do_repeat.exitable = True     # type: ignore
-    estate.estack.extend([[n, proc], _do_repeat])
+    estate.estack.extend([[nv, proc], _do_repeat])

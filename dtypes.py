@@ -6,8 +6,48 @@ from dataclasses import dataclass
 
 from error import Tilted
 
+@dataclass
+class Obj:
+    """Base class for all Stilted data objects."""
+    literal: bool
+
+@dataclass
+class Int(Obj):
+    """An integer."""
+    value: int
+
+    @classmethod
+    def from_string(cls, s: str):
+        """Convert a string into an Int."""
+        return cls(True, int(s))
+
+
+@dataclass
+class Float(Obj):
+    """A float."""
+    value: float
+
+    @classmethod
+    def from_string(cls, s):
+        """Convert a string into a Float."""
+        return cls(True, float(s))
+
+
 # For type-checking numbers.
-Number: UnionType = int | float
+Number: UnionType = Int | Float
+
+def from_py(val: Any) -> Any:
+    """Convert any Python value into the appropriate Stilted object."""
+    match val:
+        case bool() | str():
+            return val
+        case int():
+            return Int(True, val)
+        case float():
+            return Float(True, val)
+        case _:
+            raise Exception(f"Buh? from_py({val=})")
+
 
 def typecheck(a_type, *vals) -> None:
     """Check that all the arguments are the right type."""
@@ -17,11 +57,10 @@ def typecheck(a_type, *vals) -> None:
 
 
 @dataclass
-class Name:
+class Name(Obj):
     """A name, either /literal or not."""
 
     name: str
-    literal: bool = False
 
     def __str__(self):
         return self.name
@@ -32,20 +71,20 @@ class Name:
     @classmethod
     def from_string(cls, text):
         if text.startswith("/"):
-            return cls(text[1:], literal=True)
+            return cls(True, text[1:])
         else:
-            return cls(text, literal=False)
+            return cls(False, text)
 
 
-class Mark:
+class Mark(Obj):
     """A mark. There is only one."""
 
 
-MARK = Mark()
+MARK = Mark(False)
 
 
 @dataclass
-class Procedure:
+class Procedure(Obj):
     """A procedure in curly braces."""
 
     objs: list[Any]

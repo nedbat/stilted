@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
 
 from error import Tilted
-from dtypes import Name
+from dtypes import Int, Float, Name
 
 
 @dataclass
@@ -102,8 +102,8 @@ def error(text: str):
 DELIMITED = r"(?=[()<>\[\]{}/%\s]|\Z)"
 
 lexer = Lexer(
-    Token(r"[-+]?\d*(\d\.|\.\d)\d*" + DELIMITED, float),
-    Token(r"[-+]?\d+" + DELIMITED, int),
+    Token(r"[-+]?\d*(\d\.|\.\d)\d*" + DELIMITED, Float.from_string),
+    Token(r"[-+]?\d+" + DELIMITED, Int.from_string),
     Token(r"/?[\[\]{}]", Name.from_string),
     Token(r"/?[^()<>\[\]{}/%\s]+" + DELIMITED, Name.from_string),
     Token(r"\((?:\\\[0-7]{1,3}|\\.|\\\n|.|\n)*?\)", convert_string),

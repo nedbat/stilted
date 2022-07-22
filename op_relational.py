@@ -5,16 +5,16 @@ from typing import Any, Callable
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import Name
+from dtypes import from_py, Float, Int, Name
 
 
 def eq_ne(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
     a, b = estate.opop(2)
     match a, b:
-        case (int() | float(), int() | float()):
-            estate.opush(pyop(a, b))
+        case (Int() | Float(), Int() | Float()):
+            estate.opush(from_py(pyop(a.value, b.value)))
         case (str() | Name(), str() | Name()):
-            estate.opush(pyop(str(a), str(b)))
+            estate.opush(from_py(pyop(str(a), str(b))))
         case _:
             raise Tilted("typecheck")
 
@@ -22,10 +22,10 @@ def eq_ne(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
 def ge_etc(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
     a, b = estate.opop(2)
     match a, b:
-        case (int() | float(), int() | float()):
-            estate.opush(pyop(a, b))
+        case (Int() | Float(), Int() | Float()):
+            estate.opush(from_py(pyop(a.value, b.value)))
         case (str(), str()):
-            estate.opush(pyop(str(a), str(b)))
+            estate.opush(from_py(pyop(str(a), str(b))))
         case _:
             raise Tilted("typecheck")
 
@@ -38,9 +38,9 @@ def bool_op(
     a, b = estate.opop(2)
     match a, b:
         case (bool(), bool()):
-            estate.opush(py_bool_op(a, b))
-        case (int(), int()):
-            estate.opush(py_int_op(a, b))
+            estate.opush(from_py(py_bool_op(a, b)))
+        case (Int(), Int()):
+            estate.opush(from_py(py_int_op(a.value, b.value)))
         case _:
             raise Tilted("typecheck")
 
@@ -78,9 +78,9 @@ def not_(estate: ExecState) -> None:
     a, = estate.opop(1)
     match a:
         case bool():
-            estate.opush(not a)
-        case int():
-            estate.opush(-(a + 1))
+            estate.opush(from_py(not a))
+        case Int():
+            estate.opush(from_py(-(a.value + 1)))
         case _:
             raise Tilted("typecheck")
 

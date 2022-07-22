@@ -5,6 +5,7 @@ import pytest
 from error import Tilted
 from evaluate import evaluate
 from dtypes import MARK
+from test_helpers import compare_stacks
 
 
 @pytest.mark.parametrize(
@@ -44,7 +45,7 @@ from dtypes import MARK
     ],
 )
 def test_evaluate(text, stack):
-    assert evaluate(text).ostack == stack
+    compare_stacks(evaluate(text).ostack, stack)
 
 
 @pytest.mark.parametrize(
