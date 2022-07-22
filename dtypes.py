@@ -7,58 +7,58 @@ from dataclasses import dataclass
 from error import Tilted
 
 @dataclass
-class Obj:
+class Object:
     """Base class for all Stilted data objects."""
     literal: bool
 
 @dataclass
-class Int(Obj):
+class Integer(Object):
     """An integer."""
     value: int
 
     @classmethod
     def from_string(cls, s: str):
-        """Convert a string into an Int."""
+        """Convert a string into an Integer."""
         return cls(True, int(s))
 
 
 @dataclass
-class Float(Obj):
-    """A float."""
+class Real(Object):
+    """A real (float)."""
     value: float
 
     @classmethod
     def from_string(cls, s):
-        """Convert a string into a Float."""
+        """Convert a string into a Real."""
         return cls(True, float(s))
 
 
 @dataclass
-class Bool(Obj):
+class Boolean(Object):
     """A boolean."""
     value: bool
 
 
 @dataclass
-class String(Obj):
+class String(Object):
     """A string."""
     value: str
 
 
 # For type-checking numbers.
-Number: UnionType = Int | Float
+Number: UnionType = Integer | Real
 
-def from_py(val: Any) -> Obj:
+def from_py(val: Any) -> Object:
     """Convert any Python value into the appropriate Stilted object."""
     match val:
         case bool():
-            return Bool(True, val)
+            return Boolean(True, val)
         case str():
             return String(True, val)
         case int():
-            return Int(True, val)
+            return Integer(True, val)
         case float():
-            return Float(True, val)
+            return Real(True, val)
         case _:
             raise Exception(f"Buh? from_py({val=})")
 
@@ -71,7 +71,7 @@ def typecheck(a_type, *vals) -> None:
 
 
 @dataclass
-class Name(Obj):
+class Name(Object):
     """A name, either /literal or not."""
 
     value: str
@@ -90,7 +90,7 @@ class Name(Obj):
             return cls(False, text)
 
 
-class Mark(Obj):
+class Mark(Object):
     """A mark. There is only one."""
 
 
@@ -98,7 +98,7 @@ MARK = Mark(False)
 
 
 @dataclass
-class Procedure(Obj):
+class Procedure(Object):
     """A procedure in curly braces."""
 
     objs: list[Any]

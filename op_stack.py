@@ -1,7 +1,7 @@
 """Built-in stack operators for stilted."""
 
 from estate import operator, ExecState
-from dtypes import from_py, Int, MARK
+from dtypes import from_py, Integer, MARK
 
 
 @operator
@@ -16,7 +16,7 @@ def cleartomark(estate: ExecState) -> None:
 @operator
 def copy(estate: ExecState) -> None:
     estate.ohas(1)
-    if isinstance(estate.ostack[-1], Int):
+    if isinstance(estate.ostack[-1], Integer):
         n = estate.opop(1)[0].value
         if n:
             estate.ohas(n)

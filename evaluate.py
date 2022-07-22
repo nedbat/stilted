@@ -5,7 +5,7 @@ from typing import Any, Iterable, Iterator
 
 from error import Tilted
 from lex import lexer
-from dtypes import Name, Obj, Procedure
+from dtypes import Name, Object, Procedure
 
 from estate import ExecState
 import op_control
@@ -74,7 +74,7 @@ def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
                 for subobj in obj.objs:
                     evaluate_one(subobj, estate)
 
-        case Obj(literal=True):
+        case Object(literal=True):
             estate.opush(obj)
 
         case _ if callable(obj):

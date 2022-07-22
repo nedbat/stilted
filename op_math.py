@@ -3,7 +3,7 @@
 import math
 
 from estate import operator, ExecState
-from dtypes import from_py, Number, typecheck
+from dtypes import from_py, typecheck, Number
 
 
 @operator("abs")

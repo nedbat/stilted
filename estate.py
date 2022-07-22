@@ -6,12 +6,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from dtypes import Bool, MARK, Name, Procedure
+from dtypes import Boolean, MARK, Name, Object, Procedure
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Any] = {
-    "false": Bool(literal=True, value=False),
-    "true": Bool(literal=True, value=True),
+    "false": Boolean(literal=True, value=False),
+    "true": Boolean(literal=True, value=True),
 }
 
 
@@ -20,7 +20,7 @@ class ExecState:
     """The stilted execution state."""
 
     dstack: ChainMap
-    ostack: list[Any]
+    ostack: list[Object]
     estack: list[Any]
     userdict: dict[str, Any]
 

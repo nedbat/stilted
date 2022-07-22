@@ -4,7 +4,7 @@ import sys
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Bool, Int, Number, Procedure
+from dtypes import from_py, typecheck, Boolean, Integer, Number, Procedure
 
 
 @operator
@@ -42,7 +42,7 @@ def for_(estate: ExecState) -> None:
 @operator("if")
 def if_(estate: ExecState) -> None:
     b, proc_if = estate.opop(2)
-    typecheck(Bool, b)
+    typecheck(Boolean, b)
     typecheck(Procedure, proc_if)
     if b.value:
         estate.run_proc(proc_if)
@@ -50,7 +50,7 @@ def if_(estate: ExecState) -> None:
 @operator
 def ifelse(estate: ExecState) -> None:
     b, proc_if, proc_else = estate.opop(3)
-    typecheck(Bool, b)
+    typecheck(Boolean, b)
     typecheck(Procedure, proc_if, proc_else)
     if b.value:
         estate.run_proc(proc_if)
@@ -65,7 +65,7 @@ def quit(estate: ExecState) -> None:
 def repeat(estate: ExecState) -> None:
     n, proc = estate.opop(2)
     typecheck(Procedure, proc)
-    typecheck(Int, n)
+    typecheck(Integer, n)
     nv = n.value
     if nv < 0:
         raise Tilted("rangecheck")
