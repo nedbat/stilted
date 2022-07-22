@@ -33,7 +33,7 @@ def counttomark(estate: ExecState) -> None:
 @operator("def")
 def def_(estate: ExecState) -> None:
     name, val = estate.opop(2)
-    estate.dstack[name.name] = val
+    estate.dstack[name.value] = val
 
 @operator
 def dup(estate: ExecState) -> None:

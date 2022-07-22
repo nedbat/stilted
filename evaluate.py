@@ -5,7 +5,7 @@ from typing import Any, Iterable, Iterator
 
 from error import Tilted
 from lex import lexer
-from dtypes import Bool, Float, Int, Name, Procedure
+from dtypes import Name, Obj, Procedure
 
 from estate import ExecState
 import op_control
@@ -60,12 +60,6 @@ def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
 
 def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
     match obj:
-        case Bool() | Int() | Float() | str():
-            estate.opush(obj)
-
-        case Name(True, name):
-            estate.opush(obj)
-
         case Name(False, name):
             try:
                 obj = estate.dstack[name]
@@ -79,6 +73,9 @@ def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
             else:
                 for subobj in obj.objs:
                     evaluate_one(subobj, estate)
+
+        case Obj(literal=True):
+            estate.opush(obj)
 
         case _ if callable(obj):
             obj(estate)

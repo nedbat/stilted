@@ -39,16 +39,22 @@ class Bool(Obj):
     value: bool
 
 
+@dataclass
+class String(Obj):
+    """A string."""
+    value: str
+
+
 # For type-checking numbers.
 Number: UnionType = Int | Float
 
-def from_py(val: Any) -> Any:
+def from_py(val: Any) -> Obj:
     """Convert any Python value into the appropriate Stilted object."""
     match val:
         case bool():
             return Bool(True, val)
         case str():
-            return val
+            return String(True, val)
         case int():
             return Int(True, val)
         case float():
@@ -68,13 +74,13 @@ def typecheck(a_type, *vals) -> None:
 class Name(Obj):
     """A name, either /literal or not."""
 
-    name: str
+    value: str
 
     def __str__(self):
-        return self.name
+        return self.value
 
     def __repr__(self):
-        return "<Name " + ("/" if self.literal else "") + self.name + ">"
+        return "<Name " + ("/" if self.literal else "") + self.value + ">"
 
     @classmethod
     def from_string(cls, text):

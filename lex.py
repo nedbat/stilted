@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Tuple
 
 from error import Tilted
-from dtypes import Int, Float, Name
+from dtypes import Float, Int, Name, String
 
 
 @dataclass
@@ -56,7 +56,7 @@ class Lexer:
                 yield converter(match[0])
 
 
-def convert_string(text: str) -> str:
+def convert_string(text: str) -> String:
     """
     A converter for raw string text to the string value we want.
     """
@@ -78,10 +78,13 @@ def convert_string(text: str) -> str:
                 case _:
                     return esc_text[1]
 
-    return re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
+    return String(
+        literal=True,
+        value=re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1]),
+    )
 
 
-def convert_hex_string(text: str) -> str:
+def convert_hex_string(text: str) -> String:
     """
     Convert a hex string to a string.
     """
@@ -90,7 +93,10 @@ def convert_hex_string(text: str) -> str:
     text = re.sub(r"\s", "", text[1:-1])
     if len(text) % 2 == 1:
         text += "0"
-    return base64.b16decode(text, casefold=True).decode("latin1")
+    return String(
+        literal=True,
+        value=base64.b16decode(text, casefold=True).decode("latin1"),
+    )
 
 
 def error(text: str):
