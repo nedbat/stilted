@@ -4,7 +4,7 @@ import sys
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Boolean, Integer, Number, Procedure
+from dtypes import from_py, typecheck, Boolean, Dict, Integer, Name, Number, Procedure
 
 
 @operator
@@ -39,6 +39,29 @@ def for_(estate: ExecState) -> None:
     init_val = initial.value + type(increment.value)(0)
     estate.estack.extend([[init_val, increment.value, limit.value, proc], _do_for])
 
+@operator
+def forall(estate: ExecState) -> None:
+    o, proc = estate.opop(2)
+    typecheck(Procedure, proc)
+    match o:
+        case Dict():
+            def _do_forall_dict(estate: ExecState) -> None:
+                diter, proc = estate.estack.pop()
+                try:
+                    k, v = next(diter)
+                except StopIteration:
+                    return
+                estate.opush(Name(True, k), v)
+                estate.estack.extend([[diter, proc], _do_forall_dict])
+                estate.run_proc(proc)
+
+            _do_forall_dict.exitable = True  # type: ignore
+            estate.estack.extend([[iter(o.value.items()), proc], _do_forall_dict])
+
+        case _:
+            raise Tilted("typecheck")
+
+
 @operator("if")
 def if_(estate: ExecState) -> None:
     b, proc_if = estate.opop(2)
@@ -64,8 +87,8 @@ def quit(estate: ExecState) -> None:
 @operator
 def repeat(estate: ExecState) -> None:
     n, proc = estate.opop(2)
-    typecheck(Procedure, proc)
     typecheck(Integer, n)
+    typecheck(Procedure, proc)
     nv = n.value
     if nv < 0:
         raise Tilted("rangecheck")
