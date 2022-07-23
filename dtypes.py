@@ -1,7 +1,7 @@
 """Data types for stilted."""
 
 from types import UnionType
-from typing import Any, Callable, ClassVar, MutableMapping
+from typing import Any, Callable, ClassVar
 from dataclasses import dataclass
 
 from error import Tilted
@@ -160,7 +160,16 @@ MARK = Mark(literal=False)
 class Dict(Object):
     """A dictionary."""
     typename: ClassVar[str] = "dict"
-    value: MutableMapping[str, Object]
+    value: dict[str, Object]
+
+    def __getitem__(self, name: str) -> Object:
+        return self.value[name]
+
+    def __setitem__(self, name: str, value: Object) -> None:
+        self.value[name] = value
+
+    def __contains__(self, name: str) -> bool:
+        return name in self.value
 
 
 @dataclass

@@ -8,11 +8,11 @@ from dtypes import from_py, typecheck, Dict, Integer, Name, Stringy
 def begin(estate: ExecState) -> None:
     d = estate.opop(1)[0]
     typecheck(Dict, d)
-    estate.dstack.maps.insert(0, d.value)
+    estate.dstack.append(d)
 
 @operator
 def countdictstack(estate: ExecState) -> None:
-    estate.opush(from_py(len(estate.dstack.maps)))
+    estate.opush(from_py(len(estate.dstack)))
 
 @operator("dict")
 def dict_(estate: ExecState) -> None:
@@ -24,27 +24,26 @@ def dict_(estate: ExecState) -> None:
 
 @operator
 def currentdict(estate: ExecState) -> None:
-    estate.opush(from_py(estate.dstack.maps[0]))
+    estate.opush(estate.dstack[-1])
 
 @operator("def")
 def def_(estate: ExecState) -> None:
     name, val = estate.opop(2)
     typecheck(Name, name)
-    estate.dstack[name.value] = val
+    estate.dstack[-1][name.value] = val
 
 @operator
 def end(estate: ExecState) -> None:
-    if len(estate.dstack.maps) <= 2:
+    if len(estate.dstack) <= 2:
         raise Tilted("dictstackunderflow")
-    del estate.dstack.maps[0]
+    estate.dstack.pop()
 
 @operator
 def load(estate: ExecState) -> None:
     k = estate.opop(1)[0]
     typecheck(Stringy, k)
-    try:
-        obj = estate.dstack[k.value]
-    except KeyError:
+    obj = estate.dstack_value(k)
+    if obj is None:
         raise Tilted(f"undefined: {k.value}")
     estate.opush(obj)
 
@@ -59,24 +58,21 @@ def known(estate: ExecState) -> None:
 def store(estate: ExecState) -> None:
     k, o = estate.opop(2)
     typecheck(Stringy, k)
-    for d in reversed(estate.dstack.maps):
-        if k.value in d:
-            break
-    else:
-        d = estate.dstack.maps[0]
+    d = estate.dstack_dict(k)
+    if d is None:
+        d = estate.dstack[-1]
     d[k.value] = o
 
 @operator
 def userdict(estate: ExecState) -> None:
-    estate.opush(Dict(False, estate.userdict))
+    estate.opush(estate.userdict)
 
 @operator
 def where(estate: ExecState) -> None:
     k = estate.opop(1)[0]
     typecheck(Stringy, k)
-    for d in reversed(estate.dstack.maps):
-        if k.value in d:
-            estate.opush(Dict(True, d), from_py(True))
-            break
+    d = estate.dstack_dict(k)
+    if d is not None:
+        estate.opush(d, from_py(True))
     else:
         estate.opush(from_py(False))

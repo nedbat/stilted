@@ -4,36 +4,35 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
-from typing import Any, ChainMap
+from typing import Any
 
 from error import Tilted
-from dtypes import Boolean, Dict, MARK, Name, Object, Operator, Procedure
+from dtypes import from_py, Dict, MARK, Name, Object, Operator, Procedure, String
 
 # The `systemdict` dict for all builtin names.
-SYSTEMDICT: dict[str, Object] = {
-    "false": Boolean(literal=True, value=False),
-    "true": Boolean(literal=True, value=True),
-}
+SYSTEMDICT = Dict(literal=True, value={})
 
-SYSTEMDICT["systemdict"] = Dict(literal=True, value=SYSTEMDICT)
+SYSTEMDICT["false"] = from_py(False)
+SYSTEMDICT["true"] = from_py(True)
+SYSTEMDICT["systemdict"] = SYSTEMDICT
 
 
 @dataclass
 class ExecState:
     """The stilted execution state."""
 
-    dstack: ChainMap[str, Object]
+    dstack: list[Dict]
     ostack: list[Object]
     estack: list[Any]
-    userdict: dict[str, Any]
+    userdict: Dict
     stdout: Any
 
     @classmethod
     def new(cls) -> ExecState:
         """Start a brand-new execution state."""
-        userdict: dict[str, Object] = {}
+        userdict = Dict(literal=True, value={})
         return cls(
-            dstack=ChainMap(userdict, SYSTEMDICT),
+            dstack=[SYSTEMDICT, userdict],
             ostack=[],
             estack=[],
             userdict=userdict,
@@ -70,6 +69,20 @@ class ExecState:
             if val is MARK:
                 return i
         raise Tilted("unmatchedmark")
+
+    def dstack_value(self, name: Name | String) -> Object | None:
+        """Look in dstack for `name`. If found, return the value."""
+        d = self.dstack_dict(name)
+        if d is not None:
+            return d[name.value]
+        return None
+
+    def dstack_dict(self, name: Name | String) -> Dict | None:
+        """Look in dstack for `name`. If found, return the Dict."""
+        for d in reversed(self.dstack):
+            if name.value in d:
+                return d
+        return None
 
 
 def operator(arg):

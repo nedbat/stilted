@@ -67,9 +67,8 @@ def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
 def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
     match obj:
         case Name(False, name):
-            try:
-                obj = estate.dstack[name]
-            except KeyError:
+            obj = estate.dstack_value(obj)
+            if obj is None:
                 raise Tilted(f"undefined: {name}")
             evaluate_one(obj, estate)
 
