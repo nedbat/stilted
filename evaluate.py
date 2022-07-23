@@ -11,13 +11,16 @@ from estate import ExecState
 import op_control
 import op_math
 import op_object
+import op_output
 import op_relational
 import op_stack
 
 
-def evaluate(text: str) -> ExecState:
+def evaluate(text: str, stdout=None) -> ExecState:
     estate = ExecState.new()
     estate.estack.append(collect_objects(lexer.tokens(text)))
+    if stdout:
+        estate.stdout = stdout
 
     while estate.estack:
         if callable(estate.estack[-1]):

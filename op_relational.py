@@ -42,7 +42,7 @@ def bool_op(
         case (Integer(), Integer()):
             estate.opush(from_py(py_int_op(a.value, b.value)))
         case _:
-            raise Tilted(f"typecheck")
+            raise Tilted("typecheck")
 
 
 @operator("and")

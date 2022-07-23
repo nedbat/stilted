@@ -9,12 +9,20 @@ from error import Tilted
 @dataclass
 class Object:
     """Base class for all Stilted data objects."""
+    typename: ClassVar[str] = "object"
     literal: bool
+
+    def op_eq(self) -> str:
+        return "--nostringval--"
+
+    def op_eqeq(self) -> str:
+        return f"-{self.typename}-"
+
 
 @dataclass
 class Integer(Object):
     """An integer."""
-    typename: ClassVar[str] = "integertype"
+    typename: ClassVar[str] = "integer"
     value: int
 
     @classmethod
@@ -22,11 +30,17 @@ class Integer(Object):
         """Convert a string into an Integer."""
         return cls(True, int(s))
 
+    def op_eq(self) -> str:
+        return str(self.value)
+
+    def op_eqeq(self) -> str:
+        return str(self.value)
+
 
 @dataclass
 class Real(Object):
     """A real (float)."""
-    typename: ClassVar[str] = "realtype"
+    typename: ClassVar[str] = "real"
     value: float
 
     @classmethod
@@ -34,19 +48,48 @@ class Real(Object):
         """Convert a string into a Real."""
         return cls(True, float(s))
 
+    def op_eq(self) -> str:
+        return str(self.value)
+
+    def op_eqeq(self) -> str:
+        return str(self.value)
+
 
 @dataclass
 class Boolean(Object):
     """A boolean."""
-    typename: ClassVar[str] = "booleantype"
+    typename: ClassVar[str] = "boolean"
     value: bool
+
+    def op_eq(self) -> str:
+        return str(self.value).lower()
+
+    def op_eqeq(self) -> str:
+        return str(self.value).lower()
 
 
 @dataclass
 class String(Object):
     """A string."""
-    typename: ClassVar[str] = "stringtype"
+    typename: ClassVar[str] = "string"
     value: str
+
+    def op_eq(self) -> str:
+        return self.value
+
+    def op_eqeq(self) -> str:
+        eqeq = "("
+        for ch in self.value:
+            if ch in "()\\":
+                eqeq += "\\" + ch
+            elif ch in "\n\t\r":
+                eqeq += repr(ch)[1:-1]
+            elif "\x00" <= ch < "\x20":
+                eqeq += f"\\{ord(ch):03o}"
+            else:
+                eqeq += ch
+        eqeq += ")"
+        return eqeq
 
 
 # For type-checking numbers.
@@ -78,7 +121,7 @@ def typecheck(a_type, *vals) -> None:
 class Name(Object):
     """A name, either /literal or not."""
 
-    typename: ClassVar[str] = "nametype"
+    typename: ClassVar[str] = "name"
     value: str
 
     def __str__(self):
@@ -94,10 +137,16 @@ class Name(Object):
         else:
             return cls(False, text)
 
+    def op_eq(self) -> str:
+        return self.value
+
+    def op_eqeq(self) -> str:
+        return ("/" if self.literal else "") + self.value
+
 
 class Mark(Object):
     """A mark. There is only one."""
-    typename: ClassVar[str] = "marktype"
+    typename: ClassVar[str] = "mark"
 
 
 MARK = Mark(literal=False)

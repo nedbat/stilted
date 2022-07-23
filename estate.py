@@ -1,6 +1,8 @@
 """Execution state and helpers for stilted."""
 
 from __future__ import annotations
+
+import sys
 from collections import ChainMap
 from dataclasses import dataclass
 from typing import Any
@@ -23,6 +25,7 @@ class ExecState:
     ostack: list[Object]
     estack: list[Any]
     userdict: dict[str, Any]
+    stdout: Any
 
     @classmethod
     def new(cls) -> ExecState:
@@ -33,6 +36,7 @@ class ExecState:
             ostack=[],
             estack=[],
             userdict=userdict,
+            stdout=sys.stdout,
         )
 
     def opop(self, n: int) -> list[Any]:
@@ -85,6 +89,7 @@ def operator(arg):
     """
     if isinstance(arg, str):
         def _dec(func):
+            assert func.__name__.endswith("_")
             SYSTEMDICT[arg] = Operator(literal=False, value=func)
         return _dec
     else:
