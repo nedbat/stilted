@@ -14,7 +14,7 @@ class Object:
 @dataclass
 class Integer(Object):
     """An integer."""
-    typename: ClassVar[str] = "integer"
+    typename: ClassVar[str] = "integertype"
     value: int
 
     @classmethod
@@ -26,7 +26,7 @@ class Integer(Object):
 @dataclass
 class Real(Object):
     """A real (float)."""
-    typename: ClassVar[str] = "real"
+    typename: ClassVar[str] = "realtype"
     value: float
 
     @classmethod
@@ -38,14 +38,14 @@ class Real(Object):
 @dataclass
 class Boolean(Object):
     """A boolean."""
-    typename: ClassVar[str] = "boolean"
+    typename: ClassVar[str] = "booleantype"
     value: bool
 
 
 @dataclass
 class String(Object):
     """A string."""
-    typename: ClassVar[str] = "string"
+    typename: ClassVar[str] = "stringtype"
     value: str
 
 
@@ -78,7 +78,7 @@ def typecheck(a_type, *vals) -> None:
 class Name(Object):
     """A name, either /literal or not."""
 
-    typename: ClassVar[str] = "name"
+    typename: ClassVar[str] = "nametype"
     value: str
 
     def __str__(self):
@@ -97,10 +97,10 @@ class Name(Object):
 
 class Mark(Object):
     """A mark. There is only one."""
-    typename: ClassVar[str] = "mark"
+    typename: ClassVar[str] = "marktype"
 
 
-MARK = Mark(False)
+MARK = Mark(literal=False)
 
 
 @dataclass

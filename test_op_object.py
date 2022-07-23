@@ -16,12 +16,12 @@ from test_helpers import compare_stacks
         # cvx
         ("/Hello cvx xcheck", [True]),
         # type
-        ("true type", [Name(False, "boolean")]),
-        ("123 type", [Name(False, "integer")]),
-        ("mark type", [Name(False, "mark")]),
-        ("/Name type", [Name(False, "name")]),
-        ("12.3 type", [Name(False, "real")]),
-        ("(hello) type", [Name(False, "string")]),
+        ("true type", [Name(False, "booleantype")]),
+        ("123 type", [Name(False, "integertype")]),
+        ("mark type", [Name(False, "marktype")]),
+        ("/Name type", [Name(False, "nametype")]),
+        ("12.3 type", [Name(False, "realtype")]),
+        ("(hello) type", [Name(False, "stringtype")]),
         # xcheck
         ("/Hello xcheck", [False]),
         ("{hello} xcheck", [True]),
