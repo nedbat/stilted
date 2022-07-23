@@ -16,11 +16,18 @@ from test_helpers import compare_stacks
         # countdictstack
         ("countdictstack", [2]),
         ("10 dict begin countdictstack", [3]),
+        # currentdict
+        ("10 dict begin /foo 17 def currentdict /foo known", [True]),
+        # def
+        ("1 /hello (there) def 2 hello", [1, 2, "there"]),
         # dict
         ("10 dict type", [Name(False, "dicttype")]),
         ("10 dict dup /foo 23 put /foo get", [23]),
         # get
         ("systemdict /add get type", [Name(False, "operatortype")]),
+        # length
+        ("10 dict length", [0]),
+        ("10 dict begin /foo 10 def /bar 11 def currentdict length", [2]),
         # load
         ("/add load type", [Name(False, "operatortype")]),
         # known
@@ -29,6 +36,9 @@ from test_helpers import compare_stacks
         # put
         ("userdict /foo 17 put foo", [17]),
         ("userdict /foo 17 put userdict /foo 23 put foo", [23]),
+        # store
+        ("10 dict begin /foo 17 def 10 dict begin /foo 23 store end foo", [23]),
+        ("10 dict begin 10 dict begin /foo 23 store end /foo where", [False]),
         # systemdict
         ("systemdict type", [Name(False, "dicttype")]),
         # userdict
@@ -50,6 +60,10 @@ def test_evaluate(text, stack):
         # begin
         ("begin", "stackunderflow"),
         ("123 begin", "typecheck"),
+        # def
+        ("def", "stackunderflow"),
+        ("12 def", "stackunderflow"),
+        ("123 45 def", "typecheck"),
         # dict
         ("dict", "stackunderflow"),
         ("-1 dict", "rangecheck"),
@@ -63,6 +77,9 @@ def test_evaluate(text, stack):
         ("123 /foo get", "typecheck"),
         ("systemdict 123 get", "typecheck"),
         ("systemdict /xyzzy get", "undefined: xyzzy"),
+        # length
+        ("length", "stackunderflow"),
+        ("213 length", "typecheck"),
         # load
         ("load", "stackunderflow"),
         ("123 load", "typecheck"),
@@ -78,6 +95,10 @@ def test_evaluate(text, stack):
         ("/foo 12 put", "stackunderflow"),
         ("123 /foo 12 put", "typecheck"),
         ("userdict true 12 put", "typecheck"),
+        # store
+        ("store", "stackunderflow"),
+        ("12 store", "stackunderflow"),
+        ("12 34 store", "typecheck"),
         # where
         ("where", "stackunderflow"),
         ("23 where", "typecheck"),

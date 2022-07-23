@@ -8,6 +8,7 @@ from lex import lexer
 from dtypes import Name, Object, Operator, Procedure
 
 from estate import ExecState
+import op_collections
 import op_control
 import op_dict
 import op_math

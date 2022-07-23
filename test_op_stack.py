@@ -40,8 +40,6 @@ from test_helpers import compare_stacks
         ("(a) (b) (c) 3 -1 roll", ["b", "c", "a"]),
         ("(a) (b) (c) 3 1 roll", ["c", "a", "b"]),
         ("(a) (b) (c) 3 0 roll", ["a", "b", "c"]),
-        # def
-        ("1 /hello (there) def 2 hello", [1, 2, "there"]),
     ],
 )
 def test_evaluate(text, stack):

@@ -30,11 +30,6 @@ def count(estate: ExecState) -> None:
 def counttomark(estate: ExecState) -> None:
     estate.opush(from_py(estate.counttomark()))
 
-@operator("def")
-def def_(estate: ExecState) -> None:
-    name, val = estate.opop(2)
-    estate.dstack[name.value] = val
-
 @operator
 def dup(estate: ExecState) -> None:
     estate.ohas(1)

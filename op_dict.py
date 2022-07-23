@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Dict, Integer, Stringy
+from dtypes import from_py, typecheck, Dict, Integer, Name, Stringy
 
 @operator
 def begin(estate: ExecState) -> None:
@@ -23,21 +23,20 @@ def dict_(estate: ExecState) -> None:
     estate.opush(from_py({}))
 
 @operator
+def currentdict(estate: ExecState) -> None:
+    estate.opush(from_py(estate.dstack.maps[0]))
+
+@operator("def")
+def def_(estate: ExecState) -> None:
+    name, val = estate.opop(2)
+    typecheck(Name, name)
+    estate.dstack[name.value] = val
+
+@operator
 def end(estate: ExecState) -> None:
     if len(estate.dstack.maps) <= 2:
         raise Tilted("dictstackunderflow")
     del estate.dstack.maps[0]
-
-@operator
-def get(estate: ExecState) -> None:
-    d, k = estate.opop(2)
-    typecheck(Dict, d)
-    typecheck(Stringy, k)
-    try:
-        obj = d.value[k.value]
-    except KeyError:
-        raise Tilted(f"undefined: {k.value}")
-    estate.opush(obj)
 
 @operator
 def load(estate: ExecState) -> None:
@@ -57,11 +56,15 @@ def known(estate: ExecState) -> None:
     estate.opush(from_py(k.value in d.value))
 
 @operator
-def put(estate: ExecState) -> None:
-    d, k, o = estate.opop(3)
-    typecheck(Dict, d)
+def store(estate: ExecState) -> None:
+    k, o = estate.opop(2)
     typecheck(Stringy, k)
-    d.value[k.value] = o
+    for d in reversed(estate.dstack.maps):
+        if k.value in d:
+            break
+    else:
+        d = estate.dstack.maps[0]
+    d[k.value] = o
 
 @operator
 def userdict(estate: ExecState) -> None:
