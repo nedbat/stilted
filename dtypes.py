@@ -1,7 +1,7 @@
 """Data types for stilted."""
 
 from types import UnionType
-from typing import Any, ClassVar
+from typing import Any, Callable, ClassVar
 from dataclasses import dataclass
 
 from error import Tilted
@@ -101,6 +101,13 @@ class Mark(Object):
 
 
 MARK = Mark(literal=False)
+
+
+@dataclass
+class Operator(Object):
+    """A built-in operator."""
+    typename: ClassVar[str] = "operator"
+    value: Callable[[Any], None]
 
 
 @dataclass

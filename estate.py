@@ -6,10 +6,10 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from dtypes import Boolean, MARK, Name, Object, Procedure
+from dtypes import Boolean, MARK, Name, Object, Operator, Procedure
 
 # The `systemdict` dict for all builtin names.
-SYSTEMDICT: dict[str, Any] = {
+SYSTEMDICT: dict[str, Object] = {
     "false": Boolean(literal=True, value=False),
     "true": Boolean(literal=True, value=True),
 }
@@ -85,7 +85,7 @@ def operator(arg):
     """
     if isinstance(arg, str):
         def _dec(func):
-            SYSTEMDICT[arg] = func
+            SYSTEMDICT[arg] = Operator(literal=False, value=func)
         return _dec
     else:
-        SYSTEMDICT[arg.__name__] = arg
+        SYSTEMDICT[arg.__name__] = Operator(literal=False, value=arg)
