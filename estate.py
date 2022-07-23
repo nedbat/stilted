@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import sys
-from collections import ChainMap
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, ChainMap
 
 from error import Tilted
-from dtypes import Boolean, MARK, Name, Object, Operator, Procedure
+from dtypes import Boolean, Dict, MARK, Name, Object, Operator, Procedure
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Object] = {
@@ -16,12 +15,14 @@ SYSTEMDICT: dict[str, Object] = {
     "true": Boolean(literal=True, value=True),
 }
 
+SYSTEMDICT["systemdict"] = Dict(literal=True, value=SYSTEMDICT)
+
 
 @dataclass
 class ExecState:
     """The stilted execution state."""
 
-    dstack: ChainMap
+    dstack: ChainMap[str, Object]
     ostack: list[Object]
     estack: list[Any]
     userdict: dict[str, Any]
@@ -30,7 +31,7 @@ class ExecState:
     @classmethod
     def new(cls) -> ExecState:
         """Start a brand-new execution state."""
-        userdict: dict[str, Any] = {}
+        userdict: dict[str, Object] = {}
         return cls(
             dstack=ChainMap(userdict, SYSTEMDICT),
             ostack=[],

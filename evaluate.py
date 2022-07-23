@@ -9,6 +9,7 @@ from dtypes import Name, Object, Operator, Procedure
 
 from estate import ExecState
 import op_control
+import op_dict
 import op_math
 import op_object
 import op_output
@@ -68,7 +69,7 @@ def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
             try:
                 obj = estate.dstack[name]
             except KeyError:
-                raise Tilted("undefined")
+                raise Tilted(f"undefined: {name}")
             evaluate_one(obj, estate)
 
         case Procedure():

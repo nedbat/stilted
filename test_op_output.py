@@ -22,6 +22,8 @@ from test_helpers import compare_stacks
         ("/hello cvx =", [], "hello\n"),
         ("mark =", [], "--nostringval--\n"),
         ("true false = =", [], "false\ntrue\n"),
+        ("systemdict =", [], "--nostringval--\n"),
+        ("/add load =", [], "add\n"),
         # ==
         ("12345 ==", [], "12345\n"),
         ("1234.5 ==", [], "1234.5\n"),
@@ -34,6 +36,8 @@ from test_helpers import compare_stacks
         ("/hello cvx ==", [], "hello\n"),
         ("mark ==", [], "-mark-\n"),
         ("true false == ==", [], "false\ntrue\n"),
+        ("systemdict ==", [], "-dict-\n"),
+        ("/add load ==", [], "--add--\n"),
         # print
         ("(hello) print", [], "hello"),
         ("(hello) print (world) print", [], "helloworld"),

@@ -1,7 +1,7 @@
 """Data types for stilted."""
 
 from types import UnionType
-from typing import Any, Callable, ClassVar
+from typing import Any, Callable, ClassVar, MutableMapping
 from dataclasses import dataclass
 
 from error import Tilted
@@ -100,12 +100,14 @@ def from_py(val: Any) -> Object:
     match val:
         case bool():
             return Boolean(True, val)
-        case str():
-            return String(True, val)
-        case int():
-            return Integer(True, val)
+        case dict():
+            return Dict(True, val)
         case float():
             return Real(True, val)
+        case int():
+            return Integer(True, val)
+        case str():
+            return String(True, val)
         case _:
             raise Exception(f"Buh? from_py({val=})")
 
@@ -114,7 +116,7 @@ def typecheck(a_type, *vals) -> None:
     """Check that all the arguments are the right type."""
     for val in vals:
         if not isinstance(val, a_type):
-            raise Tilted("typecheck")
+            raise Tilted(f"typecheck: expected {a_type}, got {type(val)}")
 
 
 @dataclass
@@ -143,6 +145,8 @@ class Name(Object):
     def op_eqeq(self) -> str:
         return ("/" if self.literal else "") + self.value
 
+Stringy: UnionType = Name | String
+
 
 class Mark(Object):
     """A mark. There is only one."""
@@ -153,10 +157,23 @@ MARK = Mark(literal=False)
 
 
 @dataclass
+class Dict(Object):
+    """A dictionary."""
+    typename: ClassVar[str] = "dict"
+    value: MutableMapping[str, Object]
+
+
+@dataclass
 class Operator(Object):
     """A built-in operator."""
     typename: ClassVar[str] = "operator"
     value: Callable[[Any], None]
+
+    def op_eq(self) -> str:
+        return self.value.__name__
+
+    def op_eqeq(self) -> str:
+        return "--" + self.value.__name__ + "--"
 
 
 @dataclass
