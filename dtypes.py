@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from types import UnionType
-from typing import Any, Callable, ClassVar
+from typing import Any, Callable, ClassVar, Generic, TypeVar
 from dataclasses import dataclass
 
 from error import Tilted
@@ -71,12 +71,30 @@ class Boolean(Object):
     def op_eqeq(self) -> str:
         return str(self.value).lower()
 
+T = TypeVar("T")
+
+@dataclass
+class SaveableObject(Object, Generic[T]):
+    """A value that can be save/restored."""
+    values: list[tuple[Save, T]]
+
+    def prep_for_change(self, save: Save) -> None:
+        """Call this before mutating a saveable object."""
+        if self.values[-1][0] is not save:
+            save.changed_objs.append(self)
+            self.values.append((save, self._copy_for_restore()))
+
+    def _copy_for_restore(self) -> T:
+        """Make a new copy of the real data, for later restoring."""
+        raise NotImplemented
+
 
 @dataclass
 class Save(Object):
     """A VM snapshot object."""
+    typename: ClassVar[str] = "save"
     is_valid: bool
-    changed_objs: list[Object]
+    changed_objs: list[SaveableObject]
 
 
 @dataclass
@@ -142,14 +160,16 @@ MARK = Mark(literal=False)
 
 
 @dataclass
-class Dict(Object):
+class Dict(SaveableObject[dict[str, Object]]):
     """A dictionary."""
     typename: ClassVar[str] = "dict"
-    values: list[tuple[Save, dict[str, Object]]]
 
     @property
     def value(self) -> dict[str, Object]:
         return self.values[-1][1]
+
+    def _copy_for_restore(self) -> dict[str, Object]:
+        return dict(self.value)
 
     def __getitem__(self, name: str) -> Object:
         return self.value[name]

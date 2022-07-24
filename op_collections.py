@@ -26,4 +26,5 @@ def put(estate: ExecState) -> None:
     d, k, o = estate.opopn(3)
     typecheck(Dict, d)
     typecheck(Stringy, k)
+    estate.prep_for_change(d)
     d.value[k.value] = o

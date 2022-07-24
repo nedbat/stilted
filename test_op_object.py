@@ -24,6 +24,7 @@ from test_helpers import compare_stacks
         ("(hello) type", [Name(False, "stringtype")]),
         ("systemdict type", [Name(False, "dicttype")]),
         ("/add load type", [Name(False, "operatortype")]),
+        ("save type", [Name(False, "savetype")]),
         # xcheck
         ("/Hello xcheck", [False]),
         ("{hello} xcheck", [True]),

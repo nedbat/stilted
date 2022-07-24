@@ -7,7 +7,10 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from dtypes import from_py, Dict, MARK, Name, Object, Operator, Procedure, Save, String
+from dtypes import (
+    from_py, Dict, MARK, Name, Object, Operator, Procedure, Save,
+    SaveableObject, String,
+)
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Object] = {}
@@ -37,8 +40,7 @@ class ExecState:
             stdout=sys.stdout,
         )
 
-        save0 = Save(literal=True, is_valid=True, changed_objs=[])
-        estate.sstack.append(save0)
+        estate.new_save()
 
         systemdict = estate.new_dict(value=SYSTEMDICT)
         systemdict["systemdict"] = systemdict
@@ -107,6 +109,16 @@ class ExecState:
             if name.value in d:
                 return d
         return None
+
+    def prep_for_change(self, d: SaveableObject) -> None:
+        """An object is about to change. Do save/restore bookkeeping."""
+        d.prep_for_change(self.sstack[-1])
+
+    def new_save(self) -> Save:
+        """Make a new save-point."""
+        save = Save(literal=True, is_valid=True, changed_objs=[])
+        self.sstack.append(save)
+        return save
 
 
 def operator(arg):

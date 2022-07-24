@@ -35,7 +35,9 @@ def dict_(estate: ExecState) -> None:
 def def_(estate: ExecState) -> None:
     name, val = estate.opopn(2)
     typecheck(Name, name)
-    estate.dstack[-1][name.value] = val
+    d = estate.dstack[-1]
+    estate.prep_for_change(d)
+    d[name.value] = val
 
 @operator
 def end(estate: ExecState) -> None:
@@ -72,6 +74,7 @@ def store(estate: ExecState) -> None:
     d = estate.dstack_dict(k)
     if d is None:
         d = estate.dstack[-1]
+    estate.prep_for_change(d)
     d[k.value] = o
 
 @operator
