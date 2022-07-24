@@ -13,6 +13,9 @@ from test_helpers import compare_stacks
     [
         # begin
         ("10 dict dup begin /foo 17 def end /foo get /foo where", [17, False]),
+        # cleardictstack
+        ("cleardictstack countdictstack", [2]),
+        ("10 dict begin cleardictstack countdictstack", [2]),
         # countdictstack
         ("countdictstack", [2]),
         ("10 dict begin countdictstack", [3]),
@@ -33,6 +36,8 @@ from test_helpers import compare_stacks
         ("10 dict begin /foo 10 def /bar 11 def currentdict length", [2]),
         # load
         ("/add load type", [Name(False, "operatortype")]),
+        # maxlength
+        ("10 dict dup maxlength exch length gt", [True]),
         # put
         ("userdict /foo 17 put foo", [17]),
         ("userdict /foo 17 put userdict /foo 23 put foo", [23]),
@@ -89,6 +94,9 @@ def test_evaluate(text, stack):
         ("load", "stackunderflow"),
         ("123 load", "typecheck"),
         ("/xyzzy load", "undefined: xyzzy"),
+        # maxlength
+        ("maxlength", "stackunderflow"),
+        ("213 maxlength", "typecheck"),
         # put
         ("put", "stackunderflow"),
         ("12 put", "stackunderflow"),

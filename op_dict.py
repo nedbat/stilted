@@ -11,6 +11,11 @@ def begin(estate: ExecState) -> None:
     estate.dstack.append(d)
 
 @operator
+def cleardictstack(estate: ExecState) -> None:
+    while len(estate.dstack) > 2:
+        estate.dstack.pop()
+
+@operator
 def countdictstack(estate: ExecState) -> None:
     estate.opush(from_py(len(estate.dstack)))
 
@@ -53,6 +58,12 @@ def load(estate: ExecState) -> None:
     if obj is None:
         raise Tilted(f"undefined: {k.value}")
     estate.opush(obj)
+
+@operator
+def maxlength(estate: ExecState) -> None:
+    d = estate.opop()
+    typecheck(Dict, d)
+    estate.opush(from_py(len(d.value) + 10))
 
 @operator
 def store(estate: ExecState) -> None:
