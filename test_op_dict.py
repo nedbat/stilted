@@ -25,14 +25,14 @@ from test_helpers import compare_stacks
         ("10 dict dup /foo 23 put /foo get", [23]),
         # get
         ("systemdict /add get type", [Name(False, "operatortype")]),
+        # known
+        ("systemdict /add known", [True]),
+        ("systemdict /xyzzy known", [False]),
         # length
         ("10 dict length", [0]),
         ("10 dict begin /foo 10 def /bar 11 def currentdict length", [2]),
         # load
         ("/add load type", [Name(False, "operatortype")]),
-        # known
-        ("systemdict /add known", [True]),
-        ("systemdict /xyzzy known", [False]),
         # put
         ("userdict /foo 17 put foo", [17]),
         ("userdict /foo 17 put userdict /foo 23 put foo", [23]),
@@ -77,6 +77,11 @@ def test_evaluate(text, stack):
         ("123 /foo get", "typecheck"),
         ("systemdict 123 get", "typecheck"),
         ("systemdict /xyzzy get", "undefined: xyzzy"),
+        # known
+        ("known", "stackunderflow"),
+        ("/foo known", "stackunderflow"),
+        ("123 /foo known", "typecheck"),
+        ("systemdict 123 known", "typecheck"),
         # length
         ("length", "stackunderflow"),
         ("213 length", "typecheck"),
@@ -84,11 +89,6 @@ def test_evaluate(text, stack):
         ("load", "stackunderflow"),
         ("123 load", "typecheck"),
         ("/xyzzy load", "undefined: xyzzy"),
-        # known
-        ("known", "stackunderflow"),
-        ("/foo known", "stackunderflow"),
-        ("123 /foo known", "typecheck"),
-        ("systemdict 123 known", "typecheck"),
         # put
         ("put", "stackunderflow"),
         ("12 put", "stackunderflow"),

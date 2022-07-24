@@ -14,6 +14,10 @@ def begin(estate: ExecState) -> None:
 def countdictstack(estate: ExecState) -> None:
     estate.opush(from_py(len(estate.dstack)))
 
+@operator
+def currentdict(estate: ExecState) -> None:
+    estate.opush(estate.dstack[-1])
+
 @operator("dict")
 def dict_(estate: ExecState) -> None:
     n = estate.opop()
@@ -21,10 +25,6 @@ def dict_(estate: ExecState) -> None:
     if n.value < 0:
         raise Tilted("rangecheck")
     estate.opush(estate.new_dict())
-
-@operator
-def currentdict(estate: ExecState) -> None:
-    estate.opush(estate.dstack[-1])
 
 @operator("def")
 def def_(estate: ExecState) -> None:
@@ -39,6 +39,13 @@ def end(estate: ExecState) -> None:
     estate.dstack.pop()
 
 @operator
+def known(estate: ExecState) -> None:
+    d, k = estate.opopn(2)
+    typecheck(Dict, d)
+    typecheck(Stringy, k)
+    estate.opush(from_py(k.value in d.value))
+
+@operator
 def load(estate: ExecState) -> None:
     k = estate.opop()
     typecheck(Stringy, k)
@@ -46,13 +53,6 @@ def load(estate: ExecState) -> None:
     if obj is None:
         raise Tilted(f"undefined: {k.value}")
     estate.opush(obj)
-
-@operator
-def known(estate: ExecState) -> None:
-    d, k = estate.opopn(2)
-    typecheck(Dict, d)
-    typecheck(Stringy, k)
-    estate.opush(from_py(k.value in d.value))
 
 @operator
 def store(estate: ExecState) -> None:
