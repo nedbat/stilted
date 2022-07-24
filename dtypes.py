@@ -54,6 +54,9 @@ class Real(Object):
     def op_eqeq(self) -> str:
         return str(self.value)
 
+# For type-checking numbers.
+Number: UnionType = Integer | Real
+
 
 @dataclass
 class Boolean(Object):
@@ -92,33 +95,6 @@ class String(Object):
         return eqeq
 
 
-# For type-checking numbers.
-Number: UnionType = Integer | Real
-
-def from_py(val: Any) -> Object:
-    """Convert any Python value into the appropriate Stilted object."""
-    match val:
-        case bool():
-            return Boolean(True, val)
-        case dict():
-            return Dict(True, val)
-        case float():
-            return Real(True, val)
-        case int():
-            return Integer(True, val)
-        case str():
-            return String(True, val)
-        case _:
-            raise Exception(f"Buh? from_py({val=})")
-
-
-def typecheck(a_type, *vals) -> None:
-    """Check that all the arguments are the right type."""
-    for val in vals:
-        if not isinstance(val, a_type):
-            raise Tilted(f"typecheck: expected {a_type}, got {type(val)}")
-
-
 @dataclass
 class Name(Object):
     """A name, either /literal or not."""
@@ -146,6 +122,7 @@ class Name(Object):
         return ("/" if self.literal else "") + self.value
 
 Stringy: UnionType = Name | String
+
 
 
 class Mark(Object):
@@ -189,7 +166,31 @@ class Operator(Object):
 class Procedure(Object):
     """A procedure in curly braces."""
 
-    objs: list[Any]
+    objs: list[Object]
 
     def __repr__(self):
         return "<Proc {" + " ".join(map(repr, self.objs)) + "}>"
+
+
+def from_py(val: Any) -> Object:
+    """Convert any Python value into the appropriate Stilted object."""
+    match val:
+        case bool():
+            return Boolean(True, val)
+        case dict():
+            return Dict(True, val)
+        case float():
+            return Real(True, val)
+        case int():
+            return Integer(True, val)
+        case str():
+            return String(True, val)
+        case _:
+            raise Exception(f"Buh? from_py({val=})")
+
+
+def typecheck(a_type, *vals) -> None:
+    """Check that all the arguments are the right type."""
+    for val in vals:
+        if not isinstance(val, a_type):
+            raise Tilted(f"typecheck: expected {a_type}, got {type(val)}")
