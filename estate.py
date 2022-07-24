@@ -7,14 +7,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from error import Tilted
-from dtypes import from_py, Dict, MARK, Name, Object, Operator, Procedure, String
+from dtypes import from_py, Dict, MARK, Name, Object, Operator, Procedure, Save, String
 
 # The `systemdict` dict for all builtin names.
-SYSTEMDICT = Dict(literal=True, value={})
+SYSTEMDICT: dict[str, Object] = {}
 
 SYSTEMDICT["false"] = from_py(False)
 SYSTEMDICT["true"] = from_py(True)
-SYSTEMDICT["systemdict"] = SYSTEMDICT
 
 
 @dataclass
@@ -24,20 +23,32 @@ class ExecState:
     dstack: list[Dict]
     ostack: list[Object]
     estack: list[Any]
-    userdict: Dict
+    sstack: list[Save]
     stdout: Any
 
     @classmethod
     def new(cls) -> ExecState:
         """Start a brand-new execution state."""
-        userdict = Dict(literal=True, value={})
-        return cls(
-            dstack=[SYSTEMDICT, userdict],
+        estate = cls(
+            dstack=[],
             ostack=[],
             estack=[],
-            userdict=userdict,
+            sstack=[],
             stdout=sys.stdout,
         )
+
+        save0 = Save(literal=True, is_valid=True, changed_objs=[])
+        estate.sstack.append(save0)
+
+        systemdict = estate.new_dict(value=SYSTEMDICT)
+        systemdict["systemdict"] = systemdict
+        estate.dstack.append(systemdict)
+
+        userdict = estate.new_dict()
+        systemdict["userdict"] = userdict
+        estate.dstack.append(userdict)
+
+        return estate
 
     def opop(self) -> Any:
         """Remove the top operand and return it."""
@@ -81,6 +92,14 @@ class ExecState:
         if d is not None:
             return d[name.value]
         return None
+
+    def new_dict(self, value: dict[str, Object]=None) -> Dict:
+        """Make a new Dict."""
+        value = value if value is not None else {}
+        return Dict(
+            literal=True,
+            values=[(self.sstack[-1], value)],
+        )
 
     def dstack_dict(self, name: Name | String) -> Dict | None:
         """Look in dstack for `name`. If found, return the Dict."""

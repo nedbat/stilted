@@ -1,5 +1,6 @@
 """Data types for stilted."""
 
+from __future__ import annotations
 from types import UnionType
 from typing import Any, Callable, ClassVar
 from dataclasses import dataclass
@@ -72,6 +73,13 @@ class Boolean(Object):
 
 
 @dataclass
+class Save(Object):
+    """A VM snapshot object."""
+    is_valid: bool
+    changed_objs: list[Object]
+
+
+@dataclass
 class String(Object):
     """A string."""
     typename: ClassVar[str] = "string"
@@ -137,7 +145,11 @@ MARK = Mark(literal=False)
 class Dict(Object):
     """A dictionary."""
     typename: ClassVar[str] = "dict"
-    value: dict[str, Object]
+    values: list[tuple[Save, dict[str, Object]]]
+
+    @property
+    def value(self) -> dict[str, Object]:
+        return self.values[-1][1]
 
     def __getitem__(self, name: str) -> Object:
         return self.value[name]
@@ -173,12 +185,10 @@ class Procedure(Object):
 
 
 def from_py(val: Any) -> Object:
-    """Convert any Python value into the appropriate Stilted object."""
+    """Convert a simple Python value into the appropriate Stilted object."""
     match val:
         case bool():
             return Boolean(True, val)
-        case dict():
-            return Dict(True, val)
         case float():
             return Real(True, val)
         case int():

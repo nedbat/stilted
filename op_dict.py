@@ -20,7 +20,7 @@ def dict_(estate: ExecState) -> None:
     typecheck(Integer, n)
     if n.value < 0:
         raise Tilted("rangecheck")
-    estate.opush(from_py({}))
+    estate.opush(estate.new_dict())
 
 @operator
 def currentdict(estate: ExecState) -> None:
@@ -62,10 +62,6 @@ def store(estate: ExecState) -> None:
     if d is None:
         d = estate.dstack[-1]
     d[k.value] = o
-
-@operator
-def userdict(estate: ExecState) -> None:
-    estate.opush(estate.userdict)
 
 @operator
 def where(estate: ExecState) -> None:
