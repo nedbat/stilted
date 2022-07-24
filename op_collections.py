@@ -6,7 +6,7 @@ from dtypes import from_py, typecheck, Dict, Stringy
 
 @operator
 def get(estate: ExecState) -> None:
-    d, k = estate.opop(2)
+    d, k = estate.opopn(2)
     typecheck(Dict, d)
     typecheck(Stringy, k)
     try:
@@ -17,13 +17,13 @@ def get(estate: ExecState) -> None:
 
 @operator
 def length(estate: ExecState) -> None:
-    d = estate.opop(1)[0]
+    d = estate.opop()
     typecheck(Dict, d)
     estate.opush(from_py(len(d.value)))
 
 @operator
 def put(estate: ExecState) -> None:
-    d, k, o = estate.opop(3)
+    d, k, o = estate.opopn(3)
     typecheck(Dict, d)
     typecheck(Stringy, k)
     d.value[k.value] = o

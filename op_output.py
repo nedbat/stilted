@@ -6,19 +6,19 @@ from dtypes import Name, String
 
 @operator("=")
 def eq_(estate: ExecState) -> None:
-    o = estate.opop(1)[0]
+    o = estate.opop()
     estate.stdout.write(o.op_eq())
     estate.stdout.write("\n")
 
 @operator("==")
 def eqeq_(estate: ExecState) -> None:
-    o = estate.opop(1)[0]
+    o = estate.opop()
     estate.stdout.write(o.op_eqeq())
     estate.stdout.write("\n")
 
 @operator("print")
 def print_(estate: ExecState) -> None:
-    s = estate.opop(1)[0]
+    s = estate.opop()
     match s:
         case String() | Name():
             estate.stdout.write(s.value)

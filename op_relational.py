@@ -9,7 +9,7 @@ from dtypes import from_py, Boolean, Integer, Name, Real, String
 
 
 def eq_ne(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
-    a, b = estate.opop(2)
+    a, b = estate.opopn(2)
     match a, b:
         case (Integer() | Real(), Integer() | Real()):
             estate.opush(from_py(pyop(a.value, b.value)))
@@ -20,7 +20,7 @@ def eq_ne(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
 
 
 def ge_etc(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
-    a, b = estate.opop(2)
+    a, b = estate.opopn(2)
     match a, b:
         case (Integer() | Real(), Integer() | Real()):
             estate.opush(from_py(pyop(a.value, b.value)))
@@ -35,7 +35,7 @@ def bool_op(
     py_bool_op: Callable[[Any, Any], bool],
     py_int_op: Callable[[Any, Any], int],
 ) -> None:
-    a, b = estate.opop(2)
+    a, b = estate.opopn(2)
     match a, b:
         case (Boolean(), Boolean()):
             estate.opush(from_py(py_bool_op(a.value, b.value)))
@@ -75,7 +75,7 @@ def ne(estate: ExecState) -> None:
 
 @operator("not")
 def not_(estate: ExecState) -> None:
-    a, = estate.opop(1)
+    a = estate.opop()
     match a:
         case Boolean():
             estate.opush(from_py(not a.value))

@@ -6,7 +6,7 @@ from dtypes import from_py, typecheck, Dict, Integer, Name, Stringy
 
 @operator
 def begin(estate: ExecState) -> None:
-    d = estate.opop(1)[0]
+    d = estate.opop()
     typecheck(Dict, d)
     estate.dstack.append(d)
 
@@ -16,7 +16,7 @@ def countdictstack(estate: ExecState) -> None:
 
 @operator("dict")
 def dict_(estate: ExecState) -> None:
-    n = estate.opop(1)[0]
+    n = estate.opop()
     typecheck(Integer, n)
     if n.value < 0:
         raise Tilted("rangecheck")
@@ -28,7 +28,7 @@ def currentdict(estate: ExecState) -> None:
 
 @operator("def")
 def def_(estate: ExecState) -> None:
-    name, val = estate.opop(2)
+    name, val = estate.opopn(2)
     typecheck(Name, name)
     estate.dstack[-1][name.value] = val
 
@@ -40,7 +40,7 @@ def end(estate: ExecState) -> None:
 
 @operator
 def load(estate: ExecState) -> None:
-    k = estate.opop(1)[0]
+    k = estate.opop()
     typecheck(Stringy, k)
     obj = estate.dstack_value(k)
     if obj is None:
@@ -49,14 +49,14 @@ def load(estate: ExecState) -> None:
 
 @operator
 def known(estate: ExecState) -> None:
-    d, k = estate.opop(2)
+    d, k = estate.opopn(2)
     typecheck(Dict, d)
     typecheck(Stringy, k)
     estate.opush(from_py(k.value in d.value))
 
 @operator
 def store(estate: ExecState) -> None:
-    k, o = estate.opop(2)
+    k, o = estate.opopn(2)
     typecheck(Stringy, k)
     d = estate.dstack_dict(k)
     if d is None:
@@ -69,7 +69,7 @@ def userdict(estate: ExecState) -> None:
 
 @operator
 def where(estate: ExecState) -> None:
-    k = estate.opop(1)[0]
+    k = estate.opop()
     typecheck(Stringy, k)
     d = estate.dstack_dict(k)
     if d is not None:

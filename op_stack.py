@@ -17,7 +17,7 @@ def cleartomark(estate: ExecState) -> None:
 def copy(estate: ExecState) -> None:
     estate.ohas(1)
     if isinstance(estate.ostack[-1], Integer):
-        n = estate.opop(1)[0].value
+        n = estate.opop().value
         if n:
             estate.ohas(n)
             estate.opush(*estate.ostack[-n:])
@@ -37,12 +37,12 @@ def dup(estate: ExecState) -> None:
 
 @operator
 def exch(estate: ExecState) -> None:
-    a, b = estate.opop(2)
+    a, b = estate.opopn(2)
     estate.opush(b, a)
 
 @operator
 def index(estate: ExecState) -> None:
-    n = estate.opop(1)[0].value
+    n = estate.opop().value
     estate.opush(estate.ostack[-(n + 1)])
 
 @operator
@@ -55,11 +55,11 @@ def mark_(estate: ExecState) -> None:
 
 @operator
 def pop(estate: ExecState) -> None:
-    estate.opop(1)
+    estate.opop()
 
 @operator
 def roll(estate: ExecState) -> None:
-    n, j = estate.opop(2)
-    vals = estate.opop(n.value)
+    n, j = estate.opopn(2)
+    vals = estate.opopn(n.value)
     estate.opush(*vals[-j.value:])
     estate.opush(*vals[:-j.value])

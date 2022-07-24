@@ -39,7 +39,12 @@ class ExecState:
             stdout=sys.stdout,
         )
 
-    def opop(self, n: int) -> list[Any]:
+    def opop(self) -> Any:
+        """Remove the top operand and return it."""
+        self.ohas(1)
+        return self.ostack.pop()
+
+    def opopn(self, n: int) -> list[Any]:
         """Remove the top n operands and return them."""
         self.ohas(n)
         vals = self.ostack[-n:]

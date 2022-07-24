@@ -22,7 +22,7 @@ def exit(estate: ExecState) -> None:
 
 @operator("for")
 def for_(estate: ExecState) -> None:
-    initial, increment, limit, proc = estate.opop(4)
+    initial, increment, limit, proc = estate.opopn(4)
     typecheck(Number, initial, increment, limit)
     typecheck(Procedure, proc)
 
@@ -41,7 +41,7 @@ def for_(estate: ExecState) -> None:
 
 @operator
 def forall(estate: ExecState) -> None:
-    o, proc = estate.opop(2)
+    o, proc = estate.opopn(2)
     typecheck(Procedure, proc)
     match o:
         case Dict():
@@ -64,7 +64,7 @@ def forall(estate: ExecState) -> None:
 
 @operator("if")
 def if_(estate: ExecState) -> None:
-    b, proc_if = estate.opop(2)
+    b, proc_if = estate.opopn(2)
     typecheck(Boolean, b)
     typecheck(Procedure, proc_if)
     if b.value:
@@ -72,7 +72,7 @@ def if_(estate: ExecState) -> None:
 
 @operator
 def ifelse(estate: ExecState) -> None:
-    b, proc_if, proc_else = estate.opop(3)
+    b, proc_if, proc_else = estate.opopn(3)
     typecheck(Boolean, b)
     typecheck(Procedure, proc_if, proc_else)
     if b.value:
@@ -86,7 +86,7 @@ def quit(estate: ExecState) -> None:
 
 @operator
 def repeat(estate: ExecState) -> None:
-    n, proc = estate.opop(2)
+    n, proc = estate.opopn(2)
     typecheck(Integer, n)
     typecheck(Procedure, proc)
     nv = n.value

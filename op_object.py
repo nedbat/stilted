@@ -15,10 +15,10 @@ def cvx(estate: ExecState) -> None:
 
 @operator("type")
 def type_(estate: ExecState) -> None:
-    obj = estate.opop(1)[0]
+    obj = estate.opop()
     estate.opush(Name(literal=False, value=obj.typename + "type"))
 
 @operator
 def xcheck(estate: ExecState) -> None:
-    obj = estate.opop(1)[0]
+    obj = estate.opop()
     estate.opush(from_py(not obj.literal))
