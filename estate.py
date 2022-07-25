@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import itertools
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Iterator
 
 from error import Tilted
@@ -24,25 +24,17 @@ SYSTEMDICT["true"] = from_py(True)
 class ExecState:
     """The stilted execution state."""
 
-    dstack: list[Dict]
-    ostack: list[Object]
-    estack: list[Any]
-    sstack: list[Save]
-    stdout: Any
-    save_serials: Iterator[int]
+    dstack: list[Dict] = field(default_factory=list)
+    ostack: list[Object] = field(default_factory=list)
+    estack: list[Any] = field(default_factory=list)
+    sstack: list[Save] = field(default_factory=list)
+    stdout: Any = sys.stdout,
+    save_serials: Iterator[int] = field(default_factory=itertools.count)
 
     @classmethod
     def new(cls) -> ExecState:
         """Start a brand-new execution state."""
-        estate = cls(
-            dstack=[],
-            ostack=[],
-            estack=[],
-            sstack=[],
-            stdout=sys.stdout,
-            save_serials=itertools.count(),
-        )
-
+        estate = cls()
         estate.new_save()
 
         systemdict = estate.new_dict(value=SYSTEMDICT)
