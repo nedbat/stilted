@@ -147,7 +147,9 @@ def operator(arg):
     if isinstance(arg, str):
         def _dec(func):
             assert func.__name__.endswith("_")
+            assert arg not in SYSTEMDICT
             SYSTEMDICT[arg] = Operator(literal=False, value=func)
         return _dec
     else:
+        assert arg.__name__ not in SYSTEMDICT
         SYSTEMDICT[arg.__name__] = Operator(literal=False, value=arg)
