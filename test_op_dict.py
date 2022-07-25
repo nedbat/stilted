@@ -26,6 +26,24 @@ from test_helpers import compare_stacks
         # dict
         ("10 dict type", [Name(False, "dicttype")]),
         ("10 dict dup /foo 23 put /foo get", [23]),
+        # forall
+        ("""
+            /d 2 dict def
+            d /abc 123 put
+            d /xyz (test) put
+            d { 1 } forall
+            """,
+            [Name(True, "abc"), 123, 1, Name(True, "xyz"), "test", 1],
+        ),
+        ("10 dict {(what)} forall", []),
+        ("""
+            /d 2 dict def
+            d /abc 123 put
+            d /xyz (test) put
+            d { dup 123 eq { exit } if } forall
+            """,
+            [Name(True, "abc"), 123],
+        ),
         # get
         ("systemdict /add get type", [Name(False, "operatortype")]),
         # known
@@ -76,6 +94,8 @@ def test_evaluate(text, stack):
         # end
         ("end", "dictstackunderflow"),
         ("10 dict begin end end", "dictstackunderflow"),
+        # forall
+        ("10 dict 123 forall", "typecheck"),
         # get
         ("get", "stackunderflow"),
         ("/foo get", "stackunderflow"),

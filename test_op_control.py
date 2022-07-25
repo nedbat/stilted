@@ -19,24 +19,6 @@ from test_helpers import compare_stacks
         ("3 -.5 1 {} for", [3.0, 2.5, 2.0, 1.5, 1.0]),
         ("10 1 5 {(a)} for", []),
         ("1 1 5 { dup 3 gt { dup } if } for", [1, 2, 3, 4, 4, 5, 5]),
-        # forall
-        ("""
-            /d 2 dict def
-            d /abc 123 put
-            d /xyz (test) put
-            d { 1 } forall
-            """,
-            [Name(True, "abc"), 123, 1, Name(True, "xyz"), "test", 1],
-        ),
-        ("10 dict {(what)} forall", []),
-        ("""
-            /d 2 dict def
-            d /abc 123 put
-            d /xyz (test) put
-            d { dup 123 eq { exit } if } forall
-            """,
-            [Name(True, "abc"), 123],
-        ),
         # if
         ("(a) 3 4 lt {(3 < 4)} if", ["a", "3 < 4"]),
         ("(a) 3 4 gt {(3 > 4)} if", ["a"]),
@@ -70,7 +52,6 @@ def test_evaluate(text, stack):
         ("forall", "stackunderflow"),
         ("{} forall", "stackunderflow"),
         ("123 {} forall", "typecheck"),
-        ("10 dict 123 forall", "typecheck"),
         # if
         ("if", "stackunderflow"),
         ("{1} if", "stackunderflow"),
