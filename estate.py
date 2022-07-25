@@ -94,7 +94,7 @@ class ExecState:
         """Look in dstack for `name`. If found, return the value."""
         d = self.dstack_dict(name)
         if d is not None:
-            return d[name.value]
+            return d[name.str_value]
         return None
 
     def new_dict(self, value: dict[str, Object]=None) -> Dict:
@@ -108,7 +108,7 @@ class ExecState:
     def dstack_dict(self, name: Name | String) -> Dict | None:
         """Look in dstack for `name`. If found, return the Dict."""
         for d in reversed(self.dstack):
-            if name.value in d:
+            if name.str_value in d:
                 return d
         return None
 

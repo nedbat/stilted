@@ -19,7 +19,7 @@ def eqeq_(estate: ExecState) -> None:
 @operator("print")
 def print_(estate: ExecState) -> None:
     s = estate.opop(Stringy)
-    estate.stdout.write(s.value)
+    estate.stdout.write(s.str_value)
 
 @operator
 def pstack(estate: ExecState) -> None:

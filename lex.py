@@ -78,10 +78,8 @@ def convert_string(text: str) -> String:
                 case _:
                     return esc_text[1]
 
-    return String(
-        literal=True,
-        value=re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1]),
-    )
+    string = re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
+    return String(literal=True, value=bytearray(string.encode("iso8859-1")))
 
 
 def convert_hex_string(text: str) -> String:
@@ -95,7 +93,7 @@ def convert_hex_string(text: str) -> String:
         text += "0"
     return String(
         literal=True,
-        value=base64.b16decode(text, casefold=True).decode("latin1"),
+        value=bytearray(base64.b16decode(text, casefold=True)),
     )
 
 

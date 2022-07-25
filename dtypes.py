@@ -100,22 +100,27 @@ class Save(Object):
 
 @dataclass
 class String(Object):
-    """A string."""
+    """A string, a mutable array of bytes"""
     typename: ClassVar[str] = "string"
-    value: str
+    value: bytearray
+
+    @property
+    def str_value(self) -> str:
+        return self.value.decode("iso8859-1")
 
     def op_eq(self) -> str:
-        return self.value
+        return self.str_value
 
     def op_eqeq(self) -> str:
         eqeq = "("
-        for ch in self.value:
+        for b in self.value:
+            ch = chr(b)
             if ch in "()\\":
                 eqeq += "\\" + ch
             elif ch in "\n\t\r":
                 eqeq += repr(ch)[1:-1]
             elif "\x00" <= ch < "\x20":
-                eqeq += f"\\{ord(ch):03o}"
+                eqeq += f"\\{b:03o}"
             else:
                 eqeq += ch
         eqeq += ")"
@@ -141,6 +146,10 @@ class Name(Object):
             return cls(True, text[1:])
         else:
             return cls(False, text)
+
+    @property
+    def str_value(self) -> str:
+        return self.value
 
     def op_eq(self) -> str:
         return self.value
@@ -215,7 +224,7 @@ def from_py(val: Any) -> Object:
         case int():
             return Integer(True, val)
         case str():
-            return String(True, val)
+            return String(True, bytearray(val.encode("iso8859-1")))
         case _:
             raise Exception(f"Buh? from_py({val=})")
 

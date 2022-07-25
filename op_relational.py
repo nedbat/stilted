@@ -14,7 +14,7 @@ def eq_ne(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
         case (Integer() | Real(), Integer() | Real()):
             estate.opush(from_py(pyop(a.value, b.value)))
         case (String() | Name(), String() | Name()):
-            estate.opush(from_py(pyop(a.value, b.value)))
+            estate.opush(from_py(pyop(a.str_value, b.str_value)))
         case _:
             raise Tilted("typecheck")
 
@@ -25,7 +25,7 @@ def ge_etc(estate: ExecState, pyop: Callable[[Any, Any], bool]) -> None:
         case (Integer() | Real(), Integer() | Real()):
             estate.opush(from_py(pyop(a.value, b.value)))
         case (String(), String()):
-            estate.opush(from_py(pyop(a.value, b.value)))
+            estate.opush(from_py(pyop(a.str_value, b.str_value)))
         case _:
             raise Tilted("typecheck")
 
