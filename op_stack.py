@@ -1,7 +1,7 @@
 """Built-in stack operators for stilted."""
 
 from estate import operator, ExecState
-from dtypes import from_py, Integer, MARK
+from dtypes import from_py, typecheck, Integer, MARK
 
 
 @operator
@@ -42,8 +42,9 @@ def exch(estate: ExecState) -> None:
 
 @operator
 def index(estate: ExecState) -> None:
-    n = estate.opop().value
-    estate.opush(estate.ostack[-(n + 1)])
+    n = estate.opop()
+    typecheck(Integer, n)
+    estate.opush(estate.ostack[-(n.value + 1)])
 
 @operator
 def mark(estate: ExecState) -> None:

@@ -61,6 +61,9 @@ def test_evaluate(text, stack):
         # exch
         ("exch", "stackunderflow"),
         ("1 exch", "stackunderflow"),
+        # index
+        ("index", "stackunderflow"),
+        ("(a) index", "typecheck"),
         # pop
         ("pop", "stackunderflow"),
         # roll
