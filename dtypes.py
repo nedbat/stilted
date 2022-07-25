@@ -93,6 +93,7 @@ class SaveableObject(Object, Generic[T]):
 class Save(Object):
     """A VM snapshot object."""
     typename: ClassVar[str] = "save"
+    serial: int
     is_valid: bool
     changed_objs: list[SaveableObject]
 

@@ -25,6 +25,8 @@ def test_evaluate(text, stack):
         ("123 restore", "typecheck"),
         ("save dup restore restore", "invalidrestore"),
         ("save save exch restore restore", "invalidrestore"),
+        ("save 10 dict exch restore", "invalidrestore"),
+        ("save 10 dict begin restore", "invalidrestore"),
     ],
 )
 def test_evaluate_error(text, error):

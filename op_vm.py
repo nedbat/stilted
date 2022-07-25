@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import typecheck, Save
+from dtypes import typecheck, Object, Save, SaveableObject
 
 @operator
 def restore(estate: ExecState) -> None:
@@ -18,6 +18,13 @@ def restore(estate: ExecState) -> None:
         save.is_valid = False
         if save is s:
             break
+
+    # Check the ostack and dstack for things newer than the savepoint.
+    for stack in [estate.ostack, estate.dstack]:
+        for o in stack:     # type: ignore
+            if isinstance(o, SaveableObject):
+                if o.values[0][0].serial >= s.serial:
+                    raise Tilted("invalidrestore")
 
 @operator
 def save(estate: ExecState) -> None:

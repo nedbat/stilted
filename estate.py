@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import itertools
 import sys
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterator
 
 from error import Tilted
 from dtypes import (
@@ -28,6 +29,7 @@ class ExecState:
     estack: list[Any]
     sstack: list[Save]
     stdout: Any
+    save_serials: Iterator[int]
 
     @classmethod
     def new(cls) -> ExecState:
@@ -38,6 +40,7 @@ class ExecState:
             estack=[],
             sstack=[],
             stdout=sys.stdout,
+            save_serials=itertools.count(),
         )
 
         estate.new_save()
@@ -123,7 +126,7 @@ class ExecState:
 
     def new_save(self) -> Save:
         """Make a new save-point."""
-        save = Save(literal=True, is_valid=True, changed_objs=[])
+        save = Save(literal=True, serial=next(self.save_serials), is_valid=True, changed_objs=[])
         self.sstack.append(save)
         return save
 
