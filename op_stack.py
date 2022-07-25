@@ -42,8 +42,7 @@ def exch(estate: ExecState) -> None:
 
 @operator
 def index(estate: ExecState) -> None:
-    n = estate.opop()
-    typecheck(Integer, n)
+    n = estate.opop(Integer)
     estate.opush(estate.ostack[-(n.value + 1)])
 
 @operator

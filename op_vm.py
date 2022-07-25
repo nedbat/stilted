@@ -6,8 +6,7 @@ from dtypes import typecheck, Save
 
 @operator
 def restore(estate: ExecState) -> None:
-    s = estate.opop()
-    typecheck(Save, s)
+    s = estate.opop(Save)
     if not s.is_valid:
         raise Tilted("invalidrestore")
     assert s in estate.sstack

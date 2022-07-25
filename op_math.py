@@ -8,8 +8,7 @@ from dtypes import from_py, typecheck, Number
 
 @operator("abs")
 def abs_(estate: ExecState) -> None:
-    a = estate.opop()
-    typecheck(Number, a)
+    a = estate.opop(Number)
     estate.opush(from_py(abs(a.value)))
 
 @operator
@@ -20,8 +19,7 @@ def add(estate: ExecState) -> None:
 
 @operator
 def ceiling(estate: ExecState) -> None:
-    a = estate.opop()
-    typecheck(Number, a)
+    a = estate.opop(Number)
     av = a.value
     estate.opush(from_py(type(av)(math.ceil(av))))
 
@@ -33,8 +31,7 @@ def div(estate: ExecState) -> None:
 
 @operator
 def floor(estate: ExecState) -> None:
-    a = estate.opop()
-    typecheck(Number, a)
+    a = estate.opop(Number)
     av = a.value
     estate.opush(from_py(type(av)(math.floor(av))))
 
@@ -60,14 +57,12 @@ def mul(estate: ExecState) -> None:
 
 @operator
 def neg(estate: ExecState) -> None:
-    a = estate.opop()
-    typecheck(Number, a)
+    a = estate.opop(Number)
     estate.opush(from_py(-a.value))
 
 @operator("round")
 def round_(estate: ExecState) -> None:
-    a = estate.opop()
-    typecheck(Number, a)
+    a = estate.opop(Number)
     av = a.value
     if av - int(av) == 0.5:
         r = int(av) + 1
@@ -83,7 +78,6 @@ def sub(estate: ExecState) -> None:
 
 @operator
 def truncate(estate: ExecState) -> None:
-    a = estate.opop()
-    typecheck(Number, a)
+    a = estate.opop(Number)
     av = a.value
     estate.opush(from_py(type(av)(math.trunc(av))))

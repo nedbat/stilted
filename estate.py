@@ -8,7 +8,7 @@ from typing import Any
 
 from error import Tilted
 from dtypes import (
-    from_py, Dict, MARK, Name, Object, Operator, Procedure, Save,
+    from_py, typecheck, Dict, MARK, Name, Object, Operator, Procedure, Save,
     SaveableObject, String,
 )
 
@@ -52,10 +52,17 @@ class ExecState:
 
         return estate
 
-    def opop(self) -> Any:
-        """Remove the top operand and return it."""
+    def opop(self, a_type=None) -> Any:
+        """
+        Remove the top operand and return it.
+
+        Optionally typecheck the value with `a_type`.
+        """
         self.ohas(1)
-        return self.ostack.pop()
+        obj = self.ostack.pop()
+        if a_type is not None:
+            typecheck(a_type, obj)
+        return obj
 
     def opopn(self, n: int) -> list[Any]:
         """Remove the top n operands and return them."""

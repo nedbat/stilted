@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import Name, String
+from dtypes import Name, Stringy
 
 @operator("=")
 def eq_(estate: ExecState) -> None:
@@ -18,12 +18,8 @@ def eqeq_(estate: ExecState) -> None:
 
 @operator("print")
 def print_(estate: ExecState) -> None:
-    s = estate.opop()
-    match s:
-        case String() | Name():
-            estate.stdout.write(s.value)
-        case _:
-            raise Tilted("typecheck")
+    s = estate.opop(Stringy)
+    estate.stdout.write(s.value)
 
 @operator
 def pstack(estate: ExecState) -> None:

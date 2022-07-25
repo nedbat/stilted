@@ -6,8 +6,7 @@ from dtypes import from_py, typecheck, Dict, Integer, Name, Stringy
 
 @operator
 def begin(estate: ExecState) -> None:
-    d = estate.opop()
-    typecheck(Dict, d)
+    d = estate.opop(Dict)
     estate.dstack.append(d)
 
 @operator
@@ -25,8 +24,7 @@ def currentdict(estate: ExecState) -> None:
 
 @operator("dict")
 def dict_(estate: ExecState) -> None:
-    n = estate.opop()
-    typecheck(Integer, n)
+    n = estate.opop(Integer)
     if n.value < 0:
         raise Tilted("rangecheck")
     estate.opush(estate.new_dict())
@@ -54,8 +52,7 @@ def known(estate: ExecState) -> None:
 
 @operator
 def load(estate: ExecState) -> None:
-    k = estate.opop()
-    typecheck(Stringy, k)
+    k = estate.opop(Stringy)
     obj = estate.dstack_value(k)
     if obj is None:
         raise Tilted(f"undefined: {k.value}")
@@ -63,8 +60,7 @@ def load(estate: ExecState) -> None:
 
 @operator
 def maxlength(estate: ExecState) -> None:
-    d = estate.opop()
-    typecheck(Dict, d)
+    d = estate.opop(Dict)
     estate.opush(from_py(len(d.value) + 10))
 
 @operator
@@ -79,8 +75,7 @@ def store(estate: ExecState) -> None:
 
 @operator
 def where(estate: ExecState) -> None:
-    k = estate.opop()
-    typecheck(Stringy, k)
+    k = estate.opop(Stringy)
     d = estate.dstack_dict(k)
     if d is not None:
         estate.opush(d, from_py(True))
