@@ -23,31 +23,73 @@ def forall(estate: ExecState) -> None:
             _do_forall_dict.exitable = True  # type: ignore
             estate.estack.extend([[iter(o.value.items()), proc], _do_forall_dict])
 
+        case String():
+            def _do_forall_string(estate: ExecState) -> None:
+                biter, proc = estate.estack.pop()
+                try:
+                    b = next(biter)
+                except StopIteration:
+                    return
+                estate.opush(from_py(b))
+                estate.estack.extend([[biter, proc], _do_forall_string])
+                estate.run_proc(proc)
+
+            _do_forall_string.exitable = True  # type: ignore
+            estate.estack.extend([[iter(o.value), proc], _do_forall_string])
+
         case _:
             raise Tilted("typecheck")
 
 
 @operator
 def get(estate: ExecState) -> None:
-    d, k = estate.opopn(2)
-    typecheck(Dict, d)
-    typecheck(Stringy, k)
-    try:
-        obj = d.value[k.value]
-    except KeyError:
-        raise Tilted(f"undefined: {k.value}")
-    estate.opush(obj)
+    obj, ind = estate.opopn(2)
+    match obj:
+        case Dict():
+            typecheck(Stringy, ind)
+            try:
+                obj = obj.value[ind.value]
+            except KeyError:
+                raise Tilted(f"undefined: {ind.value}")
+            estate.opush(obj)
+
+        case String():
+            typecheck(Integer, ind)
+            try:
+                byte = obj.value[ind.value]
+            except IndexError:
+                raise Tilted(f"rangecheck")
+            estate.opush(from_py(byte))
+
+        case _:
+            raise Tilted(f"typecheck: got {type(obj)}")
 
 @operator
 def length(estate: ExecState) -> None:
-    d = estate.opop()
-    typecheck(Dict, d)
-    estate.opush(from_py(len(d.value)))
+    o = estate.opop()
+    match o:
+        case Dict() | Name() | String():
+            estate.opush(from_py(len(o.value)))
+        case _:
+            raise Tilted(f"typecheck: got {type(o)}")
 
 @operator
 def put(estate: ExecState) -> None:
-    d, k, o = estate.opopn(3)
-    typecheck(Dict, d)
-    typecheck(Stringy, k)
-    estate.prep_for_change(d)
-    d.value[k.value] = o
+    obj, ind, elt = estate.opopn(3)
+    match obj:
+        case Dict():
+            typecheck(Stringy, ind)
+            estate.prep_for_change(obj)
+            obj.value[ind.value] = elt
+
+        case String():
+            typecheck(Integer, ind, elt)
+            if not (0 <= elt.value < 256):
+                raise Tilted(f"rangecheck")
+            try:
+                obj.value[ind.value] = elt.value
+            except IndexError:
+                raise Tilted(f"rangecheck")
+
+        case _:
+            raise Tilted(f"typecheck: got {type(obj)}")

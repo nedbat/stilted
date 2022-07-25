@@ -16,6 +16,7 @@ import op_object
 import op_output
 import op_relational
 import op_stack
+import op_string
 import op_vm
 
 
