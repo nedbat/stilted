@@ -169,8 +169,19 @@ class Mark(Object):
     """A mark. There is only one."""
     typename: ClassVar[str] = "mark"
 
+MARK = Mark(literal=True)
 
-MARK = Mark(literal=False)
+
+class Null(Object):
+    """A null. There is only one."""
+    typename: ClassVar[str] = "null"
+
+    def op_eqeq(self) -> str:
+        return "null"
+
+NULL = Null(literal=True)
+
+
 
 
 @dataclass
@@ -223,6 +234,8 @@ def from_py(val: Any) -> Object:
             return Real(True, val)
         case int():
             return Integer(True, val)
+        case None:
+            return NULL
         case str():
             return String(True, bytearray(val.encode("iso8859-1")))
         case _:

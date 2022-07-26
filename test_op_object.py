@@ -20,6 +20,7 @@ from test_helpers import compare_stacks
         ("123 type", [Name(False, "integertype")]),
         ("mark type", [Name(False, "marktype")]),
         ("/Name type", [Name(False, "nametype")]),
+        ("null type", [Name(False, "nulltype")]),
         ("12.3 type", [Name(False, "realtype")]),
         ("(hello) type", [Name(False, "stringtype")]),
         ("systemdict type", [Name(False, "dicttype")]),
@@ -29,6 +30,8 @@ from test_helpers import compare_stacks
         ("/Hello xcheck", [False]),
         ("{hello} xcheck", [True]),
         ("123 xcheck", [False]),
+        ("mark xcheck", [False]),
+        ("null xcheck", [False]),
     ],
 )
 def test_evaluate(text, stack):

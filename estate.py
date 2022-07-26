@@ -9,7 +9,8 @@ from typing import Any, Iterator
 
 from error import Tilted
 from dtypes import (
-    from_py, typecheck, Dict, MARK, Name, Object, Operator, Procedure, Save,
+    from_py, typecheck,
+    Dict, MARK, Name, NULL, Object, Operator, Procedure, Save,
     SaveableObject, String,
 )
 
@@ -17,6 +18,7 @@ from dtypes import (
 SYSTEMDICT: dict[str, Object] = {}
 
 SYSTEMDICT["false"] = from_py(False)
+SYSTEMDICT["null"] = from_py(None)
 SYSTEMDICT["true"] = from_py(True)
 
 
