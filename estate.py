@@ -10,7 +10,7 @@ from typing import Any, Iterator
 from error import Tilted
 from dtypes import (
     from_py, typecheck,
-    Dict, MARK, Name, NULL, Object, Operator, Procedure, Save,
+    Array, Dict, MARK, Name, NULL, Object, Operator, Procedure, Save,
     SaveableObject, String,
 )
 
@@ -64,8 +64,11 @@ class ExecState:
     def opopn(self, n: int) -> list[Any]:
         """Remove the top n operands and return them."""
         self.ohas(n)
-        vals = self.ostack[-n:]
-        del self.ostack[-n:]
+        if n == 0:
+            vals = []
+        else:
+            vals = self.ostack[-n:]
+            del self.ostack[-n:]
         return vals
 
     def opush(self, *vals) -> None:
@@ -91,6 +94,16 @@ class ExecState:
             if val is MARK:
                 return i
         raise Tilted("unmatchedmark")
+
+    def new_array(self, n: int=None, value: list[Object]=None) -> Array:
+        """Make a new Array, either by size or contents."""
+        if value is None:
+            assert n is not None
+            value = [NULL] * n
+        return Array(
+            literal=True,
+            values=[(self.sstack[-1], value)],
+        )
 
     def dstack_value(self, name: Name | String) -> Object | None:
         """Look in dstack for `name`. If found, return the value."""

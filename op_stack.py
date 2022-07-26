@@ -55,10 +55,6 @@ def index(estate: ExecState) -> None:
 def mark(estate: ExecState) -> None:
     estate.opush(MARK)
 
-@operator("[")
-def mark_(estate: ExecState) -> None:
-    estate.opush(MARK)
-
 @operator
 def pop(estate: ExecState) -> None:
     estate.opop()

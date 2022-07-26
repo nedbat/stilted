@@ -2,13 +2,30 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Dict, Integer, Name, Procedure, String, Stringy
+from dtypes import (
+    from_py, typecheck,
+    Array, Dict, Integer, Name, Procedure, String, Stringy,
+)
 
 @operator
 def forall(estate: ExecState) -> None:
     o, proc = estate.opopn(2)
     typecheck(Procedure, proc)
     match o:
+        case Array():
+            def _do_forall_array(estate: ExecState) -> None:
+                aiter, proc = estate.estack.pop()
+                try:
+                    obj = next(aiter)
+                except StopIteration:
+                    return
+                estate.opush(obj)
+                estate.estack.extend([[aiter, proc], _do_forall_array])
+                estate.run_proc(proc)
+
+            _do_forall_array.exitable = True  # type: ignore
+            estate.estack.extend([[iter(o.value), proc], _do_forall_array])
+
         case Dict():
             def _do_forall_dict(estate: ExecState) -> None:
                 diter, proc = estate.estack.pop()
@@ -45,6 +62,16 @@ def forall(estate: ExecState) -> None:
 def get(estate: ExecState) -> None:
     obj, ind = estate.opopn(2)
     match obj:
+        case Array():
+            typecheck(Integer, ind)
+            if ind.value < 0:
+                raise Tilted("rangecheck")
+            try:
+                elt = obj.value[ind.value]
+            except IndexError:
+                raise Tilted("rangecheck")
+            estate.opush(elt)
+
         case Dict():
             typecheck(Stringy, ind)
             try:
@@ -68,7 +95,7 @@ def get(estate: ExecState) -> None:
 def length(estate: ExecState) -> None:
     o = estate.opop()
     match o:
-        case Dict() | Name() | String():
+        case Array() | Dict() | Name() | String():
             estate.opush(from_py(len(o.value)))
         case _:
             raise Tilted(f"typecheck: got {type(o)}")
@@ -77,6 +104,13 @@ def length(estate: ExecState) -> None:
 def put(estate: ExecState) -> None:
     obj, ind, elt = estate.opopn(3)
     match obj:
+        case Array():
+            typecheck(Integer, ind)
+            if not (0 <= ind.value < len(obj.value)):
+                raise Tilted(f"rangecheck")
+            estate.prep_for_change(obj)
+            obj.value[ind.value] = elt
+
         case Dict():
             typecheck(Stringy, ind)
             estate.prep_for_change(obj)

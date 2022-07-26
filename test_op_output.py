@@ -26,6 +26,7 @@ from test_helpers import compare_stacks
         ("systemdict =", [], "--nostringval--\n"),
         ("/add load =", [], "add\n"),
         ("save =", [], "--nostringval--\n"),
+        ("[]=", [], "--nostringval--\n"),
         # ==
         ("12345 ==", [], "12345\n"),
         ("1234.5 ==", [], "1234.5\n"),
@@ -42,6 +43,9 @@ from test_helpers import compare_stacks
         ("systemdict ==", [], "-dict-\n"),
         ("/add load ==", [], "--add--\n"),
         ("save ==", [], "-save-\n"),
+        ("[] ==", [], "[]\n"),
+        ("[1]==", [], "[1]\n"),
+        ("[1 (a) null] ==", [], "[1 (a) null]\n"),
         # print
         ("(hello) print", [], "hello"),
         ("(hello) print (world) print", [], "helloworld"),

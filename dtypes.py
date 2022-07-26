@@ -182,6 +182,25 @@ class Null(Object):
 NULL = Null(literal=True)
 
 
+@dataclass
+class Array(SaveableObject[list[Object]]):
+    """An array."""
+    typename: ClassVar[str] = "array"
+
+    def op_eqeq(self) -> str:
+        eqeq = "["
+        eqeq += " ".join(obj.op_eqeq() for obj in self.value)
+        eqeq += "]"
+        return eqeq
+
+    def _copy_for_restore(self) -> list[Object]:
+        return list(self.value)
+
+    def __getitem__(self, index: int) -> Object:
+        return self.value[index]
+
+    def __setitem__(self, index: int, value: Object) -> None:
+        self.value[index] = value
 
 
 @dataclass

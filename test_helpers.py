@@ -1,3 +1,5 @@
+"""Helpers for tests for Stilted."""
+
 from dtypes import from_py, Object
 
 def compare_stacks(stk1, stk2):
