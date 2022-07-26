@@ -30,7 +30,7 @@ class ExecState:
     ostack: list[Object] = field(default_factory=list)
     estack: list[Any] = field(default_factory=list)
     sstack: list[Save] = field(default_factory=list)
-    stdout: Any = sys.stdout,
+    stdout: Any = sys.stdout
     save_serials: Iterator[int] = field(default_factory=itertools.count)
 
     @classmethod
