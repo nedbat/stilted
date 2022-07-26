@@ -1,5 +1,6 @@
 """Built-in stack operators for stilted."""
 
+from error import Tilted
 from estate import operator, ExecState
 from dtypes import from_py, typecheck, Integer, MARK
 
@@ -18,7 +19,9 @@ def copy(estate: ExecState) -> None:
     estate.ohas(1)
     if isinstance(estate.ostack[-1], Integer):
         n = estate.opop().value
-        if n:
+        if n < 0:
+            raise Tilted(f"rangecheck")
+        elif n > 0:
             estate.ohas(n)
             estate.opush(*estate.ostack[-n:])
 
@@ -43,6 +46,9 @@ def exch(estate: ExecState) -> None:
 @operator
 def index(estate: ExecState) -> None:
     n = estate.opop(Integer)
+    estate.ohas(n.value + 1)
+    if n.value < 0:
+        raise Tilted(f"rangecheck")
     estate.opush(estate.ostack[-(n.value + 1)])
 
 @operator
@@ -60,6 +66,7 @@ def pop(estate: ExecState) -> None:
 @operator
 def roll(estate: ExecState) -> None:
     n, j = estate.opopn(2)
+    typecheck(Integer, n, j)
     vals = estate.opopn(n.value)
     estate.opush(*vals[-j.value:])
     estate.opush(*vals[:-j.value])

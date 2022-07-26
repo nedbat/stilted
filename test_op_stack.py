@@ -54,6 +54,7 @@ def test_evaluate(text, stack):
         # copy
         ("copy", "stackunderflow"),
         ("(a) (b) 3 copy", "stackunderflow"),
+        ("(a) (b) -1 copy", "rangecheck"),
         # counttomark
         ("1 2 3 counttomark", "unmatchedmark"),
         # dup
@@ -64,12 +65,17 @@ def test_evaluate(text, stack):
         # index
         ("index", "stackunderflow"),
         ("(a) index", "typecheck"),
+        ("(a) (b) (c) (d) 4 index", "stackunderflow"),
+        ("(a) (b) (c) (d) -1 index", "rangecheck"),
         # pop
         ("pop", "stackunderflow"),
         # roll
         ("1 2 3 4 1 roll", "stackunderflow"),
         ("roll", "stackunderflow"),
         ("1 0 roll", "stackunderflow"),
+        ("1 2 3 (a) 1 roll", "typecheck"),
+        ("1 2 3 1 (a) roll", "typecheck"),
+        ("1 2 3 10 1 roll", "stackunderflow"),
     ],
 )
 def test_evaluate_error(text, error):
