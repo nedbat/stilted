@@ -2,7 +2,6 @@
 
 import pytest
 
-from dtypes import Name
 from error import Tilted
 from evaluate import evaluate
 from test_helpers import compare_stacks

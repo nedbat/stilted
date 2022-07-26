@@ -4,7 +4,7 @@ import sys
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Boolean, Dict, Integer, Name, Number, Procedure
+from dtypes import from_py, typecheck, Boolean, Integer, Number, Procedure
 
 
 @operator

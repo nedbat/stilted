@@ -85,7 +85,7 @@ def get(estate: ExecState) -> None:
             try:
                 byte = obj.value[ind.value]
             except IndexError:
-                raise Tilted(f"rangecheck")
+                raise Tilted("rangecheck")
             estate.opush(from_py(byte))
 
         case _:
@@ -107,7 +107,7 @@ def put(estate: ExecState) -> None:
         case Array():
             typecheck(Integer, ind)
             if not (0 <= ind.value < len(obj.value)):
-                raise Tilted(f"rangecheck")
+                raise Tilted("rangecheck")
             estate.prep_for_change(obj)
             obj.value[ind.value] = elt
 
@@ -119,11 +119,11 @@ def put(estate: ExecState) -> None:
         case String():
             typecheck(Integer, ind, elt)
             if not (0 <= elt.value < 256):
-                raise Tilted(f"rangecheck")
+                raise Tilted("rangecheck")
             try:
                 obj.value[ind.value] = elt.value
             except IndexError:
-                raise Tilted(f"rangecheck")
+                raise Tilted("rangecheck")
 
         case _:
             raise Tilted(f"typecheck: got {type(obj)}")

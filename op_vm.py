@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import typecheck, Object, Save, SaveableObject
+from dtypes import Save, SaveableObject
 
 @operator
 def restore(estate: ExecState) -> None:

@@ -1,8 +1,7 @@
 """Built-in output operators for stilted."""
 
-from error import Tilted
 from estate import operator, ExecState
-from dtypes import Name, Stringy
+from dtypes import Stringy
 
 @operator("=")
 def eq_(estate: ExecState) -> None:

@@ -4,7 +4,6 @@ import pytest
 
 from error import Tilted
 from evaluate import evaluate
-from dtypes import Name
 from test_helpers import compare_stacks
 
 

@@ -9,17 +9,18 @@ from dtypes import Name, Object, Operator, Procedure
 
 from estate import ExecState
 
-import op_array
-import op_collections
-import op_control
-import op_dict
-import op_math
-import op_object
-import op_output
-import op_relational
-import op_stack
-import op_string
-import op_vm
+# Imported but not used, assert them to quiet the linter
+import op_array; assert op_array
+import op_collections; assert op_collections
+import op_control; assert op_control
+import op_dict; assert op_dict
+import op_math; assert op_math
+import op_object; assert op_object
+import op_output; assert op_output
+import op_relational; assert op_relational
+import op_stack; assert op_stack
+import op_string; assert op_string
+import op_vm; assert op_vm
 
 
 def evaluate(text: str, stdout=None) -> ExecState:

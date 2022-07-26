@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Integer, String
+from dtypes import Integer, String
 
 @operator
 def string(estate: ExecState) -> None:

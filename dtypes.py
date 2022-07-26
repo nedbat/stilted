@@ -90,7 +90,7 @@ class SaveableObject(Object, Generic[T]):
 
     def _copy_for_restore(self) -> T:
         """Make a new copy of the real data, for later restoring."""
-        raise NotImplemented
+        raise NotImplementedError
 
 
 @dataclass
