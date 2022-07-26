@@ -14,6 +14,7 @@ from test_helpers import compare_stacks
         # forall
         ("(hello) {} forall", [104, 101, 108, 108, 111]),
         ("0 (hello) { add } forall", [532]),
+        ("(ABCdef) { dup (a) 0 get ge {exit} if } forall", [65, 66, 67, 100]),
         # get
         ("(hello) 2 get", [108]),
         # length
