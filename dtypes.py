@@ -78,6 +78,10 @@ class SaveableObject(Object, Generic[T]):
     """A value that can be save/restored."""
     values: list[tuple[Save, T]]
 
+    @property
+    def value(self) -> T:
+        return self.values[-1][1]
+
     def prep_for_change(self, save: Save) -> None:
         """Call this before mutating a saveable object."""
         if self.values[-1][0] is not save:
@@ -173,10 +177,6 @@ MARK = Mark(literal=False)
 class Dict(SaveableObject[dict[str, Object]]):
     """A dictionary."""
     typename: ClassVar[str] = "dict"
-
-    @property
-    def value(self) -> dict[str, Object]:
-        return self.values[-1][1]
 
     def _copy_for_restore(self) -> dict[str, Object]:
         return dict(self.value)
