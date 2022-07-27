@@ -94,12 +94,7 @@ def test_evaluate(text, stack):
         # end
         ("end", "dictstackunderflow"),
         ("10 dict begin end end", "dictstackunderflow"),
-        # forall
-        ("10 dict 123 forall", "typecheck"),
         # get
-        ("get", "stackunderflow"),
-        ("/foo get", "stackunderflow"),
-        ("123 /foo get", "typecheck"),
         ("systemdict 123 get", "typecheck"),
         ("systemdict /xyzzy get", "undefined: xyzzy"),
         # known
@@ -107,9 +102,6 @@ def test_evaluate(text, stack):
         ("/foo known", "stackunderflow"),
         ("123 /foo known", "typecheck"),
         ("systemdict 123 known", "typecheck"),
-        # length
-        ("length", "stackunderflow"),
-        ("213 length", "typecheck"),
         # load
         ("load", "stackunderflow"),
         ("123 load", "typecheck"),
@@ -118,10 +110,6 @@ def test_evaluate(text, stack):
         ("maxlength", "stackunderflow"),
         ("213 maxlength", "typecheck"),
         # put
-        ("put", "stackunderflow"),
-        ("12 put", "stackunderflow"),
-        ("/foo 12 put", "stackunderflow"),
-        ("123 /foo 12 put", "typecheck"),
         ("userdict true 12 put", "typecheck"),
         # store
         ("store", "stackunderflow"),
