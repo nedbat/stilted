@@ -1,8 +1,7 @@
 """Built-in array operators for stilted."""
 
-from error import Tilted
 from estate import operator, ExecState
-from dtypes import Integer, MARK
+from dtypes import rangecheck, Integer, MARK
 
 @operator("[")
 def mark_(estate: ExecState) -> None:
@@ -18,6 +17,5 @@ def array_(estate: ExecState) -> None:
 @operator
 def array(estate: ExecState) -> None:
     n = estate.opop(Integer).value
-    if n < 0:
-        raise Tilted("rangecheck")
+    rangecheck(0, n)
     estate.opush(estate.new_array(n=n))

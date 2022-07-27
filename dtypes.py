@@ -130,12 +130,9 @@ class String(Object):
 
     def new_sub(self, start: int, length: int) -> String:
         """Make a new string as a substring of another."""
-        if not (0 <= start <= self.length):
-            raise Tilted("rangecheck")
-        if not (0 <= length):
-            raise Tilted("rangecheck")
-        if not (start + length <= self.length):
-            raise Tilted("rangecheck")
+        rangecheck(0, start, self.length)
+        rangecheck(0, length)
+        rangecheck(start + length, self.length)
         return String(
             literal=True,
             barr=self.barr,
@@ -311,3 +308,12 @@ def typecheck(a_type, *vals) -> None:
     for val in vals:
         if not isinstance(val, a_type):
             raise Tilted(f"typecheck: expected {a_type}, got {type(val)}")
+
+
+def rangecheck(lo: int, val: int, hi: int | None=None) -> None:
+    """Check that `lo <= val` and `val <= hi`."""
+    if not (lo <= val):
+        raise Tilted(f"rangecheck: need {lo} <= {val}")
+    if hi is not None:
+        if not (val <= hi):
+            raise Tilted(f"rangecheck: need {val} <= {hi}")

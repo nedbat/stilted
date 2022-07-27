@@ -2,9 +2,11 @@
 
 import sys
 
-from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Boolean, Integer, Number, Procedure
+from dtypes import (
+    from_py, rangecheck, typecheck,
+    Boolean, Integer, Number, Procedure,
+)
 
 
 @operator
@@ -67,8 +69,7 @@ def repeat(estate: ExecState) -> None:
     typecheck(Integer, n)
     typecheck(Procedure, proc)
     nv = n.value
-    if nv < 0:
-        raise Tilted("rangecheck")
+    rangecheck(0, nv)
 
     def _do_repeat(estate: ExecState) -> None:
         nv, proc = estate.estack.pop()

@@ -3,7 +3,7 @@
 from error import Tilted
 from estate import operator, ExecState
 from dtypes import (
-    from_py, typecheck,
+    from_py, rangecheck, typecheck,
     Array, Dict, Integer, Name, Procedure, String, Stringy,
 )
 
@@ -63,12 +63,8 @@ def get(estate: ExecState) -> None:
     match obj:
         case Array():
             typecheck(Integer, ind)
-            if ind.value < 0:
-                raise Tilted("rangecheck")
-            try:
-                elt = obj[ind.value]
-            except IndexError:
-                raise Tilted("rangecheck")
+            rangecheck(0, ind.value, len(obj.value)-1)
+            elt = obj[ind.value]
             estate.opush(elt)
 
         case Dict():
@@ -81,12 +77,8 @@ def get(estate: ExecState) -> None:
 
         case String():
             typecheck(Integer, ind)
-            if ind.value < 0:
-                raise Tilted("rangecheck")
-            try:
-                byte = obj[ind.value]
-            except IndexError:
-                raise Tilted("rangecheck")
+            rangecheck(0, ind.value, obj.length - 1)
+            byte = obj[ind.value]
             estate.opush(from_py(byte))
 
         case _:
@@ -118,8 +110,7 @@ def put(estate: ExecState) -> None:
     match obj:
         case Array():
             typecheck(Integer, ind)
-            if not (0 <= ind.value < len(obj.value)):
-                raise Tilted("rangecheck")
+            rangecheck(0, ind.value, len(obj.value)-1)
             estate.prep_for_change(obj)
             obj[ind.value] = elt
 
@@ -130,12 +121,9 @@ def put(estate: ExecState) -> None:
 
         case String():
             typecheck(Integer, ind, elt)
-            if not (0 <= elt.value < 256):
-                raise Tilted("rangecheck")
-            try:
-                obj[ind.value] = elt.value
-            except IndexError:
-                raise Tilted("rangecheck")
+            rangecheck(0, elt.value, 255)
+            rangecheck(0, ind.value, obj.length - 1)
+            obj[ind.value] = elt.value
 
         case _:
             raise Tilted(f"typecheck: got {type(obj)}")

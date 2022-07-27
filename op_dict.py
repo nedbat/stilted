@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, typecheck, Dict, Integer, Name, Stringy
+from dtypes import from_py, rangecheck, typecheck, Dict, Integer, Name, Stringy
 
 @operator
 def begin(estate: ExecState) -> None:
@@ -25,8 +25,7 @@ def currentdict(estate: ExecState) -> None:
 @operator("dict")
 def dict_(estate: ExecState) -> None:
     n = estate.opop(Integer)
-    if n.value < 0:
-        raise Tilted("rangecheck")
+    rangecheck(0, n.value)
     estate.opush(estate.new_dict())
 
 @operator("def")
