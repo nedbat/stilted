@@ -9,4 +9,4 @@ def string(estate: ExecState) -> None:
     n = estate.opop(Integer)
     if n.value < 0:
         raise Tilted("rangecheck")
-    estate.opush(String(literal=True, value=bytearray(n.value)))
+    estate.opush(String.from_size(n.value))

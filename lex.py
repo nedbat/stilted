@@ -79,7 +79,7 @@ def convert_string(text: str) -> String:
                     return esc_text[1]
 
     string = re.sub(r"(?s)\\[0-7]{1,3}|\\.", do_escape, text[1:-1])
-    return String(literal=True, value=bytearray(string.encode("iso8859-1")))
+    return String.from_bytes(string.encode("iso8859-1"))
 
 
 def convert_hex_string(text: str) -> String:
@@ -91,10 +91,7 @@ def convert_hex_string(text: str) -> String:
     text = re.sub(r"\s", "", text[1:-1])
     if len(text) % 2 == 1:
         text += "0"
-    return String(
-        literal=True,
-        value=bytearray(base64.b16decode(text, casefold=True)),
-    )
+    return String.from_bytes(base64.b16decode(text, casefold=True))
 
 
 def error(text: str):

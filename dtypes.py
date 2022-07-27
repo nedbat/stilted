@@ -106,7 +106,52 @@ class Save(Object):
 class String(Object):
     """A string, a mutable array of bytes"""
     typename: ClassVar[str] = "string"
-    value: bytearray
+    barr: bytearray
+    start: int
+    length: int
+
+    @classmethod
+    def from_bytes(cls, bytes: bytes) -> String:
+        """Make a new string from a bytestring."""
+        return cls(
+            literal=True,
+            barr=bytearray(bytes),
+            start=0,
+            length=len(bytes),
+        )
+
+    @classmethod
+    def from_size(cls, n: int) -> String:
+        """Make a new string with `n` zero bytes."""
+        return cls(literal=True, barr=bytearray(n), start=0, length=n)
+
+    def __eq__(self, other) -> bool:
+        return self.value == other.value
+
+    def new_sub(self, start: int, length: int) -> String:
+        """Make a new string as a substring of another."""
+        if not (0 <= start <= self.length):
+            raise Tilted("rangecheck")
+        if not (0 <= length):
+            raise Tilted("rangecheck")
+        if not (start + length <= self.length):
+            raise Tilted("rangecheck")
+        return String(
+            literal=True,
+            barr=self.barr,
+            start=self.start + start,
+            length=length,
+        )
+
+    @property
+    def value(self) -> bytearray:
+        return self.barr[self.start:self.start + self.length]
+
+    def __getitem__(self, index: int) -> int:
+        return self.barr[self.start + index]
+
+    def __setitem__(self, index: int, value: int) -> None:
+        self.barr[self.start + index] = value
 
     @property
     def str_value(self) -> str:
@@ -256,7 +301,7 @@ def from_py(val: Any) -> Object:
         case None:
             return NULL
         case str():
-            return String(True, bytearray(val.encode("iso8859-1")))
+            return String.from_bytes(val.encode("iso8859-1"))
         case _:
             raise Exception(f"Buh? from_py({val=})")
 

@@ -57,7 +57,6 @@ def forall(estate: ExecState) -> None:
         case _:
             raise Tilted("typecheck")
 
-
 @operator
 def get(estate: ExecState) -> None:
     obj, ind = estate.opopn(2)
@@ -67,7 +66,7 @@ def get(estate: ExecState) -> None:
             if ind.value < 0:
                 raise Tilted("rangecheck")
             try:
-                elt = obj.value[ind.value]
+                elt = obj[ind.value]
             except IndexError:
                 raise Tilted("rangecheck")
             estate.opush(elt)
@@ -75,7 +74,7 @@ def get(estate: ExecState) -> None:
         case Dict():
             typecheck(Stringy, ind)
             try:
-                obj = obj.value[ind.value]
+                obj = obj[ind.value]
             except KeyError:
                 raise Tilted(f"undefined: {ind.value}")
             estate.opush(obj)
@@ -83,10 +82,21 @@ def get(estate: ExecState) -> None:
         case String():
             typecheck(Integer, ind)
             try:
-                byte = obj.value[ind.value]
+                byte = obj[ind.value]
             except IndexError:
                 raise Tilted("rangecheck")
             estate.opush(from_py(byte))
+
+        case _:
+            raise Tilted(f"typecheck: got {type(obj)}")
+
+@operator
+def getinterval(estate: ExecState) -> None:
+    obj, ind, count = estate.opopn(3)
+    typecheck(Integer, ind, count)
+    match obj:
+        case String():
+            estate.opush(obj.new_sub(ind.value, count.value))
 
         case _:
             raise Tilted(f"typecheck: got {type(obj)}")
@@ -109,21 +119,38 @@ def put(estate: ExecState) -> None:
             if not (0 <= ind.value < len(obj.value)):
                 raise Tilted("rangecheck")
             estate.prep_for_change(obj)
-            obj.value[ind.value] = elt
+            obj[ind.value] = elt
 
         case Dict():
             typecheck(Stringy, ind)
             estate.prep_for_change(obj)
-            obj.value[ind.value] = elt
+            obj[ind.value] = elt
 
         case String():
             typecheck(Integer, ind, elt)
             if not (0 <= elt.value < 256):
                 raise Tilted("rangecheck")
             try:
-                obj.value[ind.value] = elt.value
+                obj[ind.value] = elt.value
             except IndexError:
                 raise Tilted("rangecheck")
+
+        case _:
+            raise Tilted(f"typecheck: got {type(obj)}")
+
+@operator
+def putinterval(estate: ExecState) -> None:
+    obj, ind, obj2 = estate.opopn(3)
+    typecheck(Integer, ind)
+    match obj:
+        case String():
+            typecheck(String, obj2)
+            if not (0 <= ind.value <= obj.length):
+                raise Tilted("rangecheck")
+            if not (ind.value + obj2.length <= obj.length):
+                raise Tilted("rangecheck")
+            for i in range(obj2.length):
+                obj[ind.value + i] = obj2[i]
 
         case _:
             raise Tilted(f"typecheck: got {type(obj)}")
