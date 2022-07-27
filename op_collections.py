@@ -81,6 +81,8 @@ def get(estate: ExecState) -> None:
 
         case String():
             typecheck(Integer, ind)
+            if ind.value < 0:
+                raise Tilted("rangecheck")
             try:
                 byte = obj[ind.value]
             except IndexError:

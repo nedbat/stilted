@@ -53,6 +53,7 @@ def test_evaluate(text, stack):
         ("(hello) (a) get", "typecheck"),
         ("(hello) 10 get", "rangecheck"),
         ("(hello) -10 get", "rangecheck"),
+        ("(hello) -1 get", "rangecheck"),
         # getinterval
         ("(hello) (a) 1 getinterval", "typecheck"),
         ("(hello) 1 (a) getinterval", "typecheck"),
