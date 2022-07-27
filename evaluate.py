@@ -42,6 +42,9 @@ def evaluate(text: str, stdout=None) -> ExecState:
 
     return estate
 
+def run(text: str) -> None:
+    """Run some Stilted code. Prints to stdout."""
+    evaluate(text)
 
 def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
     pstack: list[Any] = []
