@@ -21,4 +21,5 @@ test:				## Run the tests
 
 coverage:			## Measure test coverage
 	coverage run --branch --source=. -m pytest -q
-	coverage report --skip-covered --show-missing
+	coverage report --skip-covered --show-missing --precision=2
+	coverage html --skip-covered --precision=2
