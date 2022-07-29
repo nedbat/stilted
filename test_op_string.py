@@ -11,6 +11,8 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # copy
+        ("/s (.....) def (abc) s copy s s 1 88 put", ["aXc", "aXc.."]),
         # cvn
         ("(xyzzy) cvn", [Name(True, "xyzzy")]),
         ("(xyzzy) cvx cvn", [Name(False, "xyzzy")]),
@@ -56,6 +58,9 @@ def test_evaluate(text, stack):
 @pytest.mark.parametrize(
     "text, error",
     [
+        # copy
+        ("(abc) 3.5 copy", "typecheck"),
+        ("(abc) (a) copy", "rangecheck"),
         # cvn
         ("cvn", "stackunderflow"),
         ("123 cvn", "typecheck"),

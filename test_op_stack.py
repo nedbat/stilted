@@ -53,6 +53,7 @@ def test_evaluate(text, stack):
         ("1 2 3 cleartomark", "unmatchedmark"),
         # copy
         ("copy", "stackunderflow"),
+        ("3.5 3.5 copy", "typecheck"),
         ("(a) (b) 3 copy", "stackunderflow"),
         ("(a) (b) -1 copy", "rangecheck"),
         # counttomark

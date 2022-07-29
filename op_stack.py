@@ -1,7 +1,8 @@
 """Built-in stack operators for stilted."""
 
+from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, rangecheck, typecheck, Integer, MARK
+from dtypes import from_py, rangecheck, typecheck, Integer, MARK, String
 
 
 @operator
@@ -22,6 +23,17 @@ def copy(estate: ExecState) -> None:
         if n > 0:
             estate.ohas(n)
             estate.opush(*estate.ostack[-n:])
+    else:
+        obj1, obj2 = estate.opopn(2)
+        match obj1, obj2:
+            case String(), String():
+                rangecheck(obj1.length, obj2.length)
+                for i in range(obj1.length):
+                    obj2[i] = obj1[i]
+                estate.opush(obj2.new_sub(0, obj1.length))
+
+            case _:
+                raise Tilted(f"typecheck: got {type(obj1)}, {type(obj2)}")
 
 @operator
 def count(estate: ExecState) -> None:
