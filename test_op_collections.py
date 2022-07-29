@@ -33,6 +33,7 @@ from evaluate import evaluate
         ("12 putinterval", "stackunderflow"),
         ("/foo 12 putinterval", "stackunderflow"),
         ("123 /foo 12 putinterval", "typecheck"),
+        ("123 12 /foo putinterval", "typecheck"),
     ],
 )
 def test_evaluate_error(text, error):
