@@ -2,7 +2,7 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, rangecheck, typecheck, Integer, MARK, String
+from dtypes import from_py, rangecheck, typecheck, Dict, Integer, MARK, String
 
 
 @operator
@@ -26,6 +26,12 @@ def copy(estate: ExecState) -> None:
     else:
         obj1, obj2 = estate.opopn(2)
         match obj1, obj2:
+            case Dict(), Dict():
+                estate.prep_for_change(obj2)
+                for k, v in obj1.value.items():
+                    obj2[k] = v
+                estate.opush(obj2)
+
             case String(), String():
                 rangecheck(obj1.length, obj2.length)
                 for i in range(obj1.length):

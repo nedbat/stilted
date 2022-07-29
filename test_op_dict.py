@@ -16,6 +16,22 @@ from test_helpers import compare_stacks
         # cleardictstack
         ("cleardictstack countdictstack", [2]),
         ("10 dict begin cleardictstack countdictstack", [2]),
+        # copy
+        ("""
+            /d1 10 dict def /d2 10 dict def
+            d1 begin
+            /foo 123 def
+            /bar 345 def
+            end
+            save
+            d1 d2 copy length       % the length of the copy is 2
+            d2 /foo get
+            d2 /bar get
+            4 -1 roll restore       % restore to before the copy
+            d2 length               % the length is now 0
+            """,
+            [2, 123, 345, 0],
+        ),
         # countdictstack
         ("countdictstack", [2]),
         ("10 dict begin countdictstack", [3]),
@@ -83,6 +99,8 @@ def test_evaluate(text, stack):
         # begin
         ("begin", "stackunderflow"),
         ("123 begin", "typecheck"),
+        # copy
+        ("10 dict 3.5 copy", "typecheck"),
         # def
         ("def", "stackunderflow"),
         ("12 def", "stackunderflow"),
