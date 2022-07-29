@@ -25,10 +25,17 @@ import op_vm; assert op_vm
 
 def evaluate(text: str, stdout=None) -> ExecState:
     estate = ExecState.new()
-    estate.estack.append(collect_objects(lexer.tokens(text)))
     if stdout:
         estate.stdout = stdout
+    add_text(estate, text)
+    execute(estate)
+    return estate
 
+def add_text(estate: ExecState, text: str) -> None:
+    estate.estack.append(collect_objects(lexer.tokens(text)))
+
+def execute(estate: ExecState) -> None:
+    """Run the engine until it stops."""
     while estate.estack:
         if callable(estate.estack[-1]):
             obj = estate.estack.pop()
@@ -39,12 +46,6 @@ def evaluate(text: str, stdout=None) -> ExecState:
                 estate.estack.pop()
                 continue
         evaluate_one(obj, estate, direct=True)
-
-    return estate
-
-def run(text: str) -> None:
-    """Run some Stilted code. Prints to stdout."""
-    evaluate(text)
 
 def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
     pstack: list[Any] = []
