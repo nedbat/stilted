@@ -23,31 +23,66 @@ import op_string; assert op_string
 import op_vm; assert op_vm
 
 
+class Engine:
+    def __init__(self):
+        self.estate = ExecState.new()
+
+    def add_text(self, text: str) -> None:
+        self.estate.estack.append(collect_objects(lexer.tokens(text)))
+
+    def run(self) -> None:
+        """Run the engine until it stops."""
+        while self.estate.estack:
+            if callable(self.estate.estack[-1]):
+                obj = self.estate.estack.pop()
+            else:
+                try:
+                    obj = next(self.estate.estack[-1])
+                except StopIteration:
+                    self.estate.estack.pop()
+                    continue
+            self.evaluate_one(obj, direct=True)
+
+    def evaluate_one(self, obj: Any, direct: bool=False) -> None:
+        match obj:
+            case Name(False, name):
+                obj = self.estate.dstack_value(obj)
+                if obj is None:
+                    raise Tilted(f"undefined: {name}")
+                self.evaluate_one(obj)
+
+            case Procedure():
+                if direct:
+                    self.estate.opush(obj)
+                else:
+                    for subobj in obj.objs:
+                        self.evaluate_one(subobj)
+
+            case Operator():
+                obj.value(self.estate)
+
+            case Object(literal=True):
+                self.estate.opush(obj)
+
+            case _ if callable(obj):
+                obj(self.estate)
+
+            case _:
+                raise Exception(f"Buh? {obj!r}")
+
+
 def evaluate(text: str, stdout=None) -> ExecState:
-    estate = ExecState.new()
+    """A simple helper to execute text."""
+    engine = Engine()
     if stdout:
-        estate.stdout = stdout
-    add_text(estate, text)
-    execute(estate)
-    return estate
+        engine.estate.stdout = stdout
+    engine.add_text(text)
+    engine.run()
+    return engine.estate
 
-def add_text(estate: ExecState, text: str) -> None:
-    estate.estack.append(collect_objects(lexer.tokens(text)))
-
-def execute(estate: ExecState) -> None:
-    """Run the engine until it stops."""
-    while estate.estack:
-        if callable(estate.estack[-1]):
-            obj = estate.estack.pop()
-        else:
-            try:
-                obj = next(estate.estack[-1])
-            except StopIteration:
-                estate.estack.pop()
-                continue
-        evaluate_one(obj, estate, direct=True)
 
 def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
+    """Assemble tokens into objects."""
     pstack: list[Any] = []
     for obj in tokens:
         match obj:
@@ -71,31 +106,3 @@ def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
 
     if pstack:
         raise Tilted("syntaxerror")
-
-
-def evaluate_one(obj: Any, estate: ExecState, direct: bool=False) -> None:
-    match obj:
-        case Name(False, name):
-            obj = estate.dstack_value(obj)
-            if obj is None:
-                raise Tilted(f"undefined: {name}")
-            evaluate_one(obj, estate)
-
-        case Procedure():
-            if direct:
-                estate.opush(obj)
-            else:
-                for subobj in obj.objs:
-                    evaluate_one(subobj, estate)
-
-        case Operator():
-            obj.value(estate)
-
-        case Object(literal=True):
-            estate.opush(obj)
-
-        case _ if callable(obj):
-            obj(estate)
-
-        case _:
-            raise Exception(f"Buh? {obj!r}")
