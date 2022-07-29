@@ -18,3 +18,7 @@ mypy:				## Run mypy to check types
 
 test:				## Run the tests
 	pytest -q -rfeX
+
+coverage:			## Measure test coverage
+	coverage run --branch --source=. -m pytest -q
+	coverage report --skip-covered --show-missing
