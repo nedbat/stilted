@@ -4,13 +4,16 @@ from error import Tilted
 from estate import operator, ExecState
 from dtypes import (
     from_py, rangecheck, typecheck,
-    Array, Dict, Integer, Name, Procedure, String, Stringy,
+    Array, Dict, Integer, Name, String, Stringy,
 )
 
 @operator
 def forall(estate: ExecState) -> None:
     o, proc = estate.opopn(2)
-    typecheck(Procedure, proc)
+    typecheck(Array, proc)
+    if proc.literal:
+        raise Tilted("typecheck")
+
     match o:
         case Array():
             def _do_forall_array(estate: ExecState) -> None:

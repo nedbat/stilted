@@ -46,6 +46,7 @@ from test_helpers import compare_stacks
         ("[] ==", [], "[]\n"),
         ("[1]==", [], "[1]\n"),
         ("[1 (a) null] ==", [], "[1 (a) null]\n"),
+        ("{1 (a) null} ==", [], "{1 (a) null}\n"),
         # print
         ("(hello) print", [], "hello"),
         ("(hello) print (world) print", [], "helloworld"),

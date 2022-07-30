@@ -5,7 +5,7 @@ from typing import Any, Iterable, Iterator
 
 from error import Tilted
 from lex import lexer
-from dtypes import Name, Object, Operator, Procedure
+from dtypes import Array, Name, Object, Operator
 
 from estate import ExecState
 
@@ -28,7 +28,34 @@ class Engine:
         self.estate = ExecState.new()
 
     def add_text(self, text: str) -> None:
-        self.estate.estack.append(collect_objects(lexer.tokens(text)))
+        self.estate.estack.append(self.collect_objects(lexer.tokens(text)))
+
+    def collect_objects(self, tokens: Iterable[Any]) -> Iterator[Any]:
+        """Assemble tokens into objects."""
+        pstack: list[Any] = []
+        for obj in tokens:
+            match obj:
+                case Name(False, "{"):
+                    pstack.append([])
+
+                case Name(False, "}"):
+                    if not pstack:
+                        raise Tilted("syntaxerror")
+                    proc = self.estate.new_array(value=pstack.pop())
+                    proc.literal = False
+                    if pstack:
+                        pstack[-1].append(proc)
+                    else:
+                        yield proc
+
+                case _:
+                    if pstack:
+                        pstack[-1].append(obj)
+                    else:
+                        yield obj
+
+        if pstack:
+            raise Tilted("syntaxerror")
 
     def run(self) -> None:
         """Run the engine until it stops."""
@@ -51,11 +78,11 @@ class Engine:
                     raise Tilted(f"undefined: {name}")
                 self.evaluate_one(obj)
 
-            case Procedure():
+            case Array() if not obj.literal:
                 if direct:
                     self.estate.opush(obj)
                 else:
-                    for subobj in obj.objs:
+                    for subobj in obj.value:
                         self.evaluate_one(subobj)
 
             case Operator():
@@ -79,30 +106,3 @@ def evaluate(text: str, stdout=None) -> ExecState:
     engine.add_text(text)
     engine.run()
     return engine.estate
-
-
-def collect_objects(tokens: Iterable[Any]) -> Iterator[Any]:
-    """Assemble tokens into objects."""
-    pstack: list[Any] = []
-    for obj in tokens:
-        match obj:
-            case Name(False, "{"):
-                pstack.append([])
-
-            case Name(False, "}"):
-                if not pstack:
-                    raise Tilted("syntaxerror")
-                proc = Procedure(False, pstack.pop())
-                if pstack:
-                    pstack[-1].append(proc)
-                else:
-                    yield proc
-
-            case _:
-                if pstack:
-                    pstack[-1].append(obj)
-                else:
-                    yield obj
-
-    if pstack:
-        raise Tilted("syntaxerror")

@@ -2,12 +2,19 @@
 
 import sys
 
+from error import Tilted
 from estate import operator, ExecState
 from dtypes import (
     from_py, rangecheck, typecheck,
-    Boolean, Integer, Number, Procedure,
+    Array, Boolean, Integer, Number,
 )
 
+
+def typecheck_procedure(*objs):
+    for obj in objs:
+        typecheck(Array, obj)
+        if obj.literal:
+            raise Tilted("typecheck")
 
 @operator
 def exit(estate: ExecState) -> None:
@@ -26,7 +33,7 @@ def exit(estate: ExecState) -> None:
 def for_(estate: ExecState) -> None:
     initial, increment, limit, proc = estate.opopn(4)
     typecheck(Number, initial, increment, limit)
-    typecheck(Procedure, proc)
+    typecheck_procedure(proc)
 
     def _do_for(estate: ExecState) -> None:
         control, increment, limit, proc = estate.estack.pop()
@@ -45,7 +52,7 @@ def for_(estate: ExecState) -> None:
 def if_(estate: ExecState) -> None:
     b, proc_if = estate.opopn(2)
     typecheck(Boolean, b)
-    typecheck(Procedure, proc_if)
+    typecheck_procedure(proc_if)
     if b.value:
         estate.run_proc(proc_if)
 
@@ -53,7 +60,7 @@ def if_(estate: ExecState) -> None:
 def ifelse(estate: ExecState) -> None:
     b, proc_if, proc_else = estate.opopn(3)
     typecheck(Boolean, b)
-    typecheck(Procedure, proc_if, proc_else)
+    typecheck_procedure(proc_if, proc_else)
     if b.value:
         estate.run_proc(proc_if)
     else:
@@ -67,7 +74,7 @@ def quit(estate: ExecState) -> None:
 def repeat(estate: ExecState) -> None:
     n, proc = estate.opopn(2)
     typecheck(Integer, n)
-    typecheck(Procedure, proc)
+    typecheck_procedure(proc)
     nv = n.value
     rangecheck(0, nv)
 

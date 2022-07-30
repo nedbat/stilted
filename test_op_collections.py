@@ -11,6 +11,7 @@ from evaluate import evaluate
     [
         # forall
         ("10 dict 123 forall", "typecheck"),
+        ("10 dict [] forall", "typecheck"),
         # get
         ("get", "stackunderflow"),
         ("/foo get", "stackunderflow"),

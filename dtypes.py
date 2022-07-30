@@ -230,9 +230,9 @@ class Array(SaveableObject[list[Object]]):
     typename: ClassVar[str] = "array"
 
     def op_eqeq(self) -> str:
-        eqeq = "["
+        eqeq = "[" if self.literal else "{"
         eqeq += " ".join(obj.op_eqeq() for obj in self.value)
-        eqeq += "]"
+        eqeq += "]" if self.literal else "}"
         return eqeq
 
     def _copy_for_restore(self) -> list[Object]:
@@ -274,16 +274,6 @@ class Operator(Object):
 
     def op_eqeq(self) -> str:
         return f"--{self.value.__name__}--"
-
-
-@dataclass
-class Procedure(Object):
-    """A procedure in curly braces."""
-
-    objs: list[Object]
-
-    def __repr__(self):
-        return "<Proc {" + " ".join(map(repr, self.objs)) + "}>"
 
 
 def from_py(val: Any) -> Object:

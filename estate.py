@@ -10,7 +10,7 @@ from typing import Any, Iterator
 from error import Tilted
 from dtypes import (
     from_py, typecheck,
-    Array, Dict, MARK, Name, NULL, Object, Operator, Procedure, Save,
+    Array, Dict, MARK, Name, NULL, Object, Operator, Save,
     SaveableObject, String,
 )
 
@@ -80,9 +80,9 @@ class ExecState:
         if len(self.ostack) < n:
             raise Tilted("stackunderflow")
 
-    def run_proc(self, proc: Procedure) -> None:
+    def run_proc(self, proc: Array) -> None:
         """Start running a procedure."""
-        self.estack.append(iter(proc.objs))
+        self.estack.append(iter(proc.value))
 
     def run_name(self, name: str) -> None:
         """Run a name."""
