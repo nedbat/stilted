@@ -273,7 +273,7 @@ class Operator(Object):
         return self.value.__name__
 
     def op_eqeq(self) -> str:
-        return "--" + self.value.__name__ + "--"
+        return f"--{self.value.__name__}--"
 
 
 @dataclass
