@@ -24,8 +24,10 @@ import op_vm; assert op_vm
 
 
 class Engine:
-    def __init__(self):
+    def __init__(self, stdout=None):
         self.estate = ExecState.new()
+        if stdout is not None:
+            self.estate.stdout = stdout
 
     def add_text(self, text: str) -> None:
         self.estate.estack.append(self.collect_objects(lexer.tokens(text)))
@@ -100,9 +102,7 @@ class Engine:
 
 def evaluate(text: str, stdout=None) -> ExecState:
     """A simple helper to execute text."""
-    engine = Engine()
-    if stdout:
-        engine.estate.stdout = stdout
+    engine = Engine(stdout=stdout)
     engine.add_text(text)
     engine.run()
     return engine.estate
