@@ -7,7 +7,7 @@ from error import Tilted
 from evaluate import evaluate, Engine
 
 
-def main(argv: list[str], input: Callable[[str], str]=input) -> int:
+def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
     if argv:
         evaluate(' '.join(argv))
     else:
@@ -15,7 +15,7 @@ def main(argv: list[str], input: Callable[[str], str]=input) -> int:
         while True:
             stack_depth = len(engine.estate.ostack)
             try:
-                line = input(f"|-{stack_depth}> ")
+                line = input_fn(f"|-{stack_depth}> ")
             except EOFError:
                 print()
                 break

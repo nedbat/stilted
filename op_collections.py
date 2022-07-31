@@ -17,13 +17,13 @@ def forall(estate: ExecState) -> None:
     match o:
         case Array():
             def _do_forall_array(estate: ExecState) -> None:
-                aiter, proc = estate.estack.pop()
+                array_iter, proc = estate.estack.pop()
                 try:
-                    obj = next(aiter)
+                    obj = next(array_iter)
                 except StopIteration:
                     return
                 estate.opush(obj)
-                estate.estack.extend([[aiter, proc], _do_forall_array])
+                estate.estack.extend([[array_iter, proc], _do_forall_array])
                 estate.run_proc(proc)
 
             _do_forall_array.exitable = True  # type: ignore

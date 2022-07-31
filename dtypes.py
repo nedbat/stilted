@@ -125,13 +125,13 @@ class String(Object):
     length: int
 
     @classmethod
-    def from_bytes(cls, bytes: bytes) -> String:
+    def from_bytes(cls, bdata: bytes) -> String:
         """Make a new string from a bytestring."""
         return cls(
             literal=True,
-            barr=bytearray(bytes),
+            barr=bytearray(bdata),
             start=0,
-            length=len(bytes),
+            length=len(bdata),
         )
 
     @classmethod

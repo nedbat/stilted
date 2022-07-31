@@ -53,5 +53,5 @@ def test_command_line_code(capsys):
     ],
 )
 def test_prompting(capsys, lines, output):
-    main([], input=fake_input(lines))
+    main([], input_fn=fake_input(lines))
     assert capsys.readouterr().out.rstrip() == textwrap.dedent(output).rstrip()

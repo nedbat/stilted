@@ -16,8 +16,8 @@ def typecheck_procedure(*objs):
         if obj.literal:
             raise Tilted("typecheck")
 
-@operator
-def exit(estate: ExecState) -> None:
+@operator("exit")
+def exit_(estate: ExecState) -> None:
     # Find the function with .exitable on the stack.
     while estate.estack and not hasattr(estate.estack[-1], "exitable"):
         estate.estack.pop()
@@ -66,8 +66,8 @@ def ifelse(estate: ExecState) -> None:
     else:
         estate.run_proc(proc_else)
 
-@operator
-def quit(estate: ExecState) -> None:
+@operator("quit")
+def quit_(estate: ExecState) -> None:
     sys.exit()
 
 @operator

@@ -10,13 +10,13 @@ def restore(estate: ExecState) -> None:
     if not s.is_valid:
         raise Tilted("invalidrestore")
     assert s in estate.sstack
-    for save in reversed(estate.sstack):
-        for obj in save.changed_objs:
-            if obj.values[-1][0] is save:
+    for save_obj in reversed(estate.sstack):
+        for obj in save_obj.changed_objs:
+            if obj.values[-1][0] is save_obj:
                 obj.values.pop()
         estate.sstack.pop()
-        save.is_valid = False
-        if save is s:
+        save_obj.is_valid = False
+        if save_obj is s:
             break
 
     # Check the ostack and dstack for things newer than the savepoint.
