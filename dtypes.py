@@ -74,8 +74,8 @@ class Boolean(Object):
 T = TypeVar("T")
 
 @dataclass
-class SaveableObject(Object, Generic[T]):
-    """A value that can be save/restored."""
+class SaveableStorage(Generic[T]):
+    """The actual storage for savable objects."""
     values: list[tuple[Save, T]]
 
     @property
@@ -94,12 +94,26 @@ class SaveableObject(Object, Generic[T]):
 
 
 @dataclass
+class SaveableObject(Object, Generic[T]):
+    """A value that can be save/restored."""
+    storage: SaveableStorage[T]
+
+    @property
+    def value(self) -> T:
+        return self.storage.values[-1][1]
+
+    def prep_for_change(self, save: Save) -> None:
+        """Call this before mutating a saveable object."""
+        self.storage.prep_for_change(save)
+
+
+@dataclass
 class Save(Object):
     """A VM snapshot object."""
     typename: ClassVar[str] = "save"
     serial: int
     is_valid: bool
-    changed_objs: list[SaveableObject]
+    changed_objs: list[SaveableStorage]
 
 
 @dataclass
@@ -225,6 +239,13 @@ NULL = Null(literal=True)
 
 
 @dataclass
+class ArrayStorage(SaveableStorage[list[Object]]):
+    ...
+
+    def _copy_for_restore(self) -> list[Object]:
+        return list(self.value)
+
+@dataclass
 class Array(SaveableObject[list[Object]]):
     """An array."""
     typename: ClassVar[str] = "array"
@@ -235,9 +256,6 @@ class Array(SaveableObject[list[Object]]):
         eqeq += "]" if self.literal else "}"
         return eqeq
 
-    def _copy_for_restore(self) -> list[Object]:
-        return list(self.value)
-
     def __getitem__(self, index: int) -> Object:
         return self.value[index]
 
@@ -246,12 +264,16 @@ class Array(SaveableObject[list[Object]]):
 
 
 @dataclass
-class Dict(SaveableObject[dict[str, Object]]):
-    """A dictionary."""
-    typename: ClassVar[str] = "dict"
+class DictStorage(SaveableStorage[dict[str, Object]]):
+    ...
 
     def _copy_for_restore(self) -> dict[str, Object]:
         return dict(self.value)
+
+@dataclass
+class Dict(SaveableObject[dict[str, Object]]):
+    """A dictionary."""
+    typename: ClassVar[str] = "dict"
 
     def __getitem__(self, name: str) -> Object:
         return self.value[name]

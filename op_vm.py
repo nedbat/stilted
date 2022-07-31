@@ -23,7 +23,7 @@ def restore(estate: ExecState) -> None:
     for stack in [estate.ostack, estate.dstack]:
         for o in stack:     # type: ignore
             if isinstance(o, SaveableObject):
-                if o.values[0][0].serial >= s.serial:
+                if o.storage.values[0][0].serial >= s.serial:
                     raise Tilted("invalidrestore")
 
 @operator

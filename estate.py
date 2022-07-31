@@ -10,8 +10,8 @@ from typing import Any, Iterator
 from error import Tilted
 from dtypes import (
     from_py, typecheck,
-    Array, Dict, MARK, Name, NULL, Object, Operator, Save,
-    SaveableObject, String,
+    Array, ArrayStorage, Dict, DictStorage, MARK, Name, NULL,
+    Object, Operator, Save, SaveableObject, String,
 )
 
 # The `systemdict` dict for all builtin names.
@@ -102,7 +102,7 @@ class ExecState:
             value = [NULL] * n
         return Array(
             literal=True,
-            values=[(self.sstack[-1], value)],
+            storage=ArrayStorage(values=[(self.sstack[-1], value)]),
         )
 
     def dstack_value(self, name: Name | String) -> Object | None:
@@ -117,7 +117,7 @@ class ExecState:
         value = value if value is not None else {}
         return Dict(
             literal=True,
-            values=[(self.sstack[-1], value)],
+            storage=DictStorage(values=[(self.sstack[-1], value)]),
         )
 
     def dstack_dict(self, name: Name | String) -> Dict | None:
