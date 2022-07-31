@@ -2,7 +2,10 @@
 
 from error import Tilted
 from estate import operator, ExecState
-from dtypes import from_py, rangecheck, typecheck, Dict, Integer, MARK, String
+from dtypes import (
+    from_py, rangecheck, typecheck,
+    Array, Dict, Integer, MARK, String,
+)
 
 
 @operator
@@ -32,7 +35,7 @@ def copy(estate: ExecState) -> None:
                     obj2[k] = v
                 estate.opush(obj2)
 
-            case String(), String():
+            case (Array(), Array()) | (String(), String()):
                 rangecheck(obj1.length, obj2.length)
                 for i in range(obj1.length):
                     obj2[i] = obj1[i]

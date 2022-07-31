@@ -100,9 +100,13 @@ class ExecState:
         if value is None:
             assert n is not None
             value = [NULL] * n
+        else:
+            n = len(value)
         return Array(
             literal=True,
             storage=ArrayStorage(values=[(self.sstack[-1], value)]),
+            start=0,
+            length=n,
         )
 
     def dstack_value(self, name: Name | String) -> Object | None:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from types import UnionType
-from typing import Any, Callable, ClassVar, Generic, TypeVar
+from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
 from dataclasses import dataclass
 
 from error import Tilted
@@ -142,6 +142,19 @@ class String(Object):
     def __eq__(self, other) -> bool:
         return self.value == other.value
 
+    def __len__(self) -> int:
+        return self.length
+
+    def __iter__(self) -> Iterator[int]:
+        for i in range(self.start, self.start + self.length):
+            yield self.barr[i]
+
+    def __getitem__(self, index: int) -> int:
+        return self.barr[self.start + index]
+
+    def __setitem__(self, index: int, value: int) -> None:
+        self.barr[self.start + index] = value
+
     def new_sub(self, start: int, length: int) -> String:
         """Make a new string as a substring of another."""
         rangecheck(0, start, self.length)
@@ -156,13 +169,7 @@ class String(Object):
 
     @property
     def value(self) -> bytearray:
-        return self.barr[self.start:self.start + self.length]
-
-    def __getitem__(self, index: int) -> int:
-        return self.barr[self.start + index]
-
-    def __setitem__(self, index: int, value: int) -> None:
-        self.barr[self.start + index] = value
+        return self.barr[self.start: self.start + self.length]
 
     @property
     def str_value(self) -> str:
@@ -249,18 +256,39 @@ class ArrayStorage(SaveableStorage[list[Object]]):
 class Array(SaveableObject[list[Object]]):
     """An array."""
     typename: ClassVar[str] = "array"
+    start: int
+    length: int
+
+    def new_sub(self, start: int, length: int) -> Array:
+        """Make a new array as a substring of another."""
+        rangecheck(0, start, self.length)
+        rangecheck(0, length)
+        rangecheck(start + length, self.length)
+        return Array(
+            literal=True,
+            storage=self.storage,
+            start=self.start + start,
+            length=length,
+        )
+
+    def __len__(self):
+        return self.length
+
+    def __iter__(self) -> Iterator[Object]:
+        for i in range(self.start, self.start + self.length):
+            yield self.value[i]
+
+    def __getitem__(self, index: int) -> Object:
+        return self.value[self.start + index]
+
+    def __setitem__(self, index: int, value: Object) -> None:
+        self.value[self.start + index] = value
 
     def op_eqeq(self) -> str:
         eqeq = "[" if self.literal else "{"
         eqeq += " ".join(obj.op_eqeq() for obj in self.value)
         eqeq += "]" if self.literal else "}"
         return eqeq
-
-    def __getitem__(self, index: int) -> Object:
-        return self.value[index]
-
-    def __setitem__(self, index: int, value: Object) -> None:
-        self.value[index] = value
 
 
 @dataclass

@@ -27,7 +27,7 @@ def forall(estate: ExecState) -> None:
                 estate.run_proc(proc)
 
             _do_forall_array.exitable = True  # type: ignore
-            estate.estack.extend([[iter(o.value), proc], _do_forall_array])
+            estate.estack.extend([[iter(o), proc], _do_forall_array])
 
         case Dict():
             def _do_forall_dict(estate: ExecState) -> None:
@@ -55,7 +55,7 @@ def forall(estate: ExecState) -> None:
                 estate.run_proc(proc)
 
             _do_forall_string.exitable = True  # type: ignore
-            estate.estack.extend([[iter(o.value), proc], _do_forall_string])
+            estate.estack.extend([[iter(o), proc], _do_forall_string])
 
         case _:
             raise Tilted("typecheck")
@@ -92,7 +92,7 @@ def getinterval(estate: ExecState) -> None:
     obj, ind, count = estate.opopn(3)
     typecheck(Integer, ind, count)
     match obj:
-        case String():
+        case Array() | String():
             estate.opush(obj.new_sub(ind.value, count.value))
 
         case _:
@@ -102,8 +102,12 @@ def getinterval(estate: ExecState) -> None:
 def length(estate: ExecState) -> None:
     o = estate.opop()
     match o:
-        case Array() | Dict() | Name() | String():
+        case Array() | String():
+            estate.opush(from_py(len(o)))
+
+        case Dict() | Name():
             estate.opush(from_py(len(o.value)))
+
         case _:
             raise Tilted(f"typecheck: got {type(o)}")
 
@@ -133,17 +137,16 @@ def put(estate: ExecState) -> None:
 
 @operator
 def putinterval(estate: ExecState) -> None:
-    obj, ind, obj2 = estate.opopn(3)
+    obj1, ind, obj2 = estate.opopn(3)
     typecheck(Integer, ind)
-    match obj:
-        case String():
-            typecheck(String, obj2)
-            if not (0 <= ind.value <= obj.length):
+    match obj1, obj2:
+        case (Array(), Array()) | (String(), String()):
+            if not (0 <= ind.value <= obj1.length):
                 raise Tilted("rangecheck")
-            if not (ind.value + obj2.length <= obj.length):
+            if not (ind.value + obj2.length <= obj1.length):
                 raise Tilted("rangecheck")
             for i in range(obj2.length):
-                obj[ind.value + i] = obj2[i]
+                obj1[ind.value + i] = obj2[i]
 
         case _:
-            raise Tilted(f"typecheck: got {type(obj)}")
+            raise Tilted(f"typecheck: got {type(obj1)}")
