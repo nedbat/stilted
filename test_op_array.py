@@ -16,10 +16,15 @@ from test_helpers import compare_stacks
         # ]
         ("[ ] length", [0]),
         ("[ 1 2 3 ] length", [3]),
+        # aload
+        ("[1 2 (a)] aload length", [1, 2, "a", 3]),
         # array
         ("0 array dup type exch length", [Name(False, "arraytype"), 0]),
         ("10 array dup type exch length", [Name(False, "arraytype"), 10]),
         ("10 array 0 get type", [Name(False, "nulltype")]),
+        # astore
+        ("1 2 3 4 3 array astore length", [1, 3]),
+        ("99 1 2 3 4 3 array astore {add} forall", [99, 10]),
         # copy
         ("/a 5 array def [1 2 3] a copy {} forall", [1, 2, 3]),
         # forall
@@ -51,9 +56,16 @@ def test_evaluate(text, stack):
         # ]
         ("]", "unmatchedmark"),
         ("1 2 3 (a) ]", "unmatchedmark"),
+        # aload
+        ("aload", "stackunderflow"),
+        ("123 aload", "typecheck"),
         # array
         ("array", "stackunderflow"),
         ("(a) array", "typecheck"),
+        # astore
+        ("astore", "stackunderflow"),
+        ("123 astore", "typecheck"),
+        ("[1] astore", "stackunderflow"),
         # copy
         ("[1 2 3] 3.5 copy", "typecheck"),
         ("[1 2 3] [1] copy", "rangecheck"),
