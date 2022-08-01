@@ -1,6 +1,8 @@
 """Data types for stilted."""
 
 from __future__ import annotations
+
+import copy
 from types import UnionType
 from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
 from dataclasses import dataclass
@@ -78,19 +80,12 @@ class SaveableStorage(Generic[T]):
     """The actual storage for savable objects."""
     values: list[tuple[Save, T]]
 
-    @property
-    def value(self) -> T:
-        return self.values[-1][1]
 
     def prep_for_change(self, save: Save) -> None:
         """Call this before mutating a saveable object."""
         if self.values[-1][0] is not save:
             save.changed_objs.append(self)
-            self.values.append((save, self._copy_for_restore()))
-
-    def _copy_for_restore(self) -> T:
-        """Make a new copy of the real data, for later restoring."""
-        raise NotImplementedError
+            self.values.append((save, copy.copy(self.values[-1][1])))
 
 
 @dataclass
@@ -247,10 +242,8 @@ NULL = Null(literal=True)
 
 @dataclass
 class ArrayStorage(SaveableStorage[list[Object]]):
-    ...
+    """Saveable storage for Arrays."""
 
-    def _copy_for_restore(self) -> list[Object]:
-        return list(self.value)
 
 @dataclass
 class Array(SaveableObject[list[Object]]):
@@ -293,10 +286,8 @@ class Array(SaveableObject[list[Object]]):
 
 @dataclass
 class DictStorage(SaveableStorage[dict[str, Object]]):
-    ...
+    """Saveable storage for Dict objects."""
 
-    def _copy_for_restore(self) -> dict[str, Object]:
-        return dict(self.value)
 
 @dataclass
 class Dict(SaveableObject[dict[str, Object]]):
