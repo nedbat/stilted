@@ -365,17 +365,19 @@ class Operator(Object):
     """
     A built-in operator.
 
-    `value` is a Python function implementing the operator.
+    `value` is a Python function implementing the operator. `name` is the name
+    of the operator, which can differ than the name of the Python function.
 
     """
     typename: ClassVar[str] = "operator"
     value: Callable[["ExecState"], None]
+    name: str
 
     def op_eq(self) -> str:
-        return self.value.__name__
+        return self.name
 
     def op_eqeq(self) -> str:
-        return f"--{self.value.__name__}--"
+        return f"--{self.name}--"
 
 
 def from_py(val: Any) -> Object:

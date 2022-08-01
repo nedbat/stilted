@@ -162,8 +162,9 @@ def operator(arg):
         def _dec(func):
             assert func.__name__.endswith("_")
             assert arg not in SYSTEMDICT
-            SYSTEMDICT[arg] = Operator(literal=False, value=func)
+            SYSTEMDICT[arg] = Operator(literal=False, value=func, name=arg)
         return _dec
     else:
-        assert arg.__name__ not in SYSTEMDICT
-        SYSTEMDICT[arg.__name__] = Operator(literal=False, value=arg)
+        name = arg.__name__
+        assert name not in SYSTEMDICT
+        SYSTEMDICT[name] = Operator(literal=False, value=arg, name=name)

@@ -25,6 +25,7 @@ from test_helpers import compare_stacks
         ("true false = =", [], "false\ntrue\n"),
         ("systemdict =", [], "--nostringval--\n"),
         ("/add load =", [], "add\n"),
+        ("{]} 0 get load =", [], "]\n"),
         ("save =", [], "--nostringval--\n"),
         ("[]=", [], "--nostringval--\n"),
         # ==
@@ -42,6 +43,7 @@ from test_helpers import compare_stacks
         ("true false == ==", [], "false\ntrue\n"),
         ("systemdict ==", [], "-dict-\n"),
         ("/add load ==", [], "--add--\n"),
+        ("{]} 0 get load ==", [], "--]--\n"),
         ("save ==", [], "-save-\n"),
         ("[] ==", [], "[]\n"),
         ("[1]==", [], "[1]\n"),
