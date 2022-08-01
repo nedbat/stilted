@@ -115,24 +115,24 @@ class Save(Object):
 class String(Object):
     """A string, a mutable array of bytes"""
     typename: ClassVar[str] = "string"
-    barr: bytearray
+    data: bytearray
     start: int
     length: int
 
     @classmethod
-    def from_bytes(cls, bdata: bytes) -> String:
+    def from_bytes(cls, data: bytes) -> String:
         """Make a new string from a bytestring."""
         return cls(
             literal=True,
-            barr=bytearray(bdata),
+            data=bytearray(data),
             start=0,
-            length=len(bdata),
+            length=len(data),
         )
 
     @classmethod
     def from_size(cls, n: int) -> String:
         """Make a new string with `n` zero bytes."""
-        return cls(literal=True, barr=bytearray(n), start=0, length=n)
+        return cls(literal=True, data=bytearray(n), start=0, length=n)
 
     def __eq__(self, other) -> bool:
         return self.value == other.value
@@ -142,13 +142,13 @@ class String(Object):
 
     def __iter__(self) -> Iterator[int]:
         for i in range(self.start, self.start + self.length):
-            yield self.barr[i]
+            yield self.data[i]
 
     def __getitem__(self, index: int) -> int:
-        return self.barr[self.start + index]
+        return self.data[self.start + index]
 
     def __setitem__(self, index: int, value: int) -> None:
-        self.barr[self.start + index] = value
+        self.data[self.start + index] = value
 
     def new_sub(self, start: int, length: int) -> String:
         """Make a new string as a substring of another."""
@@ -157,17 +157,19 @@ class String(Object):
         rangecheck(start + length, self.length)
         return String(
             literal=True,
-            barr=self.barr,
+            data=self.data,
             start=self.start + start,
             length=length,
         )
 
     @property
     def value(self) -> bytearray:
-        return self.barr[self.start: self.start + self.length]
+        """Get the bytearray value of the string."""
+        return self.data[self.start: self.start + self.length]
 
     @property
     def str_value(self) -> str:
+        """Get the string value as a Unicode string."""
         return self.value.decode("iso8859-1")
 
     def op_eq(self) -> str:
