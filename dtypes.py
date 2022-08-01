@@ -1,24 +1,32 @@
-"""Data types for stilted."""
+"""Data types for Stilted."""
 
 from __future__ import annotations
 
 import copy
 from types import UnionType
-from typing import Any, Callable, ClassVar, Generic, Iterator, TypeVar
+from typing import (
+    Any, Callable, ClassVar, Generic, Iterator, TypeVar, TYPE_CHECKING,
+)
 from dataclasses import dataclass
 
 from error import Tilted
+if TYPE_CHECKING:
+    from estate import ExecState
 
 @dataclass
 class Object:
     """Base class for all Stilted data objects."""
+    # All classes have a typename
     typename: ClassVar[str] = "object"
+    # All objects can be literal (True) or executable (False)
     literal: bool
 
     def op_eq(self) -> str:
+        """Produce a string for the `=` operator."""
         return "--nostringval--"
 
     def op_eqeq(self) -> str:
+        """Produce a string for the `==` operator."""
         return f"-{self.typename}-"
 
 
@@ -29,7 +37,7 @@ class Integer(Object):
     value: int
 
     @classmethod
-    def from_string(cls, s: str):
+    def from_string(cls, s: str) -> Integer:
         """Convert a string into an Integer."""
         return cls(True, int(s))
 
@@ -47,7 +55,7 @@ class Real(Object):
     value: float
 
     @classmethod
-    def from_string(cls, s):
+    def from_string(cls, s) -> Real:
         """Convert a string into a Real."""
         return cls(True, float(s))
 
@@ -73,16 +81,29 @@ class Boolean(Object):
     def op_eqeq(self) -> str:
         return str(self.value).lower()
 
+
 T = TypeVar("T")
 
 @dataclass
 class SaveableStorage(Generic[T]):
-    """The actual storage for savable objects."""
-    values: list[tuple[Save, T]]
+    """
+    The storage for saveable objects.
 
+    `values` is a stack of tuples: each has a Save object and a data object.
+    When a modification is made to the data, a new tuple is pushed onto the
+    stack if the top value isn't already for the current Save object.  Each
+    tuple is the copy of the data to restore to for that Save object.
+
+    The `values` stack associates copies of data with the save object they
+    correspond to.  This lets the restore operator pop values until the correct
+    old copy is found.
+
+    """
+    values: list[tuple[Save, T]]
 
     def prep_for_change(self, save: Save) -> None:
         """Call this before mutating a saveable object."""
+        # This implements the "copy on write" for restorable objects.
         if self.values[-1][0] is not save:
             save.changed_objs.append(self)
             self.values.append((save, copy.copy(self.values[-1][1])))
@@ -90,11 +111,20 @@ class SaveableStorage(Generic[T]):
 
 @dataclass
 class SaveableObject(Object, Generic[T]):
-    """A value that can be save/restored."""
+    """
+    An object that can be saved and restored.
+
+    The actual data is in the SaveableStorage object referenced by `storage`.
+    """
     storage: SaveableStorage[T]
 
     @property
     def value(self) -> T:
+        """
+        The current value of the object's data.
+
+        It's the data from the top SaveableStorage tuple on the stack.
+        """
         return self.storage.values[-1][1]
 
     def prep_for_change(self, save: Save) -> None:
@@ -106,14 +136,31 @@ class SaveableObject(Object, Generic[T]):
 class Save(Object):
     """A VM snapshot object."""
     typename: ClassVar[str] = "save"
+    # Each Save object has a serial number so that stale objects on the operand
+    # and dictionary stack can be identified.
     serial: int
+
+    # When a Save object is restored, it is marked as invalid to prevent it
+    # from being restored twice.
     is_valid: bool
+
+    # All saveable objects that are mutated are pushed onto a list for the
+    # current save object.  The restore operator uses the list to find the
+    # objects that need to be restored to their old state.
     changed_objs: list[SaveableStorage]
 
 
 @dataclass
 class String(Object):
-    """A string, a mutable array of bytes"""
+    """
+    A string, a mutable array of bytes.
+
+    Substrings share data with their original string, so all strings have a
+    `start` and `length` to go with their bytearray `data`.  When a substring
+    is made, it uses the same bytearray as the original, but with new `start`
+    and `length`.
+
+    """
     typename: ClassVar[str] = "string"
     data: bytearray
     start: int
@@ -198,14 +245,12 @@ class Name(Object):
     typename: ClassVar[str] = "name"
     value: str
 
-    def __str__(self):
-        return self.value
-
     def __repr__(self):
         return "<Name " + ("/" if self.literal else "") + self.value + ">"
 
     @classmethod
-    def from_string(cls, text):
+    def from_string(cls, text: str) -> Name:
+        """Make a Name from a string, including leading slash maybe."""
         if text.startswith("/"):
             return cls(True, text[1:])
         else:
@@ -213,6 +258,7 @@ class Name(Object):
 
     @property
     def str_value(self) -> str:
+        """Get the name as a string."""
         return self.value
 
     def op_eq(self) -> str:
@@ -221,6 +267,7 @@ class Name(Object):
     def op_eqeq(self) -> str:
         return ("/" if self.literal else "") + self.value
 
+# Many operations are valid on either Names or Strings.
 Stringy: UnionType = Name | String
 
 
@@ -249,7 +296,14 @@ class ArrayStorage(SaveableStorage[list[Object]]):
 
 @dataclass
 class Array(SaveableObject[list[Object]]):
-    """An array."""
+    """
+    An array.
+
+    Arrays can be subsetted, and the child shares storage with the parent. So
+    all Arrays have `start` and `length`.  A new sub-array uses the same
+    ArrayStorage, but with new `start` and `length`.
+
+    """
     typename: ClassVar[str] = "array"
     start: int
     length: int
@@ -266,7 +320,7 @@ class Array(SaveableObject[list[Object]]):
             length=length,
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.length
 
     def __iter__(self) -> Iterator[Object]:
@@ -308,9 +362,14 @@ class Dict(SaveableObject[dict[str, Object]]):
 
 @dataclass
 class Operator(Object):
-    """A built-in operator."""
+    """
+    A built-in operator.
+
+    `value` is a Python function implementing the operator.
+
+    """
     typename: ClassVar[str] = "operator"
-    value: Callable[[Any], None]
+    value: Callable[["ExecState"], None]
 
     def op_eq(self) -> str:
         return self.value.__name__
