@@ -1,4 +1,4 @@
-"""Execution state and helpers for stilted."""
+"""Execution state and helpers for Stilted."""
 
 from __future__ import annotations
 
@@ -24,13 +24,27 @@ SYSTEMDICT["true"] = from_py(True)
 
 @dataclass
 class ExecState:
-    """The stilted execution state."""
+    """The Stilted execution state."""
 
+    # Dictionary stack
     dstack: list[Dict] = field(default_factory=list)
+
+    # Operand stack
     ostack: list[Object] = field(default_factory=list)
+
+    # Execution stack. This is a mix of:
+    #   1) Iterators of Stilted Objects (procedures)
+    #   2) Python functions (used for internal work)
+    #   3) Lists of arguments for functions from #2.
     estack: list[Any] = field(default_factory=list)
+
+    # Save-object stack
     sstack: list[Save] = field(default_factory=list)
+
+    # The stdout file object
     stdout: Any = field(default_factory=lambda: sys.stdout)
+
+    # Sequence of serial numbers for save objects
     save_serials: Iterator[int] = field(default_factory=itertools.count)
 
     @classmethod
@@ -71,7 +85,7 @@ class ExecState:
             del self.ostack[-n:]
         return vals
 
-    def opush(self, *vals) -> None:
+    def opush(self, *vals: Object) -> None:
         """Push values on the operand stack."""
         self.ostack.extend(vals)
 
@@ -109,13 +123,6 @@ class ExecState:
             length=n,
         )
 
-    def dstack_value(self, name: Name | String) -> Object | None:
-        """Look in dstack for `name`. If found, return the value."""
-        d = self.dstack_dict(name)
-        if d is not None:
-            return d[name.str_value]
-        return None
-
     def new_dict(self, value: dict[str, Object]=None) -> Dict:
         """Make a new Dict."""
         value = value if value is not None else {}
@@ -124,8 +131,15 @@ class ExecState:
             storage=DictStorage(values=[(self.sstack[-1], value)]),
         )
 
+    def dstack_value(self, name: Name | String) -> Object | None:
+        """Look in dstack for `name`. If found, return the value."""
+        d = self.dstack_dict(name)
+        if d is not None:
+            return d[name.str_value]
+        return None
+
     def dstack_dict(self, name: Name | String) -> Dict | None:
-        """Look in dstack for `name`. If found, return the Dict."""
+        """Look in dstack for `name`. If found, return the containing Dict."""
         for d in reversed(self.dstack):
             if name.str_value in d:
                 return d
@@ -137,7 +151,12 @@ class ExecState:
 
     def new_save(self) -> Save:
         """Make a new save-point."""
-        save = Save(literal=True, serial=next(self.save_serials), is_valid=True, changed_objs=[])
+        save = Save(
+            literal=True,
+            serial=next(self.save_serials),
+            is_valid=True,
+            changed_objs=[],
+        )
         self.sstack.append(save)
         return save
 

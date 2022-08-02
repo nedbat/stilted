@@ -24,12 +24,15 @@ import op_vm; assert op_vm
 
 
 class Engine:
-    def __init__(self, stdout=None):
+    """Stilted execution engine."""
+
+    def __init__(self, stdout=None) -> None:
         self.estate = ExecState.new()
         if stdout is not None:
             self.estate.stdout = stdout
 
     def add_text(self, text: str) -> None:
+        """Consume text as Stilted tokens, and add for execution."""
         self.estate.estack.append(self.collect_objects(lexer.tokens(text)))
 
     def collect_objects(self, tokens: Iterable[Any]) -> Iterator[Any]:
