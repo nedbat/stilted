@@ -383,16 +383,16 @@ class Operator(Object):
 def from_py(val: Any) -> Object:
     """Convert a simple Python value into the appropriate Stilted object."""
     match val:
-        case bool():
-            return Boolean(True, val)
-        case float():
-            return Real(True, val)
-        case int():
-            return Integer(True, val)
+        case bool(b):
+            return Boolean(True, b)
+        case float(f):
+            return Real(True, f)
+        case int(i):
+            return Integer(True, i)
         case None:
             return NULL
-        case str():
-            return String.from_bytes(val.encode("iso8859-1"))
+        case str(s):
+            return String.from_bytes(s.encode("iso8859-1"))
         case _:
             raise Exception(f"Buh? from_py({val=})")
 

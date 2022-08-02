@@ -79,13 +79,13 @@ class Engine:
     def _evaluate_one(self, obj: Object, direct: bool=False) -> None:
         """Evaluate one Stilted Object."""
         match obj:
-            case Name(False, name):
+            case Name(literal=False, value=name):
                 looked_up = self.estate.dstack_value(obj)
                 if looked_up is None:
                     raise Tilted(f"undefined: {name}")
                 self._evaluate_one(looked_up)
 
-            case Array() if not obj.literal:
+            case Array(literal=False):
                 if direct:
                     self.estate.opush(obj)
                 else:
