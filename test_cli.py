@@ -65,6 +65,31 @@ def fake_input(lines: Iterable[str]) -> Callable[[str], str]:
                 |-2>
             """,
         ),
+        (
+            ["-i", "-c", ""],
+            ["0 1 1 10 { add } for =="],
+            """\
+                |-0> 0 1 1 10 { add } for ==
+                55
+                |-0>
+            """,
+        ),
+        (
+            ["-i", "-c", "", "abc", "def"],
+            ["argv pstack"],
+            """\
+                |-0> argv pstack
+                [(-c) (abc) (def)]
+                |-1>
+            """,
+        ),
+        (
+            ["-c", "argv pstack", "hello", "123"],
+            [],
+            """\
+                [(-c) (hello) (123)]
+            """,
+        ),
     ],
 )
 def test_prompting(capsys, argv, lines, output):
@@ -74,6 +99,7 @@ def test_prompting(capsys, argv, lines, output):
 
 def test_file_input(capsys, tmp_path):
     foo_ps = tmp_path / "foo.ps"
-    foo_ps.write_text("123 456\n add\n ==\n")
-    main([str(foo_ps)])
-    assert capsys.readouterr().out == "579\n"
+    foo_ps.write_text("123 456\n add\n ==\n argv pstack")
+    fname = str(foo_ps)
+    main([fname, "abc"])
+    assert capsys.readouterr().out == f"579\n[({fname}) (abc)]\n"

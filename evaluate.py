@@ -5,7 +5,7 @@ from typing import Any, Iterable, Iterator
 
 from error import Tilted
 from lex import lexer
-from dtypes import Array, Name, Object, Operator
+from dtypes import Array, Name, Object, Operator, String
 
 from estate import ExecState
 
@@ -33,9 +33,18 @@ class Engine:
 
     def add_text(self, text: str) -> None:
         """Consume text as Stilted tokens, and add for execution."""
-        self.estate.estack.append(self.collect_objects(lexer.tokens(text)))
+        self.estate.estack.append(self._collect_objects(lexer.tokens(text)))
 
-    def collect_objects(self, tokens: Iterable[Any]) -> Iterator[Any]:
+    def run_text(self, text: str) -> None:
+        """Run Stilted text."""
+        self.add_text(text)
+        self.run()
+
+    def push_string(self, text: str) -> None:
+        """Create a String from `text`, and push it on the operand stack."""
+        self.estate.opush(String.from_bytes(text.encode("iso8859-1")))
+
+    def _collect_objects(self, tokens: Iterable[Any]) -> Iterator[Any]:
         """Assemble tokens into objects."""
         pstack: list[Any] = []
         for obj in tokens:
@@ -105,6 +114,5 @@ class Engine:
 def evaluate(text: str, stdout=None) -> ExecState:
     """A simple helper to execute text."""
     engine = Engine(stdout=stdout)
-    engine.add_text(text)
-    engine.run()
+    engine.run_text(text)
     return engine.estate
