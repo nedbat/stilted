@@ -1,16 +1,16 @@
 """Test cli.py for Stilted."""
 
 import textwrap
-from typing import Callable
+from typing import Callable, Iterable
 
 import pytest
 
 from cli import main
 
 
-def fake_input(lines: str) -> Callable[[str], str]:
+def fake_input(lines: Iterable[str]) -> Callable[[str], str]:
     """Create a fake `input` function that return lines from `lines`."""
-    ilines = iter(lines.split("\n"))
+    ilines = iter(lines)
 
     def _fake(prompt):
         print(prompt, end="")
@@ -24,16 +24,12 @@ def fake_input(lines: str) -> Callable[[str], str]:
     return _fake
 
 
-def test_command_line_code(capsys):
-    main(["123 456 add =="])
-    assert capsys.readouterr().out == "579\n"
-
-
 @pytest.mark.parametrize(
-    "lines, output",
+    "argv, lines, output",
     [
         (
-            "123 456\nadd\n==",
+            [],
+            ["123 456", "add", "=="],
             """\
                 |-0> 123 456
                 |-2> add
@@ -43,15 +39,41 @@ def test_command_line_code(capsys):
             """,
         ),
         (
-            "]",
+            [],
+            ["]"],
             """\
                 |-0> ]
                 !!! unmatchedmark
                 |-0>
             """,
         ),
+        (
+            ["-c", "123 456 add dup =="],
+            [],
+            """\
+                579
+            """,
+        ),
+        (
+            ["-i", "-c", "123 456 add dup =="],
+            ["dup 2 mul pstack"],
+            """\
+                579
+                |-1> dup 2 mul pstack
+                1158
+                579
+                |-2>
+            """,
+        ),
     ],
 )
-def test_prompting(capsys, lines, output):
-    main([], input_fn=fake_input(lines))
+def test_prompting(capsys, argv, lines, output):
+    main(argv, input_fn=fake_input(lines))
     assert capsys.readouterr().out.rstrip() == textwrap.dedent(output).rstrip()
+
+
+def test_file_input(capsys, tmp_path):
+    foo_ps = tmp_path / "foo.ps"
+    foo_ps.write_text("123 456\n add\n ==\n")
+    main([str(foo_ps)])
+    assert capsys.readouterr().out == "579\n"
