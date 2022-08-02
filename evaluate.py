@@ -63,38 +63,37 @@ class Engine:
         """Run the engine until it stops."""
         while self.estate.estack:
             if callable(self.estate.estack[-1]):
-                obj = self.estate.estack.pop()
+                func = self.estate.estack.pop()
+                func(self.estate)
             else:
                 try:
                     obj = next(self.estate.estack[-1])
                 except StopIteration:
                     self.estate.estack.pop()
                     continue
-            self.evaluate_one(obj, direct=True)
+                self._evaluate_one(obj, direct=True)
 
-    def evaluate_one(self, obj: Any, direct: bool=False) -> None:
+    def _evaluate_one(self, obj: Object, direct: bool=False) -> None:
+        """Evaluate one Stilted Object."""
         match obj:
             case Name(False, name):
-                obj = self.estate.dstack_value(obj)
-                if obj is None:
+                looked_up = self.estate.dstack_value(obj)
+                if looked_up is None:
                     raise Tilted(f"undefined: {name}")
-                self.evaluate_one(obj)
+                self._evaluate_one(looked_up)
 
             case Array() if not obj.literal:
                 if direct:
                     self.estate.opush(obj)
                 else:
                     for subobj in obj.value:
-                        self.evaluate_one(subobj)
+                        self._evaluate_one(subobj)
 
             case Operator():
                 obj.value(self.estate)
 
             case Object(literal=True):
                 self.estate.opush(obj)
-
-            case _ if callable(obj):
-                obj(self.estate)
 
             case _:
                 raise Exception(f"Buh? {obj!r}")
