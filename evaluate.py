@@ -14,6 +14,7 @@ import op_array; assert op_array
 import op_collections; assert op_collections
 import op_control; assert op_control
 import op_dict; assert op_dict
+import op_graphics; assert op_graphics
 import op_math; assert op_math
 import op_object; assert op_object
 import op_output; assert op_output

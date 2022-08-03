@@ -13,6 +13,8 @@ from dtypes import (
     Array, ArrayStorage, Dict, DictStorage, MARK, Name, NULL,
     Object, Operator, Save, SaveableObject, String,
 )
+from gstate import Device
+
 
 # The `systemdict` dict for all builtin names.
 SYSTEMDICT: dict[str, Object] = {}
@@ -46,6 +48,9 @@ class ExecState:
 
     # Sequence of serial numbers for save objects
     save_serials: Iterator[int] = field(default_factory=itertools.count)
+
+    # Output device
+    device: Device = field(default_factory=Device)
 
     @classmethod
     def new(cls) -> ExecState:
@@ -159,6 +164,10 @@ class ExecState:
         )
         self.sstack.append(save)
         return save
+
+    @property
+    def gctx(self):
+        return self.device.ctx
 
 
 def operator(arg):
