@@ -17,7 +17,7 @@ from test_helpers import compare_stacks
         ("% A comment\n123", [123]),
         ("()", [""]),
         (r"(\)) 123", [")", 123]),
-        (r"(\nHi\101\)) 123", ["\nHiA)", 123]),
+        (r"(\nHi\101\t\)) 123", ["\nHiA\t)", 123]),
         ("(one\ntwo)", ["one\ntwo"]),
         ("(one\\\nstill one)", ["onestill one"]),
         (r"(\1\2\34\034\0053)", ["\x01\x02\x1c\x1c\x053"]),

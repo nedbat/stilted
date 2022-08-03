@@ -14,7 +14,7 @@ class Token:
     """A token that we want."""
 
     rx: str
-    converter: Callable[[str], Any] = lambda text: text
+    converter: Callable[[str], Any]
     keep: bool = True
 
 
