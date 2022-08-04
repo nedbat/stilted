@@ -406,7 +406,7 @@ def typecheck(a_type, *vals) -> None:
             elif a_type is Stringy:
                 typename = "name"
             else:
-                typename = str(a_type)
+                typename = a_type.typename
             raise Tilted(f"typecheck: expected {typename}, got {type(val).typename}")
 
 
