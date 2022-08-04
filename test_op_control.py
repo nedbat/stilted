@@ -55,6 +55,8 @@ def test_evaluate(text, stack):
         ("forall", "stackunderflow"),
         ("{} forall", "stackunderflow"),
         ("123 {} forall", "typecheck"),
+        ("10 dict 123 forall", "typecheck"),
+        ("10 dict [] forall", "typecheck"),
         # if
         ("if", "stackunderflow"),
         ("{1} if", "stackunderflow"),
