@@ -401,7 +401,13 @@ def typecheck(a_type, *vals) -> None:
     """Check that all the arguments are the right type."""
     for val in vals:
         if not isinstance(val, a_type):
-            raise Tilted(f"typecheck: expected {a_type}, got {type(val)}")
+            if a_type is Number:
+                typename = "number"
+            elif a_type is Stringy:
+                typename = "name"
+            else:
+                typename = str(a_type)
+            raise Tilted(f"typecheck: expected {typename}, got {type(val).typename}")
 
 
 def rangecheck(lo: int, val: int, hi: int | None=None) -> None:

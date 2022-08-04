@@ -97,9 +97,16 @@ def test_prompting(capsys, argv, lines, output):
     assert capsys.readouterr().out.rstrip() == textwrap.dedent(output).rstrip()
 
 
-def test_file_input(capsys, tmp_path):
+@pytest.mark.parametrize(
+    "file_text, output",
+    [
+        ("123 456\n add\n ==\n argv pstack", "579\n[({fname}) (abc)]\n"),
+        ("123 (a) add\n", "!!! typecheck: expected number, got string\n"),
+    ],
+)
+def test_file_input(file_text, output, capsys, tmp_path):
     foo_ps = tmp_path / "foo.ps"
-    foo_ps.write_text("123 456\n add\n ==\n argv pstack")
+    foo_ps.write_text(file_text)
     fname = str(foo_ps)
     main([fname, "abc"])
-    assert capsys.readouterr().out == f"579\n[({fname}) (abc)]\n"
+    assert capsys.readouterr().out == output.format(fname=fname)
