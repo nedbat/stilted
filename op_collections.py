@@ -73,7 +73,7 @@ def get(estate: ExecState) -> None:
         case Dict():
             typecheck(Stringy, ind)
             try:
-                obj = obj[ind.value]
+                obj = obj[ind.str_value]
             except KeyError:
                 raise Tilted(f"undefined: {ind.value}")
             estate.opush(obj)
@@ -124,7 +124,7 @@ def put(estate: ExecState) -> None:
         case Dict():
             typecheck(Stringy, ind)
             estate.prep_for_change(obj)
-            obj[ind.value] = elt
+            obj[ind.str_value] = elt
 
         case String():
             typecheck(Integer, ind, elt)

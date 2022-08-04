@@ -39,6 +39,7 @@ from test_helpers import compare_stacks
         ("10 dict begin /foo 17 def currentdict /foo known", [True]),
         # def
         ("1 /hello (there) def 2 hello", [1, 2, "there"]),
+        ("1 (hello) (there) def 2 hello", [1, 2, "there"]),
         # dict
         ("10 dict type", [Name(False, "dicttype")]),
         ("10 dict dup /foo 23 put /foo get", [23]),
@@ -64,19 +65,23 @@ from test_helpers import compare_stacks
         ("systemdict /add get type", [Name(False, "operatortype")]),
         # known
         ("systemdict /add known", [True]),
+        ("systemdict (add) known", [True]),
         ("systemdict /xyzzy known", [False]),
         # length
         ("10 dict length", [0]),
         ("10 dict begin /foo 10 def /bar 11 def currentdict length", [2]),
         # load
         ("/add load type", [Name(False, "operatortype")]),
+        ("(add) load type", [Name(False, "operatortype")]),
         # maxlength
         ("10 dict dup maxlength exch length gt", [True]),
         # put
         ("userdict /foo 17 put foo", [17]),
+        ("userdict (foo) 17 put foo", [17]),
         ("userdict /foo 17 put userdict /foo 23 put foo", [23]),
         # store
         ("10 dict begin /foo 17 def 10 dict begin /foo 23 store end foo", [23]),
+        ("10 dict begin (foo) 17 def 10 dict begin (foo) 23 store end foo", [23]),
         ("10 dict begin 10 dict begin /foo 23 store end /foo where", [False]),
         # systemdict
         ("systemdict type", [Name(False, "dicttype")]),
@@ -86,6 +91,7 @@ from test_helpers import compare_stacks
         ("/xyzzy 21 def userdict /xyzzy known", [True]),
         # where
         ("/add where { /sub get type } { (buh) } ifelse", [Name(False, "operatortype")]),
+        ("(add) where { (sub) get type } { (buh) } ifelse", [Name(False, "operatortype")]),
         ("/xyzzy where {(buh)} {(nope)} ifelse", ["nope"]),
     ],
 )
