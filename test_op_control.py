@@ -25,6 +25,8 @@ from test_helpers import compare_stacks
         # ifelse
         ("(a) 3 4 lt {(3 < 4)} {(3 not < 4)} ifelse", ["a", "3 < 4"]),
         ("(a) 3 4 gt {(3 > 4)} {(3 not > 4)} ifelse", ["a", "3 not > 4"]),
+        # loop
+        ("1 2 3 4 5 { 3 eq { exit } if } loop 99", [1, 2, 99]),
         # repeat
         ("4 {(a)} repeat", ["a", "a", "a", "a"]),
         ("1 2 3 4 3 {pop} repeat", [1]),
@@ -67,6 +69,9 @@ def test_evaluate(text, stack):
         ("true 1 {2} ifelse", "typecheck"),
         ("true [1] 2 ifelse", "typecheck"),
         ("true 1 [2] ifelse", "typecheck"),
+        # loop
+        ("loop", "stackunderflow"),
+        ("1 loop", "typecheck"),
         # repeat
         ("repeat", "stackunderflow"),
         ("{} repeat", "stackunderflow"),

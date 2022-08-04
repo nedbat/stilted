@@ -66,6 +66,19 @@ def ifelse(estate: ExecState) -> None:
     else:
         estate.run_proc(proc_else)
 
+@operator
+def loop(estate: ExecState) -> None:
+    proc = estate.opop()
+    typecheck_procedure(proc)
+
+    def _do_loop(estate: ExecState) -> None:
+        proc = estate.estack.pop()
+        estate.estack.extend([proc, _do_loop])
+        estate.run_proc(proc)
+
+    _do_loop.exitable = True     # type: ignore
+    estate.estack.extend([proc, _do_loop])
+
 @operator("quit")
 def quit_(estate: ExecState) -> None:
     sys.exit()
