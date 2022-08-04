@@ -186,3 +186,31 @@ def repeat(estate: ExecState) -> None:
     rangecheck(0, countv)
 
     estate.estack.append(RepeatExec(countv, proc))
+
+@dataclass
+class StoppedExec:
+    """Exectack item for `stopped`."""
+    stoppable = True
+
+    def __call__(self, estate: ExecState) -> None:
+        # If we get here, then no `stop` was executed.
+        estate.opush(from_py(False))
+
+@operator
+def stop(estate: ExecState) -> None:
+    # Find the `stopped` object on the stack.
+    while estate.estack and not hasattr(estate.estack[-1], "stoppable"):
+        estate.estack.pop()
+    if estate.estack:
+        # `stopped` is done, and was stopped.
+        estate.estack.pop()
+        estate.opush(from_py(True))
+    else:
+        estate.run_name("quit")
+
+@operator
+def stopped(estate: ExecState) -> None:
+    proc = estate.opop()
+    typecheck_procedure(proc)
+    estate.estack.append(StoppedExec())
+    estate.run_proc(proc)

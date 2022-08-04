@@ -32,6 +32,10 @@ from test_helpers import compare_stacks
         ("1 2 3 4 3 {pop} repeat", [1]),
         ("4 {} repeat", []),
         ("99 0 {(a)} repeat", [99]),
+        # stop
+        ("{ 1 2 add } stopped 99", [3, False, 99]),
+        ("{ 1 2 add stop } stopped 99", [3, True, 99]),
+        ("{ 1 1 10 { dup 2 gt { stop } if } for } stopped 99", [1, 2, 3, True, 99]),
     ],
 )
 def test_evaluate(text, stack):
@@ -81,17 +85,22 @@ def test_evaluate(text, stack):
         ("1 [] repeat", "typecheck"),
         ("1.5 {} repeat", "typecheck"),
         ("-2 {} repeat", "rangecheck"),
+        # stop
+        ("stopped", "stackunderflow")
     ],
 )
 def test_evaluate_error(text, error):
     with pytest.raises(Tilted, match=error):
         evaluate(text)
 
-
-def test_quit():
+@pytest.mark.parametrize(
+    "code",
+    [
+        "quit",
+        "1 3 lt {exit} if",
+        "1 3 lt {stop} if",
+    ],
+)
+def test_system_exit(code):
     with pytest.raises(SystemExit):
-        evaluate("quit")
-
-def test_bare_exit():
-    with pytest.raises(SystemExit):
-        evaluate("1 3 lt {exit} if")
+        evaluate(code)
