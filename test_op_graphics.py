@@ -27,6 +27,7 @@ def test_evaluate(text, stack):
     [
         # currentpoint
         ("currentpoint", "nocurrentpoint"),
+        ("10 10 moveto 20 20 lineto stroke currentpoint", "nocurrentpoint"),
         # lineto
         ("lineto", "stackunderflow"),
         ("1 lineto", "stackunderflow"),
