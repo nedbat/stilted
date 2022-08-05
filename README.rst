@@ -2,7 +2,8 @@
 Stilted
 #######
 
-An partial implementation of a subset of PostScript, just for fun.
+An partial implementation of a subset of PostScript, with graphics by PyCairo,
+just for fun.
 
 Some things are just wrong:
 

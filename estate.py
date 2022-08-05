@@ -150,9 +150,9 @@ class ExecState:
                 return d
         return None
 
-    def prep_for_change(self, d: SaveableObject) -> None:
+    def prep_for_change(self, obj: SaveableObject) -> None:
         """An object is about to change. Do save/restore bookkeeping."""
-        d.prep_for_change(self.sstack[-1])
+        obj.prep_for_change(self.sstack[-1])
 
     def new_save(self) -> Save:
         """Make a new save-point."""

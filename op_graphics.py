@@ -10,7 +10,11 @@ def has_current_point(estate: ExecState) -> None:
         raise Tilted("nocurrentpoint")
 
 @operator
-def getcurrentpoint(estate: ExecState) -> None:
+def currentlinewidth(estate: ExecState) -> None:
+    estate.opush(from_py(estate.gctx.get_line_width()))
+
+@operator
+def currentpoint(estate: ExecState) -> None:
     has_current_point(estate)
     x, y = estate.gctx.get_current_point()
     estate.opush(from_py(x), from_py(y))

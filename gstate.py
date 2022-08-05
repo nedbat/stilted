@@ -10,6 +10,7 @@ class Device:
         self.surface = cairo.SVGSurface(self.svgio, self.width, self.height)
         self.surface.set_document_unit(cairo.SVGUnit.PT)
         self.ctx = cairo.Context(self.surface)
+        self.ctx.set_line_width(1.0)
 
     def showpage(self):
         self.surface.finish()

@@ -10,9 +10,12 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
-        # getcurrentpoint
-        ("101 202 moveto getcurrentpoint", [101.0, 202.0]),
-        ("101 202 moveto 303 404 lineto getcurrentpoint", [303.0, 404.0]),
+        # currentlinewidth
+        ("currentlinewidth", [1.0]),
+        ("3.5 setlinewidth currentlinewidth", [3.5]),
+        # currentpoint
+        ("101 202 moveto currentpoint", [101.0, 202.0]),
+        ("101 202 moveto 303 404 lineto currentpoint", [303.0, 404.0]),
     ],
 )
 def test_evaluate(text, stack):
@@ -22,8 +25,8 @@ def test_evaluate(text, stack):
 @pytest.mark.parametrize(
     "text, error",
     [
-        # getcurrentpoint
-        ("getcurrentpoint", "nocurrentpoint"),
+        # currentpoint
+        ("currentpoint", "nocurrentpoint"),
         # lineto
         ("lineto", "stackunderflow"),
         ("1 lineto", "stackunderflow"),
