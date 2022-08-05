@@ -13,7 +13,7 @@ from dtypes import (
     Array, ArrayStorage, Dict, DictStorage, MARK, Name, NULL,
     Object, Operator, Save, SaveableObject, String,
 )
-from gstate import Device
+from gstate import Device, GstateExtras
 
 
 # The `systemdict` dict for all builtin names.
@@ -36,12 +36,16 @@ class ExecState:
 
     # Execution stack. This is a mix of:
     #   1) Iterators of Stilted Objects (procedures)
-    #   2) Python functions (used for internal work)
-    #   3) Lists of arguments for functions from #2.
+    #   2) Python callables (used for internal work)
     estack: list[Any] = field(default_factory=list)
 
     # Save-object stack
     sstack: list[Save] = field(default_factory=list)
+
+    # gsave stack
+    # Most of the graphics state is in PyCairo, but we need other information
+    # for each gstate.
+    gsaves: list[GstateExtras] = field(default_factory=list)
 
     # The stdout file object
     stdout: Any = field(default_factory=lambda: sys.stdout)
@@ -168,6 +172,19 @@ class ExecState:
     @property
     def gctx(self):
         return self.device.ctx
+
+    def gsave(self, from_save: bool) -> None:
+        """Add a new gstate to the gstack."""
+        self.gctx.save()
+        self.gsaves.append(GstateExtras.from_ctx(from_save=from_save, ctx=self.gctx))
+
+    def grestoreall(self) -> None:
+        """Roll back the gstack to the last save."""
+        if self.gsaves:
+            while not self.gsaves[-1].from_save:
+                self.gctx.restore()
+                self.gsaves.pop()
+            self.gsaves[-1].restore_to_ctx(self.gctx)
 
 
 def operator(arg):

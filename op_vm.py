@@ -26,6 +26,10 @@ def restore(estate: ExecState) -> None:
                 if o.storage.values[0][0].serial >= s.serial:
                     raise Tilted("invalidrestore")
 
+    # Roll back the gstack also.
+    estate.grestoreall()
+
 @operator
 def save(estate: ExecState) -> None:
     estate.opush(estate.new_save())
+    estate.gsave(from_save=True)

@@ -20,6 +20,25 @@ def currentpoint(estate: ExecState) -> None:
     estate.opush(from_py(x), from_py(y))
 
 @operator
+def grestore(estate: ExecState) -> None:
+    if estate.gsaves:
+        estate.gctx.restore()
+        if estate.gsaves[-1].from_save:
+            estate.gctx.save()
+            gsx = estate.gsaves[-1]
+        else:
+            gsx = estate.gsaves.pop()
+        gsx.restore_to_ctx(estate.gctx)
+
+@operator
+def grestoreall(estate: ExecState) -> None:
+    estate.grestoreall()
+
+@operator
+def gsave(estate: ExecState) -> None:
+    estate.gsave(from_save=False)
+
+@operator
 def lineto(estate: ExecState) -> None:
     x, y = estate.opopn(2)
     typecheck(Number, x, y)
