@@ -15,12 +15,12 @@ from test_helpers import compare_stacks
         ("matrix currentmatrix 1 get", [0.0]),
         ("matrix currentmatrix dup 4 get exch 5 get", [0.0, 0.0]),
         # identmatrix
-        ("6 array identmatrix aload pop", [1, 0, 0, 1, 0, 0]),
+        ("6 array identmatrix aload pop", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
         # matrix
-        ("matrix aload pop", [1, 0, 0, 1, 0, 0]),
+        ("matrix aload pop", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
         # translate
         ("17 42 translate matrix currentmatrix dup 4 get exch 5 get", [17.0, 42.0]),
-        #("17 42 matrix translate aload pop", [1, 0, 0, 1, 17, 42]),
+        ("17 42 matrix translate aload pop", [1.0, 0.0, 0.0, 1.0, 17.0, 42.0]),
     ],
 )
 def test_evaluate(text, stack):
@@ -44,6 +44,8 @@ def test_evaluate(text, stack):
         ("1 translate", "stackunderflow"),
         ("(a) 1 translate", "typecheck"),
         ("1 (a) translate", "typecheck"),
+        ("1 (a) matrix translate", "typecheck"),
+        ("(a) 1 matrix translate", "typecheck"),
     ],
 )
 def test_evaluate_error(text, error):
