@@ -32,6 +32,7 @@ from test_helpers import compare_stacks
         ("matrix identmatrix setmatrix 17 42 translate 0 0 transform", [17.0, 42.0]),
         ("matrix identmatrix setmatrix 90 rotate 100 200 transform", [-200.0, 100.0]),
         ("matrix identmatrix setmatrix 2 3 scale 100 200 transform", [200.0, 600.0]),
+        ("100 200 2 3 matrix scale transform", [200.0, 600.0]),
         # translate
         ("17 42 translate matrix currentmatrix dup 4 get exch 5 get", [17.0, 42.0]),
         ("17 42 matrix translate aload pop", [1.0, 0.0, 0.0, 1.0, 17.0, 42.0]),
