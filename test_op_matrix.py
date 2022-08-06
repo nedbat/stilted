@@ -19,8 +19,7 @@ from test_helpers import compare_stacks
         # matrix
         ("matrix aload pop", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
         # rotate
-        ("30 matrix rotate 1 get 0.5 sub abs 0.000001 lt", [True]),
-        ("30 matrix rotate 2 get -0.5 sub abs 0.000001 lt", [True]),
+        ("30 matrix rotate aload pop", [0.8660254037844387, 0.5, -0.5, 0.8660254037844387, 0.0, 0.0]),
         # scale
         ("17 42 matrix scale aload pop", [17.0, 0.0, 0.0, 42.0, 0.0, 0.0]),
         # translate

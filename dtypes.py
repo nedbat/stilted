@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import math
 from types import UnionType
 from typing import (
     Any, Callable, ClassVar, Generic, Iterator, TypeVar, TYPE_CHECKING,
@@ -58,6 +59,10 @@ class Real(Object):
     def from_string(cls, s) -> Real:
         """Convert a string into a Real."""
         return cls(True, float(s))
+
+    def __eq__(self, other) -> bool:
+        """To make writing tests easier."""
+        return math.isclose(self.value, other.value)
 
     def op_eq(self) -> str:
         return str(self.value)
