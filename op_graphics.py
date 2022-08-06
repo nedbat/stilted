@@ -1,6 +1,6 @@
 """Built-in graphics operators for stilted."""
 
-from dtypes import from_py, typecheck, Number
+from dtypes import from_py, typecheck, Array, Real, Integer, Number
 from error import Tilted
 from estate import operator, ExecState
 
@@ -12,6 +12,21 @@ def has_current_point(estate: ExecState) -> None:
 @operator
 def currentlinewidth(estate: ExecState) -> None:
     estate.opush(from_py(estate.gctx.get_line_width()))
+
+def pop_matrix(estate: ExecState) -> Array:
+    """Pop a matrix from the stack."""
+    arr = estate.opop(Array)
+    if len(arr) != 6:
+        raise Tilted("rangecheck")
+    return arr
+
+@operator
+def currentmatrix(estate: ExecState) -> None:
+    arr = pop_matrix(estate)
+    mtx = list(estate.gctx.get_matrix())
+    for i in range(6):
+        arr[i] = from_py(mtx[i])
+    estate.opush(arr)
 
 @operator
 def currentpoint(estate: ExecState) -> None:
@@ -46,6 +61,19 @@ def lineto(estate: ExecState) -> None:
     estate.gctx.line_to(x.value, y.value)
 
 @operator
+def identmatrix(estate: ExecState) -> None:
+    arr = pop_matrix(estate)
+    mtx = [1, 0, 0, 1, 0, 0]
+    for i in range(6):
+        arr[i] = from_py(mtx[i])
+    estate.opush(arr)
+
+@operator
+def matrix(estate: ExecState) -> None:
+    arr = list(map(from_py, [1, 0, 0, 1, 0, 0]))
+    estate.opush(estate.new_array(value=arr))
+
+@operator
 def moveto(estate: ExecState) -> None:
     x, y = estate.opopn(2)
     typecheck(Number, x, y)
@@ -63,3 +91,17 @@ def showpage(estate: ExecState) -> None:
 @operator
 def stroke(estate: ExecState) -> None:
     estate.gctx.stroke()
+
+@operator
+def translate(estate: ExecState) -> None:
+    match estate.otop():
+        case Array():
+            raise Tilted("unregistered")
+
+        case Integer() | Real():
+            tx, ty = estate.opopn(2)
+            typecheck(Number, tx, ty)
+            estate.gctx.translate(tx.value, ty.value)
+
+        case _:
+            raise Tilted("typecheck")
