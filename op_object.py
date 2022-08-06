@@ -5,13 +5,11 @@ from dtypes import from_py, Name
 
 @operator
 def cvlit(estate: ExecState) -> None:
-    estate.ohas(1)
-    estate.ostack[-1].literal = True
+    estate.otop().literal = True
 
 @operator
 def cvx(estate: ExecState) -> None:
-    estate.ohas(1)
-    estate.ostack[-1].literal = False
+    estate.otop().literal = False
 
 @operator("type")
 def type_(estate: ExecState) -> None:

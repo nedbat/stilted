@@ -103,6 +103,11 @@ class ExecState:
         if len(self.ostack) < n:
             raise Tilted("stackunderflow")
 
+    def otop(self) -> Object:
+        """Peek at the top object on the stack, or stackunderflow if empty."""
+        self.ohas(1)
+        return self.ostack[-1]
+
     def run_proc(self, proc: Array) -> None:
         """Start running a procedure."""
         self.estack.append(iter(proc.value))

@@ -19,8 +19,7 @@ def cleartomark(estate: ExecState) -> None:
 
 @operator
 def copy(estate: ExecState) -> None:
-    estate.ohas(1)
-    if isinstance(estate.ostack[-1], Integer):
+    if isinstance(estate.otop(), Integer):
         n = estate.opop().value
         rangecheck(0, n)
         if n > 0:
@@ -54,8 +53,7 @@ def counttomark(estate: ExecState) -> None:
 
 @operator
 def dup(estate: ExecState) -> None:
-    estate.ohas(1)
-    estate.opush(estate.ostack[-1])
+    estate.opush(estate.otop())
 
 @operator
 def exch(estate: ExecState) -> None:
