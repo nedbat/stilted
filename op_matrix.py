@@ -21,6 +21,10 @@ def matrix_to_array(mtx: cairo.Matrix, arr: Array):
     for i in range(6):
         arr[i] = from_py(lmtx[i])
 
+def array_to_matrix(arr) -> cairo.Matrix:
+    """Convert an Array into a Matrix."""
+    return cairo.Matrix(*map(lambda o: o.value, arr))
+
 def deg_to_rad(degrees: float) -> float:
     """Convert degrees to radians."""
     return math.pi * degrees / 180
@@ -73,6 +77,31 @@ def scale(estate: ExecState) -> None:
             sx, sy = estate.opopn(2)
             typecheck(Number, sx, sy)
             estate.gctx.scale(sx.value, sy.value)
+
+        case _:
+            raise Tilted("typecheck")
+
+@operator
+def setmatrix(estate: ExecState) -> None:
+    arr = pop_matrix(estate)
+    estate.gctx.set_matrix(array_to_matrix(arr))
+
+@operator
+def transform(estate: ExecState) -> None:
+    match estate.otop():
+        case Array():
+            arr = pop_matrix(estate)
+            x, y = estate.opopn(2)
+            typecheck(Number, x, y)
+            mtx = array_to_matrix(arr)
+            x, y = mtx.transform_point(x.value, y.value)
+            estate.opush(from_py(x), from_py(y))
+
+        case Integer() | Real():
+            x, y = estate.opopn(2)
+            typecheck(Number, x, y)
+            x, y = estate.gctx.get_matrix().transform_point(x.value, y.value)
+            estate.opush(from_py(x), from_py(y))
 
         case _:
             raise Tilted("typecheck")
