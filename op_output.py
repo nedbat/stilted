@@ -1,33 +1,33 @@
 """Built-in output operators for stilted."""
 
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import Stringy
 
 @operator("=")
-def eq_(estate: ExecState) -> None:
-    o = estate.opop()
-    estate.stdout.write(o.op_eq())
-    estate.stdout.write("\n")
+def eq_(engine: Engine) -> None:
+    o = engine.opop()
+    engine.stdout.write(o.op_eq())
+    engine.stdout.write("\n")
 
 @operator("==")
-def eqeq_(estate: ExecState) -> None:
-    o = estate.opop()
-    estate.stdout.write(o.op_eqeq())
-    estate.stdout.write("\n")
+def eqeq_(engine: Engine) -> None:
+    o = engine.opop()
+    engine.stdout.write(o.op_eqeq())
+    engine.stdout.write("\n")
 
 @operator("print")
-def print_(estate: ExecState) -> None:
-    s = estate.opop(Stringy)
-    estate.stdout.write(s.str_value)
+def print_(engine: Engine) -> None:
+    s = engine.opop(Stringy)
+    engine.stdout.write(s.str_value)
 
 @operator
-def pstack(estate: ExecState) -> None:
-    for o in reversed(estate.ostack):
-        estate.stdout.write(o.op_eqeq())
-        estate.stdout.write("\n")
+def pstack(engine: Engine) -> None:
+    for o in reversed(engine.ostack):
+        engine.stdout.write(o.op_eqeq())
+        engine.stdout.write("\n")
 
 @operator
-def stack(estate: ExecState) -> None:
-    for o in reversed(estate.ostack):
-        estate.stdout.write(o.op_eq())
-        estate.stdout.write("\n")
+def stack(engine: Engine) -> None:
+    for o in reversed(engine.ostack):
+        engine.stdout.write(o.op_eq())
+        engine.stdout.write("\n")

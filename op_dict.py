@@ -1,82 +1,82 @@
 """Built-in dict operators for stilted."""
 
 from error import Tilted
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import from_py, rangecheck, typecheck, Dict, Integer, Stringy
 
 @operator
-def begin(estate: ExecState) -> None:
-    d = estate.opop(Dict)
-    estate.dstack.append(d)
+def begin(engine: Engine) -> None:
+    d = engine.opop(Dict)
+    engine.dstack.append(d)
 
 @operator
-def cleardictstack(estate: ExecState) -> None:
-    while len(estate.dstack) > 2:
-        estate.dstack.pop()
+def cleardictstack(engine: Engine) -> None:
+    while len(engine.dstack) > 2:
+        engine.dstack.pop()
 
 @operator
-def countdictstack(estate: ExecState) -> None:
-    estate.opush(from_py(len(estate.dstack)))
+def countdictstack(engine: Engine) -> None:
+    engine.opush(from_py(len(engine.dstack)))
 
 @operator
-def currentdict(estate: ExecState) -> None:
-    estate.opush(estate.dstack[-1])
+def currentdict(engine: Engine) -> None:
+    engine.opush(engine.dstack[-1])
 
 @operator("dict")
-def dict_(estate: ExecState) -> None:
-    n = estate.opop(Integer)
+def dict_(engine: Engine) -> None:
+    n = engine.opop(Integer)
     rangecheck(0, n.value)
-    estate.opush(estate.new_dict())
+    engine.opush(engine.new_dict())
 
 @operator("def")
-def def_(estate: ExecState) -> None:
-    name, val = estate.opopn(2)
+def def_(engine: Engine) -> None:
+    name, val = engine.opopn(2)
     typecheck(Stringy, name)
-    d = estate.dstack[-1]
-    estate.prep_for_change(d)
+    d = engine.dstack[-1]
+    engine.prep_for_change(d)
     d[name.str_value] = val
 
 @operator
-def end(estate: ExecState) -> None:
-    if len(estate.dstack) <= 2:
+def end(engine: Engine) -> None:
+    if len(engine.dstack) <= 2:
         raise Tilted("dictstackunderflow")
-    estate.dstack.pop()
+    engine.dstack.pop()
 
 @operator
-def known(estate: ExecState) -> None:
-    d, k = estate.opopn(2)
+def known(engine: Engine) -> None:
+    d, k = engine.opopn(2)
     typecheck(Dict, d)
     typecheck(Stringy, k)
-    estate.opush(from_py(k.str_value in d.value))
+    engine.opush(from_py(k.str_value in d.value))
 
 @operator
-def load(estate: ExecState) -> None:
-    k = estate.opop(Stringy)
-    obj = estate.dstack_value(k)
+def load(engine: Engine) -> None:
+    k = engine.opop(Stringy)
+    obj = engine.dstack_value(k)
     if obj is None:
         raise Tilted(f"undefined: {k.str_value}")
-    estate.opush(obj)
+    engine.opush(obj)
 
 @operator
-def maxlength(estate: ExecState) -> None:
-    d = estate.opop(Dict)
-    estate.opush(from_py(len(d.value) + 10))
+def maxlength(engine: Engine) -> None:
+    d = engine.opop(Dict)
+    engine.opush(from_py(len(d.value) + 10))
 
 @operator
-def store(estate: ExecState) -> None:
-    k, o = estate.opopn(2)
+def store(engine: Engine) -> None:
+    k, o = engine.opopn(2)
     typecheck(Stringy, k)
-    d = estate.dstack_dict(k)
+    d = engine.dstack_dict(k)
     if d is None:
-        d = estate.dstack[-1]
-    estate.prep_for_change(d)
+        d = engine.dstack[-1]
+    engine.prep_for_change(d)
     d[k.str_value] = o
 
 @operator
-def where(estate: ExecState) -> None:
-    k = estate.opop(Stringy)
-    d = estate.dstack_dict(k)
+def where(engine: Engine) -> None:
+    k = engine.opop(Stringy)
+    d = engine.dstack_dict(k)
     if d is not None:
-        estate.opush(d, from_py(True))
+        engine.opush(d, from_py(True))
     else:
-        estate.opush(from_py(False))
+        engine.opush(from_py(False))

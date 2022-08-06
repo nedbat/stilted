@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Iterator, Tuple
 
 from error import Tilted
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import (
     from_py, rangecheck, typecheck,
     Array, Boolean, Dict, Integer, Name, Number, Object, String,
@@ -25,16 +25,16 @@ class Exitable:
     exitable = True
 
 @operator("exit")
-def exit_(estate: ExecState) -> None:
+def exit_(engine: Engine) -> None:
     # Find the object with .exitable on the stack.
-    while estate.estack and not hasattr(estate.estack[-1], "exitable"):
-        estate.estack.pop()
-    if estate.estack:
+    while engine.estack and not hasattr(engine.estack[-1], "exitable"):
+        engine.estack.pop()
+    if engine.estack:
         # Pop the callable, it is done.
-        estate.estack.pop()
+        engine.estack.pop()
     else:
         # No enclosing exitable operator, so "quit".
-        estate.run_name("quit")
+        engine.run_name("quit")
 
 @dataclass
 class ForExec(Exitable):
@@ -44,25 +44,25 @@ class ForExec(Exitable):
     limit: float
     proc: Array
 
-    def __call__(self, estate: ExecState) -> None:
+    def __call__(self, engine: Engine) -> None:
         if self.increment > 0:
             terminate = (self.control > self.limit)
         else:
             terminate = (self.control < self.limit)
         if not terminate:
-            estate.opush(from_py(self.control))
+            engine.opush(from_py(self.control))
             self.control += self.increment
-            estate.estack.append(self)
-            estate.run_proc(self.proc)
+            engine.estack.append(self)
+            engine.run_proc(self.proc)
 
 @operator("for")
-def for_(estate: ExecState) -> None:
-    initial, increment, limit, proc = estate.opopn(4)
+def for_(engine: Engine) -> None:
+    initial, increment, limit, proc = engine.opopn(4)
     typecheck(Number, initial, increment, limit)
     typecheck_procedure(proc)
 
     init_val = initial.value + type(increment.value)(0)
-    estate.estack.append(ForExec(init_val, increment.value, limit.value, proc))
+    engine.estack.append(ForExec(init_val, increment.value, limit.value, proc))
 
 @dataclass
 class ForallArrayExec(Exitable):
@@ -70,14 +70,14 @@ class ForallArrayExec(Exitable):
     array_iter: Iterator[Object]
     proc: Array
 
-    def __call__(self, estate: ExecState) -> None:
+    def __call__(self, engine: Engine) -> None:
         try:
             obj = next(self.array_iter)
         except StopIteration:
             return
-        estate.opush(obj)
-        estate.estack.append(self)
-        estate.run_proc(self.proc)
+        engine.opush(obj)
+        engine.estack.append(self)
+        engine.run_proc(self.proc)
 
 @dataclass
 class ForallDictExec(Exitable):
@@ -85,14 +85,14 @@ class ForallDictExec(Exitable):
     items_iter: Iterator[Tuple[str, Object]]
     proc: Array
 
-    def __call__(self, estate: ExecState) -> None:
+    def __call__(self, engine: Engine) -> None:
         try:
             k, v = next(self.items_iter)
         except StopIteration:
             return
-        estate.opush(Name(True, k), v)
-        estate.estack.append(self)
-        estate.run_proc(self.proc)
+        engine.opush(Name(True, k), v)
+        engine.estack.append(self)
+        engine.run_proc(self.proc)
 
 @dataclass
 class ForallStringExec(Exitable):
@@ -100,70 +100,70 @@ class ForallStringExec(Exitable):
     bytes_iter: Iterator[int]
     proc: Array
 
-    def __call__(self, estate: ExecState) -> None:
+    def __call__(self, engine: Engine) -> None:
         try:
             b = next(self.bytes_iter)
         except StopIteration:
             return
-        estate.opush(from_py(b))
-        estate.estack.append(self)
-        estate.run_proc(self.proc)
+        engine.opush(from_py(b))
+        engine.estack.append(self)
+        engine.run_proc(self.proc)
 
 @operator
-def forall(estate: ExecState) -> None:
-    o, proc = estate.opopn(2)
+def forall(engine: Engine) -> None:
+    o, proc = engine.opopn(2)
     typecheck(Array, proc)
     if proc.literal:
         raise Tilted("typecheck")
 
     match o:
         case Array():
-            estate.estack.append(ForallArrayExec(iter(o), proc))
+            engine.estack.append(ForallArrayExec(iter(o), proc))
 
         case Dict():
-            estate.estack.append(ForallDictExec(iter(o.value.items()), proc))
+            engine.estack.append(ForallDictExec(iter(o.value.items()), proc))
 
         case String():
-            estate.estack.append(ForallStringExec(iter(o), proc))
+            engine.estack.append(ForallStringExec(iter(o), proc))
 
         case _:
             raise Tilted("typecheck")
 
 @operator("if")
-def if_(estate: ExecState) -> None:
-    b, proc_if = estate.opopn(2)
+def if_(engine: Engine) -> None:
+    b, proc_if = engine.opopn(2)
     typecheck(Boolean, b)
     typecheck_procedure(proc_if)
     if b.value:
-        estate.run_proc(proc_if)
+        engine.run_proc(proc_if)
 
 @operator
-def ifelse(estate: ExecState) -> None:
-    b, proc_if, proc_else = estate.opopn(3)
+def ifelse(engine: Engine) -> None:
+    b, proc_if, proc_else = engine.opopn(3)
     typecheck(Boolean, b)
     typecheck_procedure(proc_if, proc_else)
     if b.value:
-        estate.run_proc(proc_if)
+        engine.run_proc(proc_if)
     else:
-        estate.run_proc(proc_else)
+        engine.run_proc(proc_else)
 
 @dataclass
 class LoopExec(Exitable):
     """Execstack item for implementing `loop`."""
     proc: Array
 
-    def __call__(self, estate: ExecState) -> None:
-        estate.estack.append(self)
-        estate.run_proc(self.proc)
+    def __call__(self, engine: Engine) -> None:
+        engine.estack.append(self)
+        engine.run_proc(self.proc)
 
 @operator
-def loop(estate: ExecState) -> None:
-    proc = estate.opop()
+def loop(engine: Engine) -> None:
+    proc = engine.opop()
     typecheck_procedure(proc)
-    estate.estack.append(LoopExec(proc))
+    engine.estack.append(LoopExec(proc))
 
 @operator("quit")
-def quit_(estate: ExecState) -> None:
+def quit_(engine: Engine) -> None:
     sys.exit()
 
 @dataclass
@@ -171,46 +171,46 @@ class RepeatExec(Exitable):
     count: int
     proc: Array
 
-    def __call__(self, estate: ExecState) -> None:
+    def __call__(self, engine: Engine) -> None:
         if self.count > 0:
             self.count -= 1
-            estate.estack.append(self)
-            estate.run_proc(self.proc)
+            engine.estack.append(self)
+            engine.run_proc(self.proc)
 
 @operator
-def repeat(estate: ExecState) -> None:
-    count, proc = estate.opopn(2)
+def repeat(engine: Engine) -> None:
+    count, proc = engine.opopn(2)
     typecheck(Integer, count)
     typecheck_procedure(proc)
     countv = count.value
     rangecheck(0, countv)
 
-    estate.estack.append(RepeatExec(countv, proc))
+    engine.estack.append(RepeatExec(countv, proc))
 
 @dataclass
 class StoppedExec:
     """Exectack item for `stopped`."""
     stoppable = True
 
-    def __call__(self, estate: ExecState) -> None:
+    def __call__(self, engine: Engine) -> None:
         # If we get here, then no `stop` was executed.
-        estate.opush(from_py(False))
+        engine.opush(from_py(False))
 
 @operator
-def stop(estate: ExecState) -> None:
+def stop(engine: Engine) -> None:
     # Find the `stopped` object on the stack.
-    while estate.estack and not hasattr(estate.estack[-1], "stoppable"):
-        estate.estack.pop()
-    if estate.estack:
+    while engine.estack and not hasattr(engine.estack[-1], "stoppable"):
+        engine.estack.pop()
+    if engine.estack:
         # `stopped` is done, and was stopped.
-        estate.estack.pop()
-        estate.opush(from_py(True))
+        engine.estack.pop()
+        engine.opush(from_py(True))
     else:
-        estate.run_name("quit")
+        engine.run_name("quit")
 
 @operator
-def stopped(estate: ExecState) -> None:
-    proc = estate.opop()
+def stopped(engine: Engine) -> None:
+    proc = engine.opop()
     typecheck_procedure(proc)
-    estate.estack.append(StoppedExec())
-    estate.run_proc(proc)
+    engine.estack.append(StoppedExec())
+    engine.run_proc(proc)

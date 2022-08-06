@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from error import Tilted
 if TYPE_CHECKING:
-    from estate import ExecState
+    from evaluate import Engine
 
 @dataclass
 class Object:
@@ -375,7 +375,7 @@ class Operator(Object):
 
     """
     typename: ClassVar[str] = "operator"
-    value: Callable[["ExecState"], None]
+    value: Callable[["Engine"], None]
     name: str
 
     def op_eq(self) -> str:

@@ -1,37 +1,37 @@
 """Built-in array operators for stilted."""
 
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import rangecheck, Array, Integer, MARK
 
 @operator("[")
-def mark_(estate: ExecState) -> None:
-    estate.opush(MARK)
+def mark_(engine: Engine) -> None:
+    engine.opush(MARK)
 
 @operator("]")
-def array_(estate: ExecState) -> None:
-    n = estate.counttomark()
-    objs = estate.opopn(n)
-    estate.opop() # the mark
-    estate.opush(estate.new_array(value=objs))
+def array_(engine: Engine) -> None:
+    n = engine.counttomark()
+    objs = engine.opopn(n)
+    engine.opop() # the mark
+    engine.opush(engine.new_array(value=objs))
 
 @operator
-def aload(estate: ExecState) -> None:
-    arr = estate.opop(Array)
+def aload(engine: Engine) -> None:
+    arr = engine.opop(Array)
     for obj in arr:
-        estate.opush(obj)
-    estate.opush(arr)
+        engine.opush(obj)
+    engine.opush(arr)
 
 @operator
-def array(estate: ExecState) -> None:
-    n = estate.opop(Integer).value
+def array(engine: Engine) -> None:
+    n = engine.opop(Integer).value
     rangecheck(0, n)
-    estate.opush(estate.new_array(n=n))
+    engine.opush(engine.new_array(n=n))
 
 @operator
-def astore(estate: ExecState) -> None:
-    arr = estate.opop(Array)
+def astore(engine: Engine) -> None:
+    arr = engine.opop(Array)
     larr = len(arr)
-    estate.ohas(larr)
+    engine.ohas(larr)
     for i in range(larr):
-        arr[larr - i - 1] = estate.opop()
-    estate.opush(arr)
+        arr[larr - i - 1] = engine.opop()
+    engine.opush(arr)

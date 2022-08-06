@@ -63,8 +63,8 @@ from test_helpers import compare_stacks
 )
 def test_evaluate_with_output(text, stack, output):
     stdout = io.StringIO()
-    estate = evaluate(text, stdout=stdout)
-    compare_stacks(estate.ostack, stack)
+    engine = evaluate(text, stdout=stdout)
+    compare_stacks(engine.ostack, stack)
     assert stdout.getvalue() == output
 
 

@@ -1,7 +1,7 @@
 """Built-in stack operators for stilted."""
 
 from error import Tilted
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import (
     from_py, rangecheck, typecheck,
     Array, Dict, Integer, MARK, String,
@@ -9,76 +9,76 @@ from dtypes import (
 
 
 @operator
-def clear(estate: ExecState) -> None:
-    estate.ostack.clear()
+def clear(engine: Engine) -> None:
+    engine.ostack.clear()
 
 @operator
-def cleartomark(estate: ExecState) -> None:
-    n = estate.counttomark()
-    del estate.ostack[-(n + 1):]
+def cleartomark(engine: Engine) -> None:
+    n = engine.counttomark()
+    del engine.ostack[-(n + 1):]
 
 @operator
-def copy(estate: ExecState) -> None:
-    if isinstance(estate.otop(), Integer):
-        n = estate.opop().value
+def copy(engine: Engine) -> None:
+    if isinstance(engine.otop(), Integer):
+        n = engine.opop().value
         rangecheck(0, n)
         if n > 0:
-            estate.ohas(n)
-            estate.opush(*estate.ostack[-n:])
+            engine.ohas(n)
+            engine.opush(*engine.ostack[-n:])
     else:
-        obj1, obj2 = estate.opopn(2)
+        obj1, obj2 = engine.opopn(2)
         match obj1, obj2:
             case Dict(), Dict():
-                estate.prep_for_change(obj2)
+                engine.prep_for_change(obj2)
                 for k, v in obj1.value.items():
                     obj2[k] = v
-                estate.opush(obj2)
+                engine.opush(obj2)
 
             case (Array(), Array()) | (String(), String()):
                 rangecheck(obj1.length, obj2.length)
                 for i in range(obj1.length):
                     obj2[i] = obj1[i]
-                estate.opush(obj2.new_sub(0, obj1.length))
+                engine.opush(obj2.new_sub(0, obj1.length))
 
             case _:
                 raise Tilted(f"typecheck: got {type(obj1)}, {type(obj2)}")
 
 @operator
-def count(estate: ExecState) -> None:
-    estate.opush(from_py(len(estate.ostack)))
+def count(engine: Engine) -> None:
+    engine.opush(from_py(len(engine.ostack)))
 
 @operator
-def counttomark(estate: ExecState) -> None:
-    estate.opush(from_py(estate.counttomark()))
+def counttomark(engine: Engine) -> None:
+    engine.opush(from_py(engine.counttomark()))
 
 @operator
-def dup(estate: ExecState) -> None:
-    estate.opush(estate.otop())
+def dup(engine: Engine) -> None:
+    engine.opush(engine.otop())
 
 @operator
-def exch(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
-    estate.opush(b, a)
+def exch(engine: Engine) -> None:
+    a, b = engine.opopn(2)
+    engine.opush(b, a)
 
 @operator
-def index(estate: ExecState) -> None:
-    n = estate.opop(Integer)
-    estate.ohas(n.value + 1)
+def index(engine: Engine) -> None:
+    n = engine.opop(Integer)
+    engine.ohas(n.value + 1)
     rangecheck(0, n.value)
-    estate.opush(estate.ostack[-(n.value + 1)])
+    engine.opush(engine.ostack[-(n.value + 1)])
 
 @operator
-def mark(estate: ExecState) -> None:
-    estate.opush(MARK)
+def mark(engine: Engine) -> None:
+    engine.opush(MARK)
 
 @operator
-def pop(estate: ExecState) -> None:
-    estate.opop()
+def pop(engine: Engine) -> None:
+    engine.opop()
 
 @operator
-def roll(estate: ExecState) -> None:
-    n, j = estate.opopn(2)
+def roll(engine: Engine) -> None:
+    n, j = engine.opopn(2)
     typecheck(Integer, n, j)
-    vals = estate.opopn(n.value)
-    estate.opush(*vals[-j.value:])
-    estate.opush(*vals[:-j.value])
+    vals = engine.opopn(n.value)
+    engine.opush(*vals[-j.value:])
+    engine.opush(*vals[:-j.value])

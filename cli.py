@@ -52,7 +52,7 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
 
     if args.interactive:
         while True:
-            stack_depth = len(engine.estate.ostack)
+            stack_depth = len(engine.ostack)
             try:
                 line = input_fn(f"|-{stack_depth}> ")
             except EOFError:

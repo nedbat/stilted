@@ -6,11 +6,11 @@ import cairo
 
 from dtypes import from_py, typecheck, Array, Real, Integer, Number
 from error import Tilted
-from estate import operator, ExecState
+from evaluate import operator, Engine
 
-def pop_matrix(estate: ExecState) -> Array:
+def pop_matrix(engine: Engine) -> Array:
     """Pop a matrix from the stack."""
-    arr = estate.opop(Array)
+    arr = engine.opop(Array)
     if len(arr) != 6:
         raise Tilted("rangecheck")
     return arr
@@ -30,96 +30,96 @@ def deg_to_rad(degrees: float) -> float:
     return math.pi * degrees / 180
 
 @operator
-def currentmatrix(estate: ExecState) -> None:
-    arr = pop_matrix(estate)
-    matrix_to_array(estate.gctx.get_matrix(), arr)
-    estate.opush(arr)
+def currentmatrix(engine: Engine) -> None:
+    arr = pop_matrix(engine)
+    matrix_to_array(engine.gctx.get_matrix(), arr)
+    engine.opush(arr)
 
 @operator
-def identmatrix(estate: ExecState) -> None:
-    arr = pop_matrix(estate)
+def identmatrix(engine: Engine) -> None:
+    arr = pop_matrix(engine)
     matrix_to_array(cairo.Matrix(), arr)
-    estate.opush(arr)
+    engine.opush(arr)
 
 @operator
-def matrix(estate: ExecState) -> None:
-    arr = estate.new_array(n=6)
+def matrix(engine: Engine) -> None:
+    arr = engine.new_array(n=6)
     matrix_to_array(cairo.Matrix(), arr)
-    estate.opush(arr)
+    engine.opush(arr)
 
 @operator
-def rotate(estate: ExecState) -> None:
-    match estate.otop():
+def rotate(engine: Engine) -> None:
+    match engine.otop():
         case Array():
-            arr = pop_matrix(estate)
-            ang = estate.opop(Number)
+            arr = pop_matrix(engine)
+            ang = engine.opop(Number)
             matrix_to_array(cairo.Matrix.init_rotate(deg_to_rad(ang.value)), arr)
-            estate.opush(arr)
+            engine.opush(arr)
 
         case Integer() | Real():
-            ang = estate.opop(Number)
-            estate.gctx.rotate(deg_to_rad(ang.value))
+            ang = engine.opop(Number)
+            engine.gctx.rotate(deg_to_rad(ang.value))
 
         case _:
             raise Tilted("typecheck")
 
 @operator
-def scale(estate: ExecState) -> None:
-    match estate.otop():
+def scale(engine: Engine) -> None:
+    match engine.otop():
         case Array():
-            arr = pop_matrix(estate)
-            sx, sy = estate.opopn(2)
+            arr = pop_matrix(engine)
+            sx, sy = engine.opopn(2)
             typecheck(Number, sx, sy)
             matrix_to_array(cairo.Matrix(xx=sx.value, yy=sy.value), arr)
-            estate.opush(arr)
+            engine.opush(arr)
 
         case Integer() | Real():
-            sx, sy = estate.opopn(2)
+            sx, sy = engine.opopn(2)
             typecheck(Number, sx, sy)
-            estate.gctx.scale(sx.value, sy.value)
+            engine.gctx.scale(sx.value, sy.value)
 
         case _:
             raise Tilted("typecheck")
 
 @operator
-def setmatrix(estate: ExecState) -> None:
-    arr = pop_matrix(estate)
-    estate.gctx.set_matrix(array_to_matrix(arr))
+def setmatrix(engine: Engine) -> None:
+    arr = pop_matrix(engine)
+    engine.gctx.set_matrix(array_to_matrix(arr))
 
 @operator
-def transform(estate: ExecState) -> None:
-    match estate.otop():
+def transform(engine: Engine) -> None:
+    match engine.otop():
         case Array():
-            arr = pop_matrix(estate)
-            x, y = estate.opopn(2)
+            arr = pop_matrix(engine)
+            x, y = engine.opopn(2)
             typecheck(Number, x, y)
             mtx = array_to_matrix(arr)
             x, y = mtx.transform_point(x.value, y.value)
-            estate.opush(from_py(x), from_py(y))
+            engine.opush(from_py(x), from_py(y))
 
         case Integer() | Real():
-            x, y = estate.opopn(2)
+            x, y = engine.opopn(2)
             typecheck(Number, x, y)
-            x, y = estate.gctx.get_matrix().transform_point(x.value, y.value)
-            estate.opush(from_py(x), from_py(y))
+            x, y = engine.gctx.get_matrix().transform_point(x.value, y.value)
+            engine.opush(from_py(x), from_py(y))
 
         case _:
             raise Tilted("typecheck")
 
 @operator
-def translate(estate: ExecState) -> None:
-    match estate.otop():
+def translate(engine: Engine) -> None:
+    match engine.otop():
         case Array():
-            arr = pop_matrix(estate)
-            tx, ty = estate.opopn(2)
+            arr = pop_matrix(engine)
+            tx, ty = engine.opopn(2)
             typecheck(Number, tx, ty)
             matrix_to_array(cairo.Matrix(x0=tx.value, y0=ty.value), arr)
-            estate.opush(arr)
+            engine.opush(arr)
 
         case Integer() | Real():
-            tx, ty = estate.opopn(2)
+            tx, ty = engine.opopn(2)
             typecheck(Number, tx, ty)
-            estate.gctx.translate(tx.value, ty.value)
+            engine.gctx.translate(tx.value, ty.value)
 
         case _:
             raise Tilted("typecheck")

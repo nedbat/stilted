@@ -1,22 +1,22 @@
 """Built-in object model operators for stilted."""
 
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import from_py, Name
 
 @operator
-def cvlit(estate: ExecState) -> None:
-    estate.otop().literal = True
+def cvlit(engine: Engine) -> None:
+    engine.otop().literal = True
 
 @operator
-def cvx(estate: ExecState) -> None:
-    estate.otop().literal = False
+def cvx(engine: Engine) -> None:
+    engine.otop().literal = False
 
 @operator("type")
-def type_(estate: ExecState) -> None:
-    obj = estate.opop()
-    estate.opush(Name(literal=False, value=obj.typename + "type"))
+def type_(engine: Engine) -> None:
+    obj = engine.opop()
+    engine.opush(Name(literal=False, value=obj.typename + "type"))
 
 @operator
-def xcheck(estate: ExecState) -> None:
-    obj = estate.opop()
-    estate.opush(from_py(not obj.literal))
+def xcheck(engine: Engine) -> None:
+    obj = engine.opop()
+    engine.opush(from_py(not obj.literal))

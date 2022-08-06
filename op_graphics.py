@@ -2,64 +2,64 @@
 
 from dtypes import from_py, typecheck, Number
 from error import Tilted
-from estate import operator, ExecState
+from evaluate import operator, Engine
 
-def has_current_point(estate: ExecState) -> None:
+def has_current_point(engine: Engine) -> None:
     """There must be a current point, or raise nocurrentpoint."""
-    if not estate.gctx.has_current_point():
+    if not engine.gctx.has_current_point():
         raise Tilted("nocurrentpoint")
 
 @operator
-def currentlinewidth(estate: ExecState) -> None:
-    estate.opush(from_py(estate.gctx.get_line_width()))
+def currentlinewidth(engine: Engine) -> None:
+    engine.opush(from_py(engine.gctx.get_line_width()))
 
 @operator
-def currentpoint(estate: ExecState) -> None:
-    has_current_point(estate)
-    x, y = estate.gctx.get_current_point()
-    estate.opush(from_py(x), from_py(y))
+def currentpoint(engine: Engine) -> None:
+    has_current_point(engine)
+    x, y = engine.gctx.get_current_point()
+    engine.opush(from_py(x), from_py(y))
 
 @operator
-def grestore(estate: ExecState) -> None:
-    if estate.gsaves:
-        estate.gctx.restore()
-        if estate.gsaves[-1].from_save:
-            estate.gctx.save()
-            gsx = estate.gsaves[-1]
+def grestore(engine: Engine) -> None:
+    if engine.gsaves:
+        engine.gctx.restore()
+        if engine.gsaves[-1].from_save:
+            engine.gctx.save()
+            gsx = engine.gsaves[-1]
         else:
-            gsx = estate.gsaves.pop()
-        gsx.restore_to_ctx(estate.gctx)
+            gsx = engine.gsaves.pop()
+        gsx.restore_to_ctx(engine.gctx)
 
 @operator
-def grestoreall(estate: ExecState) -> None:
-    estate.grestoreall()
+def grestoreall(engine: Engine) -> None:
+    engine.grestoreall()
 
 @operator
-def gsave(estate: ExecState) -> None:
-    estate.gsave(from_save=False)
+def gsave(engine: Engine) -> None:
+    engine.gsave(from_save=False)
 
 @operator
-def lineto(estate: ExecState) -> None:
-    x, y = estate.opopn(2)
+def lineto(engine: Engine) -> None:
+    x, y = engine.opopn(2)
     typecheck(Number, x, y)
-    has_current_point(estate)
-    estate.gctx.line_to(x.value, y.value)
+    has_current_point(engine)
+    engine.gctx.line_to(x.value, y.value)
 
 @operator
-def moveto(estate: ExecState) -> None:
-    x, y = estate.opopn(2)
+def moveto(engine: Engine) -> None:
+    x, y = engine.opopn(2)
     typecheck(Number, x, y)
-    estate.gctx.move_to(x.value, y.value)
+    engine.gctx.move_to(x.value, y.value)
 
 @operator
-def setlinewidth(estate: ExecState) -> None:
-    lw = estate.opop(Number)
-    estate.gctx.set_line_width(lw.value)
+def setlinewidth(engine: Engine) -> None:
+    lw = engine.opop(Number)
+    engine.gctx.set_line_width(lw.value)
 
 @operator
-def showpage(estate: ExecState) -> None:
-    estate.device.showpage()
+def showpage(engine: Engine) -> None:
+    engine.device.showpage()
 
 @operator
-def stroke(estate: ExecState) -> None:
-    estate.gctx.stroke()
+def stroke(engine: Engine) -> None:
+    engine.gctx.stroke()

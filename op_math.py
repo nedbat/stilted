@@ -2,82 +2,82 @@
 
 import math
 
-from estate import operator, ExecState
+from evaluate import operator, Engine
 from dtypes import from_py, typecheck, Number
 
 
 @operator("abs")
-def abs_(estate: ExecState) -> None:
-    a = estate.opop(Number)
-    estate.opush(from_py(abs(a.value)))
+def abs_(engine: Engine) -> None:
+    a = engine.opop(Number)
+    engine.opush(from_py(abs(a.value)))
 
 @operator
-def add(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
+def add(engine: Engine) -> None:
+    a, b = engine.opopn(2)
     typecheck(Number, a, b)
-    estate.opush(from_py(a.value + b.value))
+    engine.opush(from_py(a.value + b.value))
 
 @operator
-def ceiling(estate: ExecState) -> None:
-    a = estate.opop(Number)
+def ceiling(engine: Engine) -> None:
+    a = engine.opop(Number)
     av = a.value
-    estate.opush(from_py(type(av)(math.ceil(av))))
+    engine.opush(from_py(type(av)(math.ceil(av))))
 
 @operator
-def div(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
+def div(engine: Engine) -> None:
+    a, b = engine.opopn(2)
     typecheck(Number, a, b)
-    estate.opush(from_py(a.value / b.value))
+    engine.opush(from_py(a.value / b.value))
 
 @operator
-def floor(estate: ExecState) -> None:
-    a = estate.opop(Number)
+def floor(engine: Engine) -> None:
+    a = engine.opop(Number)
     av = a.value
-    estate.opush(from_py(type(av)(math.floor(av))))
+    engine.opush(from_py(type(av)(math.floor(av))))
 
 @operator
-def idiv(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
+def idiv(engine: Engine) -> None:
+    a, b = engine.opopn(2)
     typecheck(Number, a, b)
-    estate.opush(from_py(int(a.value / b.value)))
+    engine.opush(from_py(int(a.value / b.value)))
 
 @operator
-def mod(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
+def mod(engine: Engine) -> None:
+    a, b = engine.opopn(2)
     typecheck(Number, a, b)
     av, bv = a.value, b.value
     remainder = (-1 if av < 0 else 1) * (abs(av) % abs(bv))
-    estate.opush(from_py(remainder))
+    engine.opush(from_py(remainder))
 
 @operator
-def mul(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
+def mul(engine: Engine) -> None:
+    a, b = engine.opopn(2)
     typecheck(Number, a, b)
-    estate.opush(from_py(a.value * b.value))
+    engine.opush(from_py(a.value * b.value))
 
 @operator
-def neg(estate: ExecState) -> None:
-    a = estate.opop(Number)
-    estate.opush(from_py(-a.value))
+def neg(engine: Engine) -> None:
+    a = engine.opop(Number)
+    engine.opush(from_py(-a.value))
 
 @operator("round")
-def round_(estate: ExecState) -> None:
-    a = estate.opop(Number)
+def round_(engine: Engine) -> None:
+    a = engine.opop(Number)
     av = a.value
     if av - int(av) == 0.5:
         r = int(av) + 1
     else:
         r = round(av)
-    estate.opush(from_py(type(av)(r)))
+    engine.opush(from_py(type(av)(r)))
 
 @operator
-def sub(estate: ExecState) -> None:
-    a, b = estate.opopn(2)
+def sub(engine: Engine) -> None:
+    a, b = engine.opopn(2)
     typecheck(Number, a, b)
-    estate.opush(from_py(a.value - b.value))
+    engine.opush(from_py(a.value - b.value))
 
 @operator
-def truncate(estate: ExecState) -> None:
-    a = estate.opop(Number)
+def truncate(engine: Engine) -> None:
+    a = engine.opop(Number)
     av = a.value
-    estate.opush(from_py(type(av)(math.trunc(av))))
+    engine.opush(from_py(type(av)(math.trunc(av))))
