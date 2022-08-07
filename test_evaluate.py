@@ -14,6 +14,11 @@ from test_helpers import compare_stacks
         ("123 (hello) 1.25", [123, "hello", 1.25]),
         ("123 /Hello 1.25", [123, Name(True, "Hello"), 1.25]),
         ("/average {add 2 div} def 40 60 average", [50.0]),
+        ("""
+            /xform { transform 2 { round .6 add exch } repeat } def
+            matrix identmatrix setmatrix 10 20 translate
+            1 2 xform
+        """, [11.6, 22.6]),
     ],
 )
 def test_evaluate(text, stack):

@@ -138,7 +138,7 @@ class Engine:
                     self.opush(obj)
                 else:
                     for subobj in obj.value:
-                        self._evaluate_one(subobj)
+                        self._evaluate_one(subobj, direct=True)
 
             case Operator():
                 obj.value(self)
