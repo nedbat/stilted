@@ -148,6 +148,14 @@ class Engine:
             case _:
                 raise Exception(f"Buh? {obj!r}")
 
+    def run_name(self, name: str) -> None:
+        """Run a name."""
+        self.estack.append(iter([Name(False, name)]))
+
+    ##
+    ## Operand stack methods.
+    ##
+
     def opop(self, a_type=None) -> Any:
         """
         Remove the top operand and return it.
@@ -184,16 +192,16 @@ class Engine:
         self.ohas(1)
         return self.ostack[-1]
 
-    def run_name(self, name: str) -> None:
-        """Run a name."""
-        self.estack.append(iter([Name(False, name)]))
-
     def counttomark(self) -> int:
         """How deep is the nearest mark on the operand stack?"""
         for i, val in enumerate(reversed(self.ostack)):
             if val is MARK:
                 return i
         raise Tilted("unmatchedmark")
+
+    ##
+    ## Compound object creation.
+    ##
 
     def new_array(self, n: int=None, value: list[Object]=None) -> Array:
         """Make a new Array, either by size or contents."""
@@ -217,6 +225,10 @@ class Engine:
             storage=DictStorage(values=[(self.sstack[-1], value)]),
         )
 
+    ##
+    ## Dict stack methods.
+    ##
+
     def dstack_value(self, name: Name | String) -> Object | None:
         """Look in dstack for `name`. If found, return the value."""
         d = self.dstack_dict(name)
@@ -231,9 +243,9 @@ class Engine:
                 return d
         return None
 
-    def prep_for_change(self, obj: SaveableObject) -> None:
-        """An object is about to change. Do save/restore bookkeeping."""
-        obj.prep_for_change(self.sstack[-1])
+    ##
+    ## Save object methods.
+    ##
 
     def new_save(self) -> Save:
         """Make a new save-point."""
@@ -245,6 +257,14 @@ class Engine:
         )
         self.sstack.append(save)
         return save
+
+    def prep_for_change(self, obj: SaveableObject) -> None:
+        """An object is about to change. Do save/restore bookkeeping."""
+        obj.prep_for_change(self.sstack[-1])
+
+    ##
+    ## Graphics stack methods.
+    ##
 
     @property
     def gctx(self):
