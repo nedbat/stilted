@@ -2,6 +2,7 @@
 
 import pytest
 
+from dtypes import Name
 from error import Tilted
 from evaluate import evaluate
 from test_helpers import compare_stacks
@@ -9,6 +10,12 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # exec
+        ("12 exec", [12]),
+        ("(abc) exec", ["abc"]),
+        ("/xyzzy exec", [Name(True, "xyzzy")]),
+        ("/xyzzy {1 2 add} def /xyzzy cvx exec", [3]),
+        ("{1 2 add} exec", [3]),
         # exit
         ("1 1 10 { dup 3 gt {exit} if } for", [1, 2, 3, 4]),
         ("1 10 { dup 1 add dup 3 gt {exit} if } repeat", [1, 2, 3, 4]),
@@ -33,9 +40,12 @@ from test_helpers import compare_stacks
         ("4 {} repeat", []),
         ("99 0 {(a)} repeat", [99]),
         # stop
-        ("{ 1 2 add } stopped 99", [3, False, 99]),
         ("{ 1 2 add stop } stopped 99", [3, True, 99]),
         ("{ 1 1 10 { dup 2 gt { stop } if } for } stopped 99", [1, 2, 3, True, 99]),
+        # stopped
+        ("12 stopped 99", [12, False, 99]),
+        ("{1 2 add} stopped 99", [3, False, 99]),
+        ("/xyzzy {1 2 add} def /xyzzy cvx stopped 99", [3, False, 99]),
     ],
 )
 def test_evaluate(text, stack):
@@ -45,6 +55,8 @@ def test_evaluate(text, stack):
 @pytest.mark.parametrize(
     "text, error",
     [
+        # exec
+        ("exec", "stackunderflow"),
         # for
         ("for", "stackunderflow"),
         ("{} for", "stackunderflow"),

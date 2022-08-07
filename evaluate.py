@@ -122,23 +122,22 @@ class Engine:
                 except StopIteration:
                     self.estack.pop()
                     continue
-                self._evaluate_one(obj, direct=True)
+                self.exec(obj, direct=True)
 
-    def _evaluate_one(self, obj: Object, direct: bool=False) -> None:
-        """Evaluate one Stilted Object."""
+    def exec(self, obj: Object, direct: bool=False) -> None:
+        """Execute one Stilted Object."""
         match obj:
             case Name(literal=False, value=name):
                 looked_up = self.dstack_value(obj)
                 if looked_up is None:
                     raise Tilted(f"undefined: {name}")
-                self._evaluate_one(looked_up)
+                self.exec(looked_up)
 
             case Array(literal=False):
                 if direct:
                     self.opush(obj)
                 else:
-                    for subobj in obj.value:
-                        self._evaluate_one(subobj, direct=True)
+                    self.estack.append(iter(obj.value))
 
             case Operator():
                 obj.value(self)
@@ -184,10 +183,6 @@ class Engine:
         """Peek at the top object on the stack, or stackunderflow if empty."""
         self.ohas(1)
         return self.ostack[-1]
-
-    def run_proc(self, proc: Array) -> None:
-        """Start running a procedure."""
-        self.estack.append(iter(proc.value))
 
     def run_name(self, name: str) -> None:
         """Run a name."""

@@ -19,6 +19,11 @@ def typecheck_procedure(*objs):
         if obj.literal:
             raise Tilted("typecheck")
 
+@operator("exec")
+def exec_(engine: Engine) -> None:
+    obj = engine.opop()
+    engine.exec(obj)
+
 @dataclass
 class Exitable:
     """An item on the execstack that can be `exit`ed."""
@@ -53,7 +58,7 @@ class ForExec(Exitable):
             engine.opush(from_py(self.control))
             self.control += self.increment
             engine.estack.append(self)
-            engine.run_proc(self.proc)
+            engine.exec(self.proc)
 
 @operator("for")
 def for_(engine: Engine) -> None:
@@ -77,7 +82,7 @@ class ForallArrayExec(Exitable):
             return
         engine.opush(obj)
         engine.estack.append(self)
-        engine.run_proc(self.proc)
+        engine.exec(self.proc)
 
 @dataclass
 class ForallDictExec(Exitable):
@@ -92,7 +97,7 @@ class ForallDictExec(Exitable):
             return
         engine.opush(Name(True, k), v)
         engine.estack.append(self)
-        engine.run_proc(self.proc)
+        engine.exec(self.proc)
 
 @dataclass
 class ForallStringExec(Exitable):
@@ -107,7 +112,7 @@ class ForallStringExec(Exitable):
             return
         engine.opush(from_py(b))
         engine.estack.append(self)
-        engine.run_proc(self.proc)
+        engine.exec(self.proc)
 
 @operator
 def forall(engine: Engine) -> None:
@@ -135,7 +140,7 @@ def if_(engine: Engine) -> None:
     typecheck(Boolean, b)
     typecheck_procedure(proc_if)
     if b.value:
-        engine.run_proc(proc_if)
+        engine.exec(proc_if)
 
 @operator
 def ifelse(engine: Engine) -> None:
@@ -143,9 +148,9 @@ def ifelse(engine: Engine) -> None:
     typecheck(Boolean, b)
     typecheck_procedure(proc_if, proc_else)
     if b.value:
-        engine.run_proc(proc_if)
+        engine.exec(proc_if)
     else:
-        engine.run_proc(proc_else)
+        engine.exec(proc_else)
 
 @dataclass
 class LoopExec(Exitable):
@@ -154,7 +159,7 @@ class LoopExec(Exitable):
 
     def __call__(self, engine: Engine) -> None:
         engine.estack.append(self)
-        engine.run_proc(self.proc)
+        engine.exec(self.proc)
 
 @operator
 def loop(engine: Engine) -> None:
@@ -175,7 +180,7 @@ class RepeatExec(Exitable):
         if self.count > 0:
             self.count -= 1
             engine.estack.append(self)
-            engine.run_proc(self.proc)
+            engine.exec(self.proc)
 
 @operator
 def repeat(engine: Engine) -> None:
@@ -210,7 +215,6 @@ def stop(engine: Engine) -> None:
 
 @operator
 def stopped(engine: Engine) -> None:
-    proc = engine.opop()
-    typecheck_procedure(proc)
+    obj = engine.opop()
     engine.estack.append(StoppedExec())
-    engine.run_proc(proc)
+    engine.exec(obj)
