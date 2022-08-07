@@ -5,9 +5,9 @@ from __future__ import annotations
 import itertools
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Iterator
+from typing import Any, Iterable, Iterator, cast
 
-from error import Tilted
+from error import ERROR_NAMES, FinalTilt, Tilted
 from lex import lexer
 from dtypes import (
     from_py, typecheck,
@@ -34,6 +34,10 @@ class Engine:
     # Operand stack
     ostack: list[Object] = field(default_factory=list)
 
+    # Objects popped by the current operator, so they can be put back for error
+    # handling if needed.
+    popped: list[Object] = field(default_factory=list)
+
     # Execution stack. This is a mix of:
     #   1) Iterators of Stilted Objects (procedures)
     #   2) Python callables (used for internal work)
@@ -56,19 +60,28 @@ class Engine:
     # Output device
     device: Device = field(default_factory=Device)
 
-    def __post_init__(self, stdout=None) -> None:
+    def __post_init__(self) -> None:
+        """Construct the initial data needed for execution."""
         self.new_save()
 
         systemdict = self.new_dict(value=SYSTEMDICT)
         systemdict["systemdict"] = systemdict
         self.dstack.append(systemdict)
 
+        systemdict["$error"] = self.new_dict()
+        err_dict: dict[str, Object] = {}
+        for err_name in ERROR_NAMES:
+            # errordict /ERROR { /ERROR _stdhandleerror } put
+            handler = self.new_array(
+                value=[Name(True, err_name), Name(False, "_stdhandleerror")],
+                literal=False,
+            )
+            err_dict[err_name] = handler
+        systemdict["errordict"] = self.new_dict(value=err_dict)
+
         userdict = self.new_dict()
         systemdict["userdict"] = userdict
         self.dstack.append(userdict)
-
-        if stdout is not None:
-            self.stdout = stdout
 
     def add_text(self, text: str) -> None:
         """Consume text as Stilted tokens, and add for execution."""
@@ -126,27 +139,42 @@ class Engine:
 
     def exec(self, obj: Object, direct: bool=False) -> None:
         """Execute one Stilted Object."""
-        match obj:
-            case Name(literal=False, value=name):
-                looked_up = self.dstack_value(obj)
-                if looked_up is None:
-                    raise Tilted(f"undefined: {name}")
-                self.exec(looked_up)
+        self.popped = []
 
-            case Array(literal=False):
-                if direct:
+        try:
+            match obj:
+                case Name(literal=False):
+                    looked_up = self.dstack_value(obj)
+                    if looked_up is None:
+                        raise Tilted("undefined")
+                    self.exec(looked_up)
+
+                case Array(literal=False):
+                    if direct:
+                        self.opush(obj)
+                    else:
+                        self.estack.append(iter(obj.value))
+
+                case Operator():
+                    obj.value(self)
+
+                case Object(literal=True):
                     self.opush(obj)
-                else:
-                    self.estack.append(iter(obj.value))
 
-            case Operator():
-                obj.value(self)
+                case _:
+                    raise Exception(f"Buh? {obj!r}")
+        except Tilted as tilt:
+            # An error! Put back was was popped, push the object, find the error
+            # name in `errordict`, and execute it.
+            self._handle_error(obj, tilt)
 
-            case Object(literal=True):
-                self.opush(obj)
-
-            case _:
-                raise Exception(f"Buh? {obj!r}")
+    def _handle_error(self, obj: Object, tilt: Tilted) -> None:
+        """Handle an error: §3.11.1"""
+        self.opush(*self.popped[::-1])
+        self.opush(obj)
+        errordict = self.builtin_dict("errordict")
+        handler = errordict[tilt.errname]
+        self.exec(handler)
 
     def run_name(self, name: str) -> None:
         """Run a name."""
@@ -164,6 +192,7 @@ class Engine:
         """
         self.ohas(1)
         obj = self.ostack.pop()
+        self.popped.append(obj)
         if a_type is not None:
             typecheck(a_type, obj)
         return obj
@@ -176,6 +205,8 @@ class Engine:
         else:
             vals = self.ostack[-n:]
             del self.ostack[-n:]
+        for val in vals:
+            self.popped.append(val)
         return vals
 
     def opush(self, *vals: Object) -> None:
@@ -203,7 +234,12 @@ class Engine:
     ## Compound object creation.
     ##
 
-    def new_array(self, n: int=None, value: list[Object]=None) -> Array:
+    def new_array(
+        self,
+        n: int=None,
+        value: list[Object]=None,
+        literal:bool=True,
+    ) -> Array:
         """Make a new Array, either by size or contents."""
         if value is None:
             assert n is not None
@@ -211,7 +247,7 @@ class Engine:
         else:
             n = len(value)
         return Array(
-            literal=True,
+            literal=literal,
             storage=ArrayStorage(values=[(self.sstack[-1], value)]),
             start=0,
             length=n,
@@ -242,6 +278,10 @@ class Engine:
             if name.str_value in d:
                 return d
         return None
+
+    def builtin_dict(self, name: str) -> Dict:
+        """Get one of the builtin dicts"""
+        return cast(Dict, self.dstack[0][name])
 
     ##
     ## Save object methods.
@@ -287,12 +327,18 @@ class Engine:
 def evaluate(text: str, stdout=None) -> Engine:
     """A simple helper to execute text."""
     engine = Engine(stdout=stdout)
-    engine.run_text(text)
+    try:
+        engine.run_text(text)
+    except FinalTilt:
+        serror = engine.builtin_dict("$error")
+        raise Tilted(cast(Name, serror["errorname"]).str_value)
     return engine
 
 
 def operator(arg):
     """
+    Define a built-in operator.
+
     @operator
     def showpage(...):
         ...
@@ -319,12 +365,13 @@ def operator(arg):
         SYSTEMDICT[name] = Operator(literal=False, value=arg, name=name)
 
 
-# Imported but not used, assert them to quiet the linter.  Import at the bottom
-# of the file to avoid circular import problems.
+# Imported but not used, assert them to quiet the linter.
+# Import at the bottom of the file to avoid circular import problems.
 import op_array; assert op_array
 import op_collections; assert op_collections
 import op_control; assert op_control
 import op_dict; assert op_dict
+import op_error; assert op_error
 import op_graphics; assert op_graphics
 import op_math; assert op_math
 import op_matrix; assert op_matrix

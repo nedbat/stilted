@@ -5,7 +5,7 @@ import pathlib
 import sys
 from typing import Callable
 
-from error import Tilted
+from error import FinalTilt
 from evaluate import Engine
 
 
@@ -47,8 +47,8 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
     if code is not None:
         try:
             engine.run_text(code)
-        except Tilted as err:
-            print(f"!!! {err}")
+        except FinalTilt:
+            pass
 
     if args.interactive:
         while True:
@@ -60,8 +60,8 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
                 break
             try:
                 engine.run_text(line)
-            except Tilted as err:
-                print(f"!!! {err}")
+            except FinalTilt:
+                pass
 
     return 0
 

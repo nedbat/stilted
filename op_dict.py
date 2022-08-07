@@ -54,7 +54,7 @@ def load(engine: Engine) -> None:
     k = engine.opop(Stringy)
     obj = engine.dstack_value(k)
     if obj is None:
-        raise Tilted(f"undefined: {k.str_value}")
+        raise Tilted("undefined", k.str_value)
     engine.opush(obj)
 
 @operator

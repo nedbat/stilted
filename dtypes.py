@@ -412,13 +412,13 @@ def typecheck(a_type, *vals) -> None:
                 typename = "name"
             else:
                 typename = a_type.typename
-            raise Tilted(f"typecheck: expected {typename}, got {type(val).typename}")
+            raise Tilted("typecheck", f"expected {typename}, got {type(val).typename}")
 
 
 def rangecheck(lo: int, val: int, hi: int | None=None) -> None:
     """Check that `lo <= val` and `val <= hi`."""
     if not (lo <= val):
-        raise Tilted(f"rangecheck: need {lo} <= {val}")
+        raise Tilted("rangecheck", f"need {lo} <= {val}")
     if hi is not None:
         if not (val <= hi):
-            raise Tilted(f"rangecheck: need {val} <= {hi}")
+            raise Tilted("rangecheck", f"need {val} <= {hi}")

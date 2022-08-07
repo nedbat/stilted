@@ -22,7 +22,7 @@ def get(engine: Engine) -> None:
             try:
                 obj = obj[ind.str_value]
             except KeyError:
-                raise Tilted(f"undefined: {ind.value}")
+                raise Tilted("undefined", f"{ind.value}")
             engine.opush(obj)
 
         case String():
@@ -32,7 +32,7 @@ def get(engine: Engine) -> None:
             engine.opush(from_py(byte))
 
         case _:
-            raise Tilted(f"typecheck: got {type(obj)}")
+            raise Tilted("typecheck", f"got {type(obj)}")
 
 @operator
 def getinterval(engine: Engine) -> None:
@@ -43,7 +43,7 @@ def getinterval(engine: Engine) -> None:
             engine.opush(obj.new_sub(ind.value, count.value))
 
         case _:
-            raise Tilted(f"typecheck: got {type(obj)}")
+            raise Tilted("typecheck", f"got {type(obj)}")
 
 @operator
 def length(engine: Engine) -> None:
@@ -56,7 +56,7 @@ def length(engine: Engine) -> None:
             engine.opush(from_py(len(o.value)))
 
         case _:
-            raise Tilted(f"typecheck: got {type(o)}")
+            raise Tilted("typecheck", f"got {type(o)}")
 
 @operator
 def put(engine: Engine) -> None:
@@ -80,7 +80,7 @@ def put(engine: Engine) -> None:
             obj[ind.value] = elt.value
 
         case _:
-            raise Tilted(f"typecheck: got {type(obj)}")
+            raise Tilted("typecheck", f"got {type(obj)}")
 
 @operator
 def putinterval(engine: Engine) -> None:
@@ -96,4 +96,4 @@ def putinterval(engine: Engine) -> None:
                 obj1[ind.value + i] = obj2[i]
 
         case _:
-            raise Tilted(f"typecheck: got {type(obj1)}")
+            raise Tilted("typecheck", f"got {type(obj1)}")

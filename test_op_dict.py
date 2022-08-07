@@ -120,7 +120,7 @@ def test_evaluate(text, stack):
         ("10 dict begin end end", "dictstackunderflow"),
         # get
         ("systemdict 123 get", "typecheck"),
-        ("systemdict /xyzzy get", "undefined: xyzzy"),
+        ("systemdict /xyzzy get", "undefined"),
         # known
         ("known", "stackunderflow"),
         ("/foo known", "stackunderflow"),
@@ -129,7 +129,7 @@ def test_evaluate(text, stack):
         # load
         ("load", "stackunderflow"),
         ("123 load", "typecheck"),
-        ("/xyzzy load", "undefined: xyzzy"),
+        ("/xyzzy load", "undefined"),
         # maxlength
         ("maxlength", "stackunderflow"),
         ("213 maxlength", "typecheck"),

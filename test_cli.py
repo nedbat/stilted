@@ -101,7 +101,7 @@ def test_prompting(capsys, argv, lines, output):
     "file_text, output",
     [
         ("123 456\n add\n ==\n argv pstack", "579\n[({fname}) (abc)]\n"),
-        ("123 (a) add\n", "!!! typecheck: expected number, got string\n"),
+        ("123 (a) add\n", "!!! typecheck\n"),
     ],
 )
 def test_file_input(file_text, output, capsys, tmp_path):

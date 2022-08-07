@@ -41,7 +41,7 @@ def copy(engine: Engine) -> None:
                 engine.opush(obj2.new_sub(0, obj1.length))
 
             case _:
-                raise Tilted(f"typecheck: got {type(obj1)}, {type(obj2)}")
+                raise Tilted("typecheck", f"got {type(obj1)}, {type(obj2)}")
 
 @operator
 def count(engine: Engine) -> None:

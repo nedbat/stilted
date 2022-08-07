@@ -28,7 +28,7 @@ def test_evaluate(text, stack):
 @pytest.mark.parametrize(
     "text, error",
     [
-        ("1 2 3 xyzzy", "undefined: xyzzy"),
+        ("1 2 3 xyzzy", "undefined"),
         ("(", "syntaxerror"),
         (")", "syntaxerror"),
         ("}", "syntaxerror"),
