@@ -3,10 +3,10 @@
 import base64
 import re
 from dataclasses import dataclass
-from typing import Any, Callable, Iterable, Tuple
+from typing import Any, Callable, Iterable
 
 from error import Tilted
-from dtypes import Integer, Name, Real, String
+from dtypes import Integer, Name, Object, Real, String
 
 
 @dataclass
@@ -46,9 +46,9 @@ class Lexer:
                 rxes.append(f"({t.rx})")
         self.rx = "(?m)" + "|".join(rxes)
 
-    def tokens(self, text: str) -> Iterable[Tuple[str, Any]]:
+    def tokens(self, text: str) -> Iterable[Object]:
         """
-        Yield (kind, value) pairs for the tokens in `text`.
+        Yield Stilted objects for the tokens in `text`.
         """
         for match in re.finditer(self.rx, text):
             if group_name := match.lastgroup:

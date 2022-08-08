@@ -19,6 +19,20 @@ from test_helpers import compare_stacks
             matrix identmatrix setmatrix 10 20 translate
             1 2 xform
         """, [11.6, 22.6]),
+        # Error handlers will be executed from errordict.
+        (
+            "errordict /undefined { (HELLO) } put xyzzy",
+            "/xyzzy cvx (HELLO)",
+        ),
+        # Errors will restore the stack and push the object.
+        (
+            "errordict /typecheck { (!!!) } put 1 (a) add",
+            "1 (a) /add load (!!!)",
+        ),
+        (
+            "errordict /typecheck { (!!!) } put (a) 1 10 { hello } for",
+            "(a) 1 10 { hello } /for load (!!!)",
+        ),
     ],
 )
 def test_evaluate(text, stack):

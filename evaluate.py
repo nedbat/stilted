@@ -205,8 +205,7 @@ class Engine:
         else:
             vals = self.ostack[-n:]
             del self.ostack[-n:]
-        for val in vals:
-            self.popped.append(val)
+        self.popped.extend(vals[::-1])
         return vals
 
     def opush(self, *vals: Object) -> None:
