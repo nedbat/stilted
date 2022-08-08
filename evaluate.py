@@ -17,13 +17,6 @@ from dtypes import (
 )
 from gstate import Device, GstateExtras
 
-# The `systemdict` dict for all builtin names.
-SYSTEMDICT: dict[str, Object] = {}
-
-SYSTEMDICT["false"] = from_py(False)
-SYSTEMDICT["null"] = from_py(None)
-SYSTEMDICT["true"] = from_py(True)
-
 
 @dataclass
 class Engine:
@@ -378,6 +371,14 @@ def operator(arg):
         name = arg.__name__
         assert name not in SYSTEMDICT
         SYSTEMDICT[name] = Operator(literal=False, value=arg, name=name)
+
+
+# The `systemdict` dict for all builtin names.
+SYSTEMDICT: dict[str, Object] = {}
+
+SYSTEMDICT["false"] = from_py(False)
+SYSTEMDICT["null"] = from_py(None)
+SYSTEMDICT["true"] = from_py(True)
 
 
 # Imported but not used, assert them to quiet the linter.

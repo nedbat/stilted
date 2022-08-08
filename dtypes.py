@@ -11,7 +11,7 @@ from typing import (
 from dataclasses import dataclass
 
 from error import Tilted
-if TYPE_CHECKING:
+if TYPE_CHECKING:   # pragma: no cover
     from evaluate import Engine
 
 @dataclass
