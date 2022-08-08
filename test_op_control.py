@@ -12,10 +12,14 @@ from test_helpers import compare_stacks
     [
         # exec
         ("12 exec", [12]),
+        ("12 cvx exec cvlit", [12]),
         ("(abc) exec", ["abc"]),
         ("/xyzzy exec", [Name(True, "xyzzy")]),
         ("/xyzzy {1 2 add} def /xyzzy cvx exec", [3]),
         ("{1 2 add} exec", [3]),
+        ("/add load cvlit exec cvx", "/add load"),
+        ("97 null cvx exec /null load cvlit pop", [97]),
+        ("{ 97 null 98 null } exec", [97, None, 98, None]),
         # exit
         ("1 1 10 { dup 3 gt {exit} if } for", [1, 2, 3, 4]),
         ("1 10 { dup 1 add dup 3 gt {exit} if } repeat", [1, 2, 3, 4]),

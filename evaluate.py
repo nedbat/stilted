@@ -11,8 +11,9 @@ from error import ERROR_NAMES, FinalTilt, Tilted
 from lex import lexer
 from dtypes import (
     from_py, typecheck,
-    Array, ArrayStorage, Dict, DictStorage, MARK, Name, NULL,
-    Object, Operator, Save, SaveableObject, String,
+    Array, ArrayStorage, Boolean, Dict, DictStorage, Integer,
+    MARK, Mark, Name, NULL, Null,
+    Object, Operator, Real, Save, SaveableObject, String,
 )
 from gstate import Device, GstateExtras
 
@@ -143,7 +144,14 @@ class Engine:
 
         try:
             match obj:
-                case Name(literal=False):
+                # PSRM §3.5.5
+                case Object(literal=True):
+                    self.opush(obj)
+
+                case Integer() | Real() | Boolean() | Mark():
+                    self.opush(obj)
+
+                case Name():
                     looked_up = self.dstack_value(obj)
                     if looked_up is None:
                         raise Tilted("undefined")
@@ -158,11 +166,12 @@ class Engine:
                 case Operator():
                     obj.value(self)
 
-                case Object(literal=True):
-                    self.opush(obj)
+                case Null():
+                    pass
 
                 case _:
                     raise Exception(f"Buh? {obj!r}")
+
         except Tilted as tilt:
             # An error! Put back was was popped, push the object, find the error
             # name in `errordict`, and execute it.
