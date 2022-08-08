@@ -2,7 +2,7 @@
 
 .DEFAULT_GOAL := help
 
-.PHONY: check help mypy test
+.PHONY: check coverage flake help mypy size test
 
 help:				## Display this help message
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -23,3 +23,7 @@ coverage:			## Measure test coverage
 	coverage run --branch --source=. -m pytest -q
 	coverage report --skip-covered --show-missing --precision=2
 	coverage html --skip-covered --precision=2
+
+size:
+	cloc -q --hide-rate *.py
+	python cli.py -c "systemdict length =="
