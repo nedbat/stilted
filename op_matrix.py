@@ -42,12 +42,17 @@ def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
             raise Tilted("typecheck")
 
     if invert:
-        mtx.invert()
+        try:
+            mtx.invert()
+        except cairo.Error:
+            raise Tilted("undefinedresult")
+
     fn = mtx.transform_distance if distance else mtx.transform_point
     x, y = engine.opopn(2)
     typecheck(Number, x, y)
     x, y = fn(x.value, y.value)
     engine.opush(from_py(x), from_py(y))
+
 
 @operator
 def currentmatrix(engine: Engine) -> None:
@@ -68,6 +73,18 @@ def identmatrix(engine: Engine) -> None:
 @operator
 def idtransform(engine: Engine) -> None:
     transform_help(engine, invert=True, distance=True)
+
+@operator
+def invertmatrix(engine: Engine) -> None:
+    arr2 = pop_matrix(engine)
+    arr1 = pop_matrix(engine)
+    mtx1 = array_to_matrix(arr1)
+    try:
+        mtx1.invert()
+    except cairo.Error:
+        raise Tilted("undefinedresult")
+    matrix_to_array(mtx1, arr2)
+    engine.opush(arr2)
 
 @operator
 def itransform(engine: Engine) -> None:

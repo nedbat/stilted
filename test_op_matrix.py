@@ -22,7 +22,7 @@ from test_helpers import compare_stacks
         ("matrix identmatrix setmatrix 17 42 translate 0 0 dtransform", [0.0, 0.0]),
         ("matrix identmatrix setmatrix 90 rotate 10 10 translate 100 200 dtransform", [-200.0, 100.0]),
         ("matrix identmatrix setmatrix 2 3 scale 10 10 translate 100 200 dtransform", [200.0, 600.0]),
-        ("100 200 2 3 matrix scale 10 10 translate dtransform", [200.0, 600.0]),
+        ("100 200 2 3 10 10 matrix translate scale dtransform", [200.0, 600.0]),
         # identmatrix
         ("6 array identmatrix aload pop", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
         # idtransform
@@ -31,7 +31,9 @@ from test_helpers import compare_stacks
         ("matrix identmatrix setmatrix 17 42 translate 17 42 idtransform", [17.0, 42.0]),
         ("matrix identmatrix setmatrix 90 rotate 10 10 translate -200 100 idtransform", [100.0, 200.0]),
         ("matrix identmatrix setmatrix 2 3 scale 10 10 translate 200 600 idtransform", [100.0, 200.0]),
-        ("200 600 2 3 matrix scale 10 10 translate idtransform", [100.0, 200.0]),
+        ("200 600 2 3 10 10 matrix translate scale idtransform", [100.0, 200.0]),
+        # invertmatrix
+        ("200 600 2 3 matrix scale matrix invertmatrix transform", [100.0, 200.0]),
         # itransform
         ("matrix identmatrix setmatrix 0 0 itransform", [0.0, 0.0]),
         ("matrix identmatrix setmatrix 100 200 itransform", [100.0, 200.0]),
@@ -71,10 +73,6 @@ def test_evaluate(text, stack):
         ("123 currentmatrix", "typecheck"),
         ("5 array currentmatrix", "rangecheck"),
         ("7 array currentmatrix", "rangecheck"),
-        # identmatrix
-        ("identmatrix", "stackunderflow"),
-        ("123 identmatrix", "typecheck"),
-        ("5 array identmatrix", "rangecheck"),
         # dtransform
         ("dtransform", "stackunderflow"),
         ("1 dtransform", "stackunderflow"),
@@ -83,6 +81,10 @@ def test_evaluate(text, stack):
         ("(a) 1 matrix dtransform", "typecheck"),
         ("1 (a) matrix dtransform", "typecheck"),
         ("1 1 [1] dtransform", "rangecheck"),
+        # identmatrix
+        ("identmatrix", "stackunderflow"),
+        ("123 identmatrix", "typecheck"),
+        ("5 array identmatrix", "rangecheck"),
         # idtransform
         ("idtransform", "stackunderflow"),
         ("1 idtransform", "stackunderflow"),
@@ -91,6 +93,15 @@ def test_evaluate(text, stack):
         ("(a) 1 matrix idtransform", "typecheck"),
         ("1 (a) matrix idtransform", "typecheck"),
         ("1 1 [1] idtransform", "rangecheck"),
+        ("0 0 [0 0 0 0 0 0] idtransform", "undefinedresult"),
+        # invertmatrix
+        ("invertmatrix", "stackunderflow"),
+        ("matrix invertmatrix", "stackunderflow"),
+        ("1 matrix invertmatrix", "typecheck"),
+        ("matrix 1 invertmatrix", "typecheck"),
+        ("[1] matrix invertmatrix", "rangecheck"),
+        ("matrix [1] invertmatrix", "rangecheck"),
+        ("[0 0 0 0 0 0] matrix invertmatrix", "undefinedresult"),
         # itransform
         ("itransform", "stackunderflow"),
         ("1 itransform", "stackunderflow"),
@@ -99,6 +110,7 @@ def test_evaluate(text, stack):
         ("(a) 1 matrix itransform", "typecheck"),
         ("1 (a) matrix itransform", "typecheck"),
         ("1 1 [1] itransform", "rangecheck"),
+        ("0 0 [0 0 0 0 0 0] itransform", "undefinedresult"),
         # rotate
         ("rotate", "stackunderflow"),
         ("(a) rotate", "typecheck"),
