@@ -16,8 +16,29 @@ from test_helpers import compare_stacks
         ("matrix currentmatrix length", [6]),
         ("matrix currentmatrix 1 get", [0.0]),
         ("matrix currentmatrix dup 4 get exch 5 get", [0.0, 0.0]),
+        # dtransform
+        ("matrix identmatrix setmatrix 0 0 dtransform", [0.0, 0.0]),
+        ("matrix identmatrix setmatrix 100 200 dtransform", [100.0, 200.0]),
+        ("matrix identmatrix setmatrix 17 42 translate 0 0 dtransform", [0.0, 0.0]),
+        ("matrix identmatrix setmatrix 90 rotate 10 10 translate 100 200 dtransform", [-200.0, 100.0]),
+        ("matrix identmatrix setmatrix 2 3 scale 10 10 translate 100 200 dtransform", [200.0, 600.0]),
+        ("100 200 2 3 matrix scale 10 10 translate dtransform", [200.0, 600.0]),
         # identmatrix
         ("6 array identmatrix aload pop", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+        # idtransform
+        ("matrix identmatrix setmatrix 0 0 idtransform", [0.0, 0.0]),
+        ("matrix identmatrix setmatrix 100 200 idtransform", [100.0, 200.0]),
+        ("matrix identmatrix setmatrix 17 42 translate 17 42 idtransform", [17.0, 42.0]),
+        ("matrix identmatrix setmatrix 90 rotate 10 10 translate -200 100 idtransform", [100.0, 200.0]),
+        ("matrix identmatrix setmatrix 2 3 scale 10 10 translate 200 600 idtransform", [100.0, 200.0]),
+        ("200 600 2 3 matrix scale 10 10 translate idtransform", [100.0, 200.0]),
+        # itransform
+        ("matrix identmatrix setmatrix 0 0 itransform", [0.0, 0.0]),
+        ("matrix identmatrix setmatrix 100 200 itransform", [100.0, 200.0]),
+        ("matrix identmatrix setmatrix 17 42 translate 17 42 itransform", [0.0, 0.0]),
+        ("matrix identmatrix setmatrix 90 rotate -200 100 itransform", [100.0, 200.0]),
+        ("matrix identmatrix setmatrix 2 3 scale 200 600 itransform", [100.0, 200.0]),
+        ("200 600 2 3 matrix scale itransform", [100.0, 200.0]),
         # matrix
         ("matrix aload pop", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
         # rotate
@@ -54,6 +75,30 @@ def test_evaluate(text, stack):
         ("identmatrix", "stackunderflow"),
         ("123 identmatrix", "typecheck"),
         ("5 array identmatrix", "rangecheck"),
+        # dtransform
+        ("dtransform", "stackunderflow"),
+        ("1 dtransform", "stackunderflow"),
+        ("(a) 1 dtransform", "typecheck"),
+        ("1 (a) dtransform", "typecheck"),
+        ("(a) 1 matrix dtransform", "typecheck"),
+        ("1 (a) matrix dtransform", "typecheck"),
+        ("1 1 [1] dtransform", "rangecheck"),
+        # idtransform
+        ("idtransform", "stackunderflow"),
+        ("1 idtransform", "stackunderflow"),
+        ("(a) 1 idtransform", "typecheck"),
+        ("1 (a) idtransform", "typecheck"),
+        ("(a) 1 matrix idtransform", "typecheck"),
+        ("1 (a) matrix idtransform", "typecheck"),
+        ("1 1 [1] idtransform", "rangecheck"),
+        # itransform
+        ("itransform", "stackunderflow"),
+        ("1 itransform", "stackunderflow"),
+        ("(a) 1 itransform", "typecheck"),
+        ("1 (a) itransform", "typecheck"),
+        ("(a) 1 matrix itransform", "typecheck"),
+        ("1 (a) matrix itransform", "typecheck"),
+        ("1 1 [1] itransform", "rangecheck"),
         # rotate
         ("rotate", "stackunderflow"),
         ("(a) rotate", "typecheck"),

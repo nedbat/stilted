@@ -29,6 +29,26 @@ def deg_to_rad(degrees: float) -> float:
     """Convert degrees to radians."""
     return math.pi * degrees / 180
 
+def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
+    """Code common to the four xxtransform operators."""
+    match engine.otop():
+        case Array():
+            mtx = array_to_matrix(pop_matrix(engine))
+
+        case Integer() | Real():
+            mtx = engine.gctx.get_matrix()
+
+        case _:
+            raise Tilted("typecheck")
+
+    if invert:
+        mtx.invert()
+    fn = mtx.transform_distance if distance else mtx.transform_point
+    x, y = engine.opopn(2)
+    typecheck(Number, x, y)
+    x, y = fn(x.value, y.value)
+    engine.opush(from_py(x), from_py(y))
+
 @operator
 def currentmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
@@ -36,10 +56,22 @@ def currentmatrix(engine: Engine) -> None:
     engine.opush(arr)
 
 @operator
+def dtransform(engine: Engine) -> None:
+    transform_help(engine, invert=False, distance=True)
+
+@operator
 def identmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
     matrix_to_array(cairo.Matrix(), arr)
     engine.opush(arr)
+
+@operator
+def idtransform(engine: Engine) -> None:
+    transform_help(engine, invert=True, distance=True)
+
+@operator
+def itransform(engine: Engine) -> None:
+    transform_help(engine, invert=True, distance=False)
 
 @operator
 def matrix(engine: Engine) -> None:
@@ -88,23 +120,7 @@ def setmatrix(engine: Engine) -> None:
 
 @operator
 def transform(engine: Engine) -> None:
-    match engine.otop():
-        case Array():
-            arr = pop_matrix(engine)
-            x, y = engine.opopn(2)
-            typecheck(Number, x, y)
-            mtx = array_to_matrix(arr)
-            x, y = mtx.transform_point(x.value, y.value)
-            engine.opush(from_py(x), from_py(y))
-
-        case Integer() | Real():
-            x, y = engine.opopn(2)
-            typecheck(Number, x, y)
-            x, y = engine.gctx.get_matrix().transform_point(x.value, y.value)
-            engine.opush(from_py(x), from_py(y))
-
-        case _:
-            raise Tilted("typecheck")
+    transform_help(engine, invert=False, distance=False)
 
 @operator
 def translate(engine: Engine) -> None:
