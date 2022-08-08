@@ -12,4 +12,6 @@ def _stdhandleerror(engine: Engine) -> None:
     serror["errorname"] = errorname = engine.opop()
     serror["command"] = command = engine.opop()
     print(f"Error: {errorname.str_value} in {command.op_eqeq()}")
+    print(f"Operand stack ({len(engine.ostack)}):")
+    engine.pstack(engine.ostack)
     raise FinalTilt()

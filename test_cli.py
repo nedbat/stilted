@@ -44,6 +44,7 @@ def fake_input(lines: Iterable[str]) -> Callable[[str], str]:
             """\
                 |-0> ]
                 Error: unmatchedmark in --]--
+                Operand stack (0):
                 |-0>
             """,
         ),
@@ -101,7 +102,7 @@ def test_prompting(capsys, argv, lines, output):
     "file_text, output",
     [
         ("123 456\n add\n ==\n argv pstack", "579\n[({fname}) (abc)]\n"),
-        ("123 (a) add\n", "Error: typecheck in --add--\n"),
+        ("123 (a) add\n", "Error: typecheck in --add--\nOperand stack (2):\n(a)\n123\n"),
     ],
 )
 def test_file_input(file_text, output, capsys, tmp_path):

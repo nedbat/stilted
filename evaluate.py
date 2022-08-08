@@ -229,6 +229,13 @@ class Engine:
                 return i
         raise Tilted("unmatchedmark")
 
+    def pstack(self, stack: list[Object]) -> None:
+        """Print a stack to stdout."""
+        if self.stdout is not None:
+            for obj in reversed(stack):
+                self.stdout.write(obj.op_eqeq())
+                self.stdout.write("\n")
+
     ##
     ## Compound object creation.
     ##

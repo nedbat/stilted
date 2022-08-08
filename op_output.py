@@ -22,9 +22,7 @@ def print_(engine: Engine) -> None:
 
 @operator
 def pstack(engine: Engine) -> None:
-    for o in reversed(engine.ostack):
-        engine.stdout.write(o.op_eqeq())
-        engine.stdout.write("\n")
+    engine.pstack(engine.ostack)
 
 @operator
 def stack(engine: Engine) -> None:
