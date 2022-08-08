@@ -17,6 +17,7 @@ class Device:
         self.surface.set_document_unit(cairo.SVGUnit.PT)
         self.ctx = cairo.Context(self.surface)
         self.ctx.set_line_width(1.0)
+        self.default_matrix = self.ctx.get_matrix()
 
     def showpage(self):
         self.surface.finish()

@@ -16,6 +16,8 @@ from test_helpers import compare_stacks
         ("matrix currentmatrix length", [6]),
         ("matrix currentmatrix 1 get", [0.0]),
         ("matrix currentmatrix dup 4 get exch 5 get", [0.0, 0.0]),
+        # defaultmatrix
+        ("10 10 scale matrix defaultmatrix", "matrix currentmatrix"),
         # dtransform
         ("matrix identmatrix setmatrix 0 0 dtransform", [0.0, 0.0]),
         ("matrix identmatrix setmatrix 100 200 dtransform", [100.0, 200.0]),
@@ -32,6 +34,8 @@ from test_helpers import compare_stacks
         ("matrix identmatrix setmatrix 90 rotate 10 10 translate -200 100 idtransform", [100.0, 200.0]),
         ("matrix identmatrix setmatrix 2 3 scale 10 10 translate 200 600 idtransform", [100.0, 200.0]),
         ("200 600 2 3 10 10 matrix translate scale idtransform", [100.0, 200.0]),
+        # initmatrix
+        ("10 10 scale initmatrix matrix currentmatrix", "matrix currentmatrix"),
         # invertmatrix
         ("200 600 2 3 matrix scale matrix invertmatrix transform", [100.0, 200.0]),
         # itransform
@@ -73,6 +77,10 @@ def test_evaluate(text, stack):
         ("123 currentmatrix", "typecheck"),
         ("5 array currentmatrix", "rangecheck"),
         ("7 array currentmatrix", "rangecheck"),
+        # defaultmatrix
+        ("defaultmatrix", "stackunderflow"),
+        ("1 defaultmatrix", "typecheck"),
+        ("[1] defaultmatrix", "rangecheck"),
         # dtransform
         ("dtransform", "stackunderflow"),
         ("1 dtransform", "stackunderflow"),

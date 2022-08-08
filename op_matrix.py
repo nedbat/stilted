@@ -61,6 +61,12 @@ def currentmatrix(engine: Engine) -> None:
     engine.opush(arr)
 
 @operator
+def defaultmatrix(engine: Engine) -> None:
+    arr = pop_matrix(engine)
+    matrix_to_array(engine.device.default_matrix, arr)
+    engine.opush(arr)
+
+@operator
 def dtransform(engine: Engine) -> None:
     transform_help(engine, invert=False, distance=True)
 
@@ -73,6 +79,10 @@ def identmatrix(engine: Engine) -> None:
 @operator
 def idtransform(engine: Engine) -> None:
     transform_help(engine, invert=True, distance=True)
+
+@operator
+def initmatrix(engine: Engine) -> None:
+    engine.gctx.set_matrix(engine.device.default_matrix)
 
 @operator
 def invertmatrix(engine: Engine) -> None:
