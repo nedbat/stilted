@@ -52,6 +52,24 @@ def moveto(engine: Engine) -> None:
     engine.gctx.move_to(x.value, y.value)
 
 @operator
+def newpath(engine: Engine) -> None:
+    engine.gctx.new_path()
+
+@operator
+def rlineto(engine: Engine) -> None:
+    dx, dy = engine.opopn(2)
+    typecheck(Number, dx, dy)
+    has_current_point(engine)
+    engine.gctx.rel_line_to(dx.value, dy.value)
+
+@operator
+def rmoveto(engine: Engine) -> None:
+    dx, dy = engine.opopn(2)
+    typecheck(Number, dx, dy)
+    has_current_point(engine)
+    engine.gctx.rel_move_to(dx.value, dy.value)
+
+@operator
 def setlinewidth(engine: Engine) -> None:
     lw = engine.opop(Number)
     engine.gctx.set_line_width(lw.value)
