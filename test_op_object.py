@@ -11,6 +11,10 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # cvi
+        ("-1.1 cvi", [-1]),
+        ("3.14 cvi", [3]),
+        ("(3.14) cvi", [3]),
         # cvlit
         ("{hello} cvlit xcheck", [False]),
         # cvx
@@ -41,6 +45,10 @@ def test_evaluate(text, stack):
 @pytest.mark.parametrize(
     "text, error",
     [
+        # cvi
+        ("cvi", "stackunderflow"),
+        ("[] cvi", "typecheck"),
+        ("(xyz) cvi", "undefinedresult"), # gs and xpost disagree on this result.
         # cvlit
         ("cvlit", "stackunderflow"),
         # cvx

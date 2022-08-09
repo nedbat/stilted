@@ -1,7 +1,21 @@
 """Built-in object model operators for stilted."""
 
+from error import Tilted
 from evaluate import operator, Engine
-from dtypes import from_py, Name
+from dtypes import from_py, Integer, Name, Real, String
+
+@operator
+def cvi(engine: Engine) -> None:
+    obj = engine.opop()
+    match obj:
+        case Integer() | Real() | String():
+            try:
+                val = int(float(obj.value))
+            except ValueError:
+                raise Tilted("undefinedresult")
+            engine.opush(from_py(val))
+        case _:
+            raise Tilted("typecheck")
 
 @operator
 def cvlit(engine: Engine) -> None:
