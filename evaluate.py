@@ -388,11 +388,13 @@ import op_collections; assert op_collections
 import op_control; assert op_control
 import op_dict; assert op_dict
 import op_error; assert op_error
-import op_graphics; assert op_graphics
+import op_gstate; assert op_gstate
 import op_math; assert op_math
 import op_matrix; assert op_matrix
 import op_object; assert op_object
 import op_output; assert op_output
+import op_paint; assert op_paint
+import op_path; assert op_path
 import op_relational; assert op_relational
 import op_stack; assert op_stack
 import op_string; assert op_string
