@@ -10,6 +10,10 @@ def has_current_point(engine: Engine) -> None:
         raise Tilted("nocurrentpoint")
 
 @operator
+def clip(engine: Engine) -> None:
+    engine.gctx.clip()
+
+@operator
 def currentlinewidth(engine: Engine) -> None:
     engine.opush(from_py(engine.gctx.get_line_width()))
 
