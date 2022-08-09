@@ -390,6 +390,8 @@ def from_py(val: Any) -> Object:
     match val:
         case bool(b):
             return Boolean(True, b)
+        case complex():
+            raise Tilted("undefinedresult")
         case float(f):
             return Real(True, f)
         case int(i):

@@ -31,6 +31,13 @@ def div(engine: Engine) -> None:
     engine.opush(from_py(a.value / b.value))
 
 @operator
+def exp(engine: Engine) -> None:
+    base, exponent = engine.opopn(2)
+    typecheck(Number, base, exponent)
+    val = base.value ** exponent.value
+    engine.opush(from_py(val))
+
+@operator
 def floor(engine: Engine) -> None:
     a = engine.opop(Number)
     av = a.value

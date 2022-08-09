@@ -25,6 +25,9 @@ from test_helpers import compare_stacks
         # div
         ("3 2 div", [1.5]),
         ("4 2 div", [2.0]),
+        # exp
+        ("9 0.5 exp", [3.0]),
+        ("-9 -1 exp", [-0.1111111111111]),
         # floor
         ("3.2 floor", [3.0]),
         ("-4.8 floor", [-5.0]),
@@ -77,7 +80,7 @@ def test_one_arg_errors(opname):
     with pytest.raises(Tilted, match="typecheck"):
         evaluate(f"(a) {opname}")
 
-OP2 = ["add", "div", "idiv", "mod", "mul", "sub"]
+OP2 = ["add", "div", "exp", "idiv", "mod", "mul", "sub"]
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow1(opname):
@@ -103,6 +106,8 @@ def test_two_arg_typecheck2(opname):
 @pytest.mark.parametrize(
     "text, error",
     [
+        # exp
+        ("-1 1.5 exp", "undefinedresult"),
         # sqrt
         ("-1 sqrt", "rangecheck"),
     ],
