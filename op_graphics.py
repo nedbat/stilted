@@ -14,6 +14,10 @@ def clip(engine: Engine) -> None:
     engine.gctx.clip()
 
 @operator
+def closepath(engine: Engine) -> None:
+    engine.gctx.close_path()
+
+@operator
 def currentlinewidth(engine: Engine) -> None:
     engine.opush(from_py(engine.gctx.get_line_width()))
 
