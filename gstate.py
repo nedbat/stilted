@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Tuple
 
 import io
 
@@ -37,22 +36,16 @@ class GstateExtras:
     # Was this gstate saved by `save` or `gsave`?
     from_save: bool
 
-    # PyCairo doesn't restore the current point, so we do it ourselves.
+    # PyCairo doesn't restore the current path, so we do it ourselves.
     # https://github.com/pygobject/pycairo/issues/273
-    cur_point: Tuple[float, float] | None
+    cur_path: cairo.Path
 
     @classmethod
     def from_ctx(cls, from_save: bool, ctx: cairo.Context) -> GstateExtras:
         """Construct a GstateExtras from a ctx."""
-        if ctx.has_current_point():
-            pt = ctx.get_current_point()
-        else:
-            pt = None
-        return GstateExtras(from_save=from_save, cur_point=pt)
+        return GstateExtras(from_save=from_save, cur_path=ctx.copy_path())
 
     def restore_to_ctx(self, ctx: cairo.Context) -> None:
         """Restore data from the Extras to the context."""
-        if self.cur_point:
-            ctx.move_to(*self.cur_point)
-        else:
-            ctx.new_path()
+        ctx.new_path()
+        ctx.append_path(self.cur_path)
