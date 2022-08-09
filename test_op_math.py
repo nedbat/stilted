@@ -50,6 +50,8 @@ from test_helpers import compare_stacks
         ("-4.8 round", [-5.0]),
         ("-6.5 round", [-6.0]),
         ("99 round", [99]),
+        # sqrt
+        ("150.0625 sqrt", [12.25]),
         # sub
         ("3 4 sub", [-1]),
         ("3.5 1.5 sub", [2.0]),
@@ -63,7 +65,7 @@ def test_evaluate(text, stack):
     compare_stacks(evaluate(text).ostack, stack)
 
 
-OP1 = ["abs", "ceiling", "floor", "neg", "round", "truncate"]
+OP1 = ["abs", "ceiling", "floor", "neg", "round", "sqrt", "truncate"]
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_stackunderflow(opname):
@@ -96,3 +98,15 @@ def test_two_arg_typecheck1(opname):
 def test_two_arg_typecheck2(opname):
     with pytest.raises(Tilted, match="typecheck"):
         evaluate(f"(a) 1 {opname}")
+
+
+@pytest.mark.parametrize(
+    "text, error",
+    [
+        # sqrt
+        ("-1 sqrt", "rangecheck"),
+    ],
+)
+def test_evaluate_error(text, error):
+    with pytest.raises(Tilted, match=error):
+        evaluate(text)

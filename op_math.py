@@ -2,6 +2,7 @@
 
 import math
 
+from error import Tilted
 from evaluate import operator, Engine
 from dtypes import from_py, typecheck, Number
 
@@ -69,6 +70,15 @@ def round_(engine: Engine) -> None:
     else:
         r = round(av)
     engine.opush(from_py(type(av)(r)))
+
+@operator
+def sqrt(engine: Engine) -> None:
+    num = engine.opop(Number)
+    try:
+        res = math.sqrt(num.value)
+    except ValueError:
+        raise Tilted("rangecheck")
+    engine.opush(from_py(res))
 
 @operator
 def sub(engine: Engine) -> None:
