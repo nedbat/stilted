@@ -55,6 +55,21 @@ def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
 
 
 @operator
+def concat(engine: Engine) -> None:
+    mtx = array_to_matrix(pop_matrix(engine))
+    mtx = mtx.multiply(engine.gctx.get_matrix())
+    engine.gctx.set_matrix(mtx)
+
+@operator
+def concatmatrix(engine: Engine) -> None:
+    arr3 = pop_matrix(engine)
+    mtx2 = array_to_matrix(pop_matrix(engine))
+    mtx1 = array_to_matrix(pop_matrix(engine))
+    mtx3 = mtx1.multiply(mtx2)
+    matrix_to_array(mtx3, arr3)
+    engine.opush(arr3)
+
+@operator
 def currentmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
     matrix_to_array(engine.gctx.get_matrix(), arr)

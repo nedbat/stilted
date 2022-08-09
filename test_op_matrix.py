@@ -12,6 +12,16 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # concat
+        (
+            "20 30 matrix identmatrix scale concat matrix currentmatrix",
+            "20 30 scale matrix currentmatrix",
+        ),
+        # concatmatrix
+        (
+            "10 20 matrix translate 3 4 matrix scale matrix concatmatrix",
+            "matrix identmatrix setmatrix 3 4 scale 10 20 translate matrix currentmatrix",
+        ),
         # currentmatrix
         ("matrix currentmatrix length", [6]),
         ("matrix currentmatrix 1 get", [0.0]),
@@ -72,6 +82,20 @@ def test_evaluate(text, stack):
 @pytest.mark.parametrize(
     "text, error",
     [
+        # concat
+        ("concat", "stackunderflow"),
+        ("1 concat", "typecheck"),
+        ("[1] concat", "rangecheck"),
+        # concatmatrix
+        ("concatmatrix", "stackunderflow"),
+        ("matrix concatmatrix", "stackunderflow"),
+        ("matrix matrix concatmatrix", "stackunderflow"),
+        ("1 matrix matrix concatmatrix", "typecheck"),
+        ("matrix 1 matrix concatmatrix", "typecheck"),
+        ("matrix matrix 1 concatmatrix", "typecheck"),
+        ("[1] matrix matrix concatmatrix", "rangecheck"),
+        ("matrix [1] matrix concatmatrix", "rangecheck"),
+        ("matrix matrix [1] concatmatrix", "rangecheck"),
         # currentmatrix
         ("currentmatrix", "stackunderflow"),
         ("123 currentmatrix", "typecheck"),
