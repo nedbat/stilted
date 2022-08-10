@@ -10,6 +10,8 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # closepath
+        ("1 2 moveto 1 3 lineto 3 1 lineto closepath currentpoint", [1.0, 2.0]),
         # currentpoint
         ("101 202 moveto currentpoint", [101.0, 202.0]),
         ("101 202 moveto 303 404 moveto currentpoint", [303.0, 404.0]),
