@@ -2,7 +2,7 @@
 
 import pytest
 
-from error import Tilted
+from error import StiltedError
 from evaluate import evaluate
 from test_helpers import compare_stacks
 
@@ -72,34 +72,34 @@ OP1 = ["abs", "ceiling", "floor", "neg", "round", "sqrt", "truncate"]
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_stackunderflow(opname):
-    with pytest.raises(Tilted, match="stackunderflow"):
+    with pytest.raises(StiltedError, match="stackunderflow"):
         evaluate(opname)
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_errors(opname):
-    with pytest.raises(Tilted, match="typecheck"):
+    with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"(a) {opname}")
 
 OP2 = ["add", "div", "exp", "idiv", "mod", "mul", "sub"]
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow1(opname):
-    with pytest.raises(Tilted, match="stackunderflow"):
+    with pytest.raises(StiltedError, match="stackunderflow"):
         evaluate(opname)
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow2(opname):
-    with pytest.raises(Tilted, match="stackunderflow"):
+    with pytest.raises(StiltedError, match="stackunderflow"):
         evaluate(f"1 {opname}")
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_typecheck1(opname):
-    with pytest.raises(Tilted, match="typecheck"):
+    with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"1 (a) {opname}")
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_typecheck2(opname):
-    with pytest.raises(Tilted, match="typecheck"):
+    with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"(a) 1 {opname}")
 
 
@@ -113,5 +113,5 @@ def test_two_arg_typecheck2(opname):
     ],
 )
 def test_evaluate_error(text, error):
-    with pytest.raises(Tilted, match=error):
+    with pytest.raises(StiltedError, match=error):
         evaluate(text)

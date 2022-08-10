@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Iterator, cast
 
-from error import ERROR_NAMES, FinalTilt, Tilted
+from error import ERROR_NAMES, Tilted
 from lex import lexer
 from dtypes import (
     from_py, typecheck,
@@ -63,15 +63,11 @@ class Engine:
         self.dstack.append(systemdict)
 
         systemdict["$error"] = self.new_dict()
-        err_dict: dict[str, Object] = {}
+        systemdict["errordict"] = self.new_dict()
         for err_name in ERROR_NAMES:
-            # errordict /ERROR { /ERROR _stdhandleerror } put
-            handler = self.new_array(
-                value=[Name(True, err_name), Name(False, "_stdhandleerror")],
-                literal=False,
+            self.exec_text(
+                f"errordict /{err_name} {{ /{err_name} .error }} put"
             )
-            err_dict[err_name] = handler
-        systemdict["errordict"] = self.new_dict(value=err_dict)
 
         userdict = self.new_dict()
         systemdict["userdict"] = userdict
@@ -101,8 +97,7 @@ class Engine:
                 case Name(False, "}"):
                     if not pstack:
                         raise Tilted("syntaxerror")
-                    proc = self.new_array(value=pstack.pop())
-                    proc.literal = False
+                    proc = self.new_array(value=pstack.pop(), literal=False)
                     if pstack:
                         pstack[-1].append(proc)
                     else:
@@ -129,7 +124,11 @@ class Engine:
                 except StopIteration:
                     self.estack.pop()
                     continue
-                self.exec(obj, direct=True)
+                except Tilted as tilt:
+                    # An error!
+                    self._handle_error(obj, tilt)
+                else:
+                    self.exec(obj, direct=True)
 
     def exec(self, obj: Object, direct: bool=False) -> None:
         """Execute one Stilted Object."""
@@ -341,11 +340,8 @@ class Engine:
 def evaluate(text: str, stdout=None) -> Engine:
     """A simple helper to execute text."""
     engine = Engine(stdout=stdout)
-    try:
-        engine.exec_text(text)
-    except FinalTilt:
-        serror = engine.builtin_dict("$error")
-        raise Tilted(cast(Name, serror["errorname"]).str_value)
+    engine.push_string(text)
+    engine.exec_text("cvx stopped { $error /errorname get .pyraise } if")
     return engine
 
 

@@ -5,7 +5,6 @@ import pathlib
 import sys
 from typing import Callable
 
-from error import FinalTilt
 from evaluate import Engine
 
 
@@ -45,10 +44,8 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
     engine.exec_text("] def")
 
     if code is not None:
-        try:
-            engine.exec_text(code)
-        except FinalTilt:
-            pass
+        engine.push_string(code)
+        engine.exec_text("cvx stopped { handleerror } if")
 
     if args.interactive:
         while True:
@@ -58,10 +55,8 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
             except EOFError:
                 print()
                 break
-            try:
-                engine.exec_text(line)
-            except FinalTilt:
-                pass
+            engine.push_string(line)
+            engine.exec_text("cvx stopped { handleerror } if")
 
     return 0
 

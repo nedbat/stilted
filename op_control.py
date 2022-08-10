@@ -194,7 +194,7 @@ def repeat(engine: Engine) -> None:
 
 @dataclass
 class StoppedExec:
-    """Exectack item for `stopped`."""
+    """Execstack item for `stopped`."""
     stoppable = True
 
     def __call__(self, engine: Engine) -> None:

@@ -15,6 +15,10 @@ def eqeq_(engine: Engine) -> None:
     engine.stdout.write(o.op_eqeq())
     engine.stdout.write("\n")
 
+@operator
+def flush(engine: Engine) -> None:
+    engine.stdout.flush()
+
 @operator("print")
 def print_(engine: Engine) -> None:
     s = engine.opop(Stringy)

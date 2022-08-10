@@ -2,7 +2,7 @@
 
 import pytest
 
-from error import Tilted
+from error import StiltedError
 from evaluate import evaluate
 
 from test_helpers import compare_stacks
@@ -86,12 +86,12 @@ OP1 = ["not"]
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_stackunderflow(opname):
-    with pytest.raises(Tilted, match="stackunderflow"):
+    with pytest.raises(StiltedError, match="stackunderflow"):
         evaluate(opname)
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_errors(opname):
-    with pytest.raises(Tilted, match="typecheck"):
+    with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"(a) {opname}")
 
 
@@ -99,17 +99,17 @@ OP2 = ["and", "eq", "ge", "gt", "le", "lt", "ne", "or", "xor"]
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow1(opname):
-    with pytest.raises(Tilted, match="stackunderflow"):
+    with pytest.raises(StiltedError, match="stackunderflow"):
         evaluate(opname)
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow2(opname):
-    with pytest.raises(Tilted, match="stackunderflow"):
+    with pytest.raises(StiltedError, match="stackunderflow"):
         evaluate(f"1 {opname}")
 
 @pytest.mark.parametrize("opname", OP2)
 def test_mismatch(opname):
-    with pytest.raises(Tilted, match="typecheck"):
+    with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"1 (abc) {opname}")
-    with pytest.raises(Tilted, match="typecheck"):
+    with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"(abc) 1 {opname}")

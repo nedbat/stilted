@@ -10,7 +10,7 @@ class Tilted(Exception):
         self.info = info
 
 
-class FinalTilt(Exception):
+class StiltedError(Exception):
     """An exception to raise to the Python wrapper."""
 
 

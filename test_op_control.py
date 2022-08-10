@@ -3,7 +3,7 @@
 import pytest
 
 from dtypes import Name
-from error import Tilted
+from error import StiltedError
 from evaluate import evaluate
 from test_helpers import compare_stacks
 
@@ -50,7 +50,9 @@ from test_helpers import compare_stacks
         # stopped
         ("12 stopped 99", [12, False, 99]),
         ("{1 2 add} stopped 99", [3, False, 99]),
+        ("(1 2 add) cvx stopped 99", [3, False, 99]),
         ("/xyzzy {1 2 add} def /xyzzy cvx stopped 99", [3, False, 99]),
+        ("/H{{loop}stopped Y}def/Y/pop/m/mul/a/add{load def}H 3 4 a 5 m", [35]),
     ],
 )
 def test_evaluate(text, stack):
@@ -107,7 +109,7 @@ def test_evaluate(text, stack):
     ],
 )
 def test_evaluate_error(text, error):
-    with pytest.raises(Tilted, match=error):
+    with pytest.raises(StiltedError, match=error):
         evaluate(text)
 
 @pytest.mark.parametrize(

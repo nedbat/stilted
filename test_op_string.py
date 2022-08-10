@@ -3,7 +3,7 @@
 import pytest
 
 from dtypes import Name
-from error import Tilted
+from error import StiltedError
 from evaluate import evaluate
 from test_helpers import compare_stacks
 
@@ -101,5 +101,5 @@ def test_evaluate(text, stack):
     ],
 )
 def test_evaluate_error(text, error):
-    with pytest.raises(Tilted, match=error):
+    with pytest.raises(StiltedError, match=error):
         evaluate(text)

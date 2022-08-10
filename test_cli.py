@@ -49,6 +49,16 @@ def fake_input(lines: Iterable[str]) -> Callable[[str], str]:
             """,
         ),
         (
+            [],
+            ["({{}) cvx exec"],
+            """\
+                |-0> ({{}) cvx exec
+                Error: syntaxerror in exec
+                Operand stack (0):
+                |-0>
+            """,
+        ),
+        (
             ["-c", "123 456 add dup =="],
             [],
             """\
