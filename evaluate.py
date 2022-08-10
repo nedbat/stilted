@@ -81,7 +81,7 @@ class Engine:
         """Consume text as Stilted tokens, and add for execution."""
         self.estack.append(self._collect_objects(lexer.tokens(text)))
 
-    def run_text(self, text: str) -> None:
+    def exec_text(self, text: str) -> None:
         """Run Stilted text."""
         self.add_text(text)
         self.run()
@@ -178,9 +178,9 @@ class Engine:
         handler = errordict[tilt.errname]
         self.exec(handler)
 
-    def run_name(self, name: str) -> None:
+    def exec_name(self, name: str) -> None:
         """Run a name."""
-        self.estack.append(iter([Name(False, name)]))
+        self.exec(Name(False, name))
 
     ##
     ## Operand stack methods.
@@ -336,7 +336,7 @@ def evaluate(text: str, stdout=None) -> Engine:
     """A simple helper to execute text."""
     engine = Engine(stdout=stdout)
     try:
-        engine.run_text(text)
+        engine.exec_text(text)
     except FinalTilt:
         serror = engine.builtin_dict("$error")
         raise Tilted(cast(Name, serror["errorname"]).str_value)

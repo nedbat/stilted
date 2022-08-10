@@ -39,14 +39,14 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
 
     engine = Engine()
 
-    engine.run_text("/argv [")
+    engine.exec_text("/argv [")
     for arg in in_argv:
         engine.push_string(arg)
-    engine.run_text("] def")
+    engine.exec_text("] def")
 
     if code is not None:
         try:
-            engine.run_text(code)
+            engine.exec_text(code)
         except FinalTilt:
             pass
 
@@ -59,7 +59,7 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
                 print()
                 break
             try:
-                engine.run_text(line)
+                engine.exec_text(line)
             except FinalTilt:
                 pass
 

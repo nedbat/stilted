@@ -39,7 +39,7 @@ def exit_(engine: Engine) -> None:
         engine.estack.pop()
     else:
         # No enclosing exitable operator, so "quit".
-        engine.run_name("quit")
+        engine.exec_name("quit")
 
 @dataclass
 class ForExec(Exitable):
@@ -211,7 +211,7 @@ def stop(engine: Engine) -> None:
         engine.estack.pop()
         engine.opush(from_py(True))
     else:
-        engine.run_name("quit")
+        engine.exec_name("quit")
 
 @operator
 def stopped(engine: Engine) -> None:
