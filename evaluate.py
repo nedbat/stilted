@@ -141,6 +141,14 @@ class Engine:
                 case Object(literal=True):
                     self.opush(obj)
 
+                # Below here are all executable cases:
+
+                case Array():
+                    if direct:
+                        self.opush(obj)
+                    else:
+                        self.estack.append(iter(obj.value))
+
                 case Integer() | Real() | Boolean() | Mark():
                     self.opush(obj)
 
@@ -150,28 +158,23 @@ class Engine:
                         raise Tilted("undefined")
                     self.exec(looked_up)
 
-                case Array(literal=False):
-                    if direct:
-                        self.opush(obj)
-                    else:
-                        self.estack.append(iter(obj.value))
+                case Null():
+                    pass
 
                 case Operator():
                     obj.value(self)
-
-                case Null():
-                    pass
 
                 case _:
                     raise Exception(f"Buh? {obj!r}")
 
         except Tilted as tilt:
-            # An error! Put back was was popped, push the object, find the error
-            # name in `errordict`, and execute it.
+            # An error!
             self._handle_error(obj, tilt)
 
     def _handle_error(self, obj: Object, tilt: Tilted) -> None:
         """Handle an error: §3.11.1"""
+        # Put back what was popped, push the object,
+        # find the error name in `errordict`, and execute it.
         self.opush(*self.popped[::-1])
         self.opush(obj)
         errordict = self.builtin_dict("errordict")
