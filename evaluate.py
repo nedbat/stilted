@@ -164,6 +164,9 @@ class Engine:
                 case Operator():
                     obj.value(self)
 
+                case String():
+                    self.add_text(obj.str_value)
+
                 case _:
                     raise Exception(f"Buh? {obj!r}")
 

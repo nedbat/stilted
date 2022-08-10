@@ -17,6 +17,7 @@ from test_helpers import compare_stacks
         ("/xyzzy exec", [Name(True, "xyzzy")]),
         ("/xyzzy {1 2 add} def /xyzzy cvx exec", [3]),
         ("{1 2 add} exec", [3]),
+        ("(1 2 add) cvx exec", [3]),
         ("/add load cvlit exec cvx", "/add load"),
         ("97 null cvx exec /null load cvlit pop", [97]),
         ("{ 97 null 98 null } exec", [97, None, 98, None]),
