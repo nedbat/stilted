@@ -10,8 +10,26 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
-        # currentlinewidth
+        # currentgray / setgray
+        ("currentgray", [0.0]),
+        (".75 setgray currentgray", [.75]),
+        (".75 setgray gsave .5 setgray currentgray grestore currentgray", [.5, .75]),
+        ("-.1 setgray currentgray", [0.0]),
+        ("1.1 setgray currentgray", [1.0]),
+        # currentlinewidth / setlinewidth
         ("currentlinewidth", [1.0]),
+        ("3.5 setlinewidth currentlinewidth", [3.5]),
+        # currentrgbcolor / setrgbcolor
+        ("currentrgbcolor", [0.0, 0.0, 0.0]),
+        (".1 .2 .3 setrgbcolor currentrgbcolor", [.1, .2, .3]),
+        (".1 .2 .3 setrgbcolor currentgray", [.181]),
+        (".1 .2 .3 setrgbcolor gsave .5 setgray currentrgbcolor grestore currentrgbcolor", [.5, .5, .5, .1, .2, .3]),
+        ("-.5 .5 .5 setrgbcolor currentrgbcolor", [0., .5, .5]),
+        ("1.5 .5 .5 setrgbcolor currentrgbcolor", [1., .5, .5]),
+        (".5 -.5 .5 setrgbcolor currentrgbcolor", [.5, 0., .5]),
+        (".5 1.5 .5 setrgbcolor currentrgbcolor", [.5, 1., .5]),
+        (".5 .5 -.5 setrgbcolor currentrgbcolor", [.5, .5, 0.]),
+        (".5 .5 1.5 setrgbcolor currentrgbcolor", [.5, .5, 1.]),
         # grestore
         ("grestore grestore grestore", []),
         # grestoreall
@@ -22,8 +40,6 @@ from test_helpers import compare_stacks
         ("1 2 moveto gsave 3 4 moveto save pop 5 6 moveto grestore grestore grestore currentpoint", [3.0, 4.0]),
         ("1 2 moveto gsave 3 4 moveto save 5 6 moveto gsave 7 8 moveto gsave restore currentpoint", [3.0, 4.0]),
         ("2.5 setlinewidth gsave 3.5 setlinewidth grestore currentlinewidth", [2.5]),
-        # setlinewidth
-        ("3.5 setlinewidth currentlinewidth", [3.5]),
     ],
 )
 def test_evaluate(text, stack):
@@ -35,9 +51,19 @@ def test_evaluate(text, stack):
     [
         # gsave
         ("gsave 10 10 moveto grestore currentpoint", "nocurrentpoint"),
+        # setgray
+        ("setgray", "stackunderflow"),
+        ("(a) setgray", "typecheck"),
         # setlinewidth
         ("setlinewidth", "stackunderflow"),
         ("(a) setlinewidth", "typecheck"),
+        # setrgbcolor
+        ("setrgbcolor", "stackunderflow"),
+        (".5 setrgbcolor", "stackunderflow"),
+        (".5 .5 setrgbcolor", "stackunderflow"),
+        ("(a) .5 .5 setrgbcolor", "typecheck"),
+        (".5 (a) .5 setrgbcolor", "typecheck"),
+        (".5 .5 (a) setrgbcolor", "typecheck"),
     ],
 )
 def test_evaluate_error(text, error):
