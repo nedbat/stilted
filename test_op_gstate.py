@@ -16,6 +16,10 @@ from test_helpers import compare_stacks
         (".75 setgray gsave .5 setgray currentgray grestore currentgray", [.5, .75]),
         ("-.1 setgray currentgray", [0.0]),
         ("1.1 setgray currentgray", [1.0]),
+        # currenthsbcolor / sethsbcolor
+        (".1 .2 .3 setrgbcolor currenthsbcolor", [.5833333333333, .666666666, .3]),
+        (".1 .2 .3 sethsbcolor currenthsbcolor", [.1, .2, .3]),
+        (".1 .2 .3 sethsbcolor currentrgbcolor", [.3, .276, .24]),
         # currentlinewidth / setlinewidth
         ("currentlinewidth", [1.0]),
         ("3.5 setlinewidth currentlinewidth", [3.5]),
@@ -57,6 +61,13 @@ def test_evaluate(text, stack):
         # setlinewidth
         ("setlinewidth", "stackunderflow"),
         ("(a) setlinewidth", "typecheck"),
+        # sethsbcolor
+        ("sethsbcolor", "stackunderflow"),
+        (".5 sethsbcolor", "stackunderflow"),
+        (".5 .5 sethsbcolor", "stackunderflow"),
+        ("(a) .5 .5 sethsbcolor", "typecheck"),
+        (".5 (a) .5 sethsbcolor", "typecheck"),
+        (".5 .5 (a) sethsbcolor", "typecheck"),
         # setrgbcolor
         ("setrgbcolor", "stackunderflow"),
         (".5 setrgbcolor", "stackunderflow"),

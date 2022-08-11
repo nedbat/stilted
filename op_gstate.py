@@ -1,13 +1,24 @@
 """Built-in graphics state operators for stilted."""
 
+import colorsys
 from dtypes import clamp, from_py, typecheck, Number
 from evaluate import operator, Engine
+
+@operator
+def currentcmykcolor(engine: Engine) -> None:
+    r, g, b, _ = engine.gctx.get_source().get_rgba()
 
 @operator
 def currentgray(engine: Engine) -> None:
     r, g, b, _ = engine.gctx.get_source().get_rgba()
     gray = 0.3 * r + 0.59 * g + 0.11 * b
     engine.opush(from_py(gray))
+
+@operator
+def currenthsbcolor(engine: Engine) -> None:
+    r, g, b, _ = engine.gctx.get_source().get_rgba()
+    h, s, v = colorsys.rgb_to_hsv(r, g, b)
+    engine.opush(from_py(h), from_py(s), from_py(v))
 
 @operator
 def currentlinewidth(engine: Engine) -> None:
@@ -42,6 +53,16 @@ def setgray(engine: Engine) -> None:
     gray = engine.opop(Number)
     gv = clamp(0.0, gray.value, 1.0)
     engine.gctx.set_source_rgb(gv, gv, gv)
+
+@operator
+def sethsbcolor(engine: Engine) -> None:
+    h, s, v = engine.opopn(3)
+    typecheck(Number, h, s, v)
+    hv = clamp(0.0, h.value, 1.0)
+    sv = clamp(0.0, s.value, 1.0)
+    vv = clamp(0.0, v.value, 1.0)
+    r, g, b = colorsys.hsv_to_rgb(hv, sv, vv)
+    engine.gctx.set_source_rgb(r, g, b)
 
 @operator
 def setlinewidth(engine: Engine) -> None:
