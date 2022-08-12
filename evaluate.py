@@ -79,6 +79,13 @@ class Engine:
                 f"errordict /{err_name} {{ /{err_name} .error }} put"
             )
 
+        self.exec_text("""
+            /=string 150 string def     % Not standardized, but expected.
+            /languagelevel 1 def
+            /product (Stilted) def
+            /version (0.0) def
+            """)
+
         userdict = self.new_dict()
         systemdict["userdict"] = userdict
         self.dstack.append(userdict)
