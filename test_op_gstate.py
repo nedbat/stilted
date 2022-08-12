@@ -20,9 +20,21 @@ from test_helpers import compare_stacks
         (".1 .2 .3 setrgbcolor currenthsbcolor", [.5833333333333, .666666666, .3]),
         (".1 .2 .3 sethsbcolor currenthsbcolor", [.1, .2, .3]),
         (".1 .2 .3 sethsbcolor currentrgbcolor", [.3, .276, .24]),
+        # currentlinecap / setlinecap
+        ("currentlinecap", [0]),
+        ("1 setlinecap currentlinecap", [1]),
+        ("1 setlinecap gsave 2 setlinecap currentlinecap grestore currentlinecap", [2, 1]),
+        # currentlinejoin / setlinejoin
+        ("currentlinejoin", [0]),
+        ("1 setlinejoin currentlinejoin", [1]),
+        ("1 setlinejoin gsave 2 setlinejoin currentlinejoin grestore currentlinejoin", [2, 1]),
         # currentlinewidth / setlinewidth
         ("currentlinewidth", [1.0]),
         ("3.5 setlinewidth currentlinewidth", [3.5]),
+        # currentmiterlimit / setmiterlimit
+        ("currentmiterlimit", [10.0]),
+        ("17.5 setmiterlimit currentmiterlimit", [17.5]),
+        ("17.5 setmiterlimit gsave 35.25 setmiterlimit currentmiterlimit grestore currentmiterlimit", [35.25, 17.5]),
         # currentrgbcolor / setrgbcolor
         ("currentrgbcolor", [0.0, 0.0, 0.0]),
         (".1 .2 .3 setrgbcolor currentrgbcolor", [.1, .2, .3]),
@@ -58,9 +70,20 @@ def test_evaluate(text, stack):
         # setgray
         ("setgray", "stackunderflow"),
         ("(a) setgray", "typecheck"),
+        # setlinecap
+        ("setlinecap", "stackunderflow"),
+        ("(a) setlinecap", "typecheck"),
+        ("10 setlinecap", "rangecheck"),
+        # setlinejoin
+        ("setlinejoin", "stackunderflow"),
+        ("(a) setlinejoin", "typecheck"),
+        ("10 setlinejoin", "rangecheck"),
         # setlinewidth
         ("setlinewidth", "stackunderflow"),
         ("(a) setlinewidth", "typecheck"),
+        # setmiterlimit
+        ("setmiterlimit", "stackunderflow"),
+        ("(a) setmiterlimit", "typecheck"),
         # sethsbcolor
         ("sethsbcolor", "stackunderflow"),
         (".5 sethsbcolor", "stackunderflow"),
