@@ -403,6 +403,7 @@ import op_error; assert op_error
 import op_gstate; assert op_gstate
 import op_math; assert op_math
 import op_matrix; assert op_matrix
+import op_misc; assert op_misc
 import op_object; assert op_object
 import op_output; assert op_output
 import op_paint; assert op_paint
