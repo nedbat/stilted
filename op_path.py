@@ -37,6 +37,12 @@ def currentpoint(engine: Engine) -> None:
     engine.opush(from_py(x), from_py(y))
 
 @operator
+def curveto(engine: Engine) -> None:
+    x1, y1, x2, y2, x3, y3 = engine.opopn(6)
+    typecheck(Number, x1, y1, x2, y2, x3, y3)
+    engine.gctx.curve_to(x1.value, y1.value, x2.value, y2.value, x3.value, y3.value)
+
+@operator
 def lineto(engine: Engine) -> None:
     x, y = engine.opopn(2)
     typecheck(Number, x, y)
@@ -52,6 +58,13 @@ def moveto(engine: Engine) -> None:
 @operator
 def newpath(engine: Engine) -> None:
     engine.gctx.new_path()
+
+@operator
+def rcurveto(engine: Engine) -> None:
+    dx1, dy1, dx2, dy2, dx3, dy3 = engine.opopn(6)
+    typecheck(Number, dx1, dy1, dx2, dy2, dx3, dy3)
+    has_current_point(engine)
+    engine.gctx.rel_curve_to(dx1.value, dy1.value, dx2.value, dy2.value, dx3.value, dy3.value)
 
 @operator
 def rlineto(engine: Engine) -> None:

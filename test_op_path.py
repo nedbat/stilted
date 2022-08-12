@@ -49,6 +49,8 @@ def test_evaluate(text, stack):
         ("1 (a) moveto", "typecheck"),
         # newpath
         ("10 10 moveto newpath currentpoint", "nocurrentpoint"),
+        # rcurveto
+        ("1 1 1 1 1 1 rcurveto", "nocurrentpoint"),
         # rlineto
         ("rlineto", "stackunderflow"),
         ("1 rlineto", "stackunderflow"),
@@ -85,5 +87,28 @@ def test_evaluate_error(text, error):
     ],
 )
 def test_arc_errors(op, text, error):
+    with pytest.raises(StiltedError, match=error):
+        evaluate(text.replace("@@", op))
+
+
+@pytest.mark.parametrize("op", ["curveto", "rcurveto"])
+@pytest.mark.parametrize(
+    "text, error",
+    [
+        ("@@", "stackunderflow"),
+        ("1 @@", "stackunderflow"),
+        ("1 1 @@", "stackunderflow"),
+        ("1 1 1 @@", "stackunderflow"),
+        ("1 1 1 1 @@", "stackunderflow"),
+        ("1 1 1 1 1 @@", "stackunderflow"),
+        ("(a) 1 1 1 1 1 @@", "typecheck"),
+        ("1 (a) 1 1 1 1 @@", "typecheck"),
+        ("1 1 (a) 1 1 1 @@", "typecheck"),
+        ("1 1 1 (a) 1 1 @@", "typecheck"),
+        ("1 1 1 1 (a) 1 @@", "typecheck"),
+        ("1 1 1 1 1 (a) @@", "typecheck"),
+    ],
+)
+def test_curveto_errors(op, text, error):
     with pytest.raises(StiltedError, match=error):
         evaluate(text.replace("@@", op))
