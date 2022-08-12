@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import itertools
 import sys
-from dataclasses import dataclass, field
 from typing import Any, Iterable, Iterator, cast
 
 from error import ERROR_NAMES, Tilted
@@ -18,44 +17,55 @@ from dtypes import (
 from gstate import Device, GstateExtras
 
 
-@dataclass
 class Engine:
     """Stilted execution engine."""
 
-    # Dictionary stack
-    dstack: list[Dict] = field(default_factory=list)
-
     # Operand stack
-    ostack: list[Object] = field(default_factory=list)
+    ostack: list[Object]
+
+    # Dictionary stack
+    dstack: list[Dict]
 
     # Objects popped by the current operator, so they can be put back for error
     # handling if needed.
-    popped: list[Object] = field(default_factory=list)
+    popped: list[Object]
 
     # Execution stack. This is a mix of:
     #   1) Iterators of Stilted Objects (procedures)
     #   2) Python callables (used for internal work)
-    estack: list[Any] = field(default_factory=list)
+    estack: list[Any]
 
     # Save-object stack
-    sstack: list[Save] = field(default_factory=list)
+    sstack: list[Save]
 
     # gsave stack
     # Most of the graphics state is in PyCairo, but we need other information
     # for each gstate.
-    gsaves: list[GstateExtras] = field(default_factory=list)
+    gsaves: list[GstateExtras]
 
     # The stdout file object
-    stdout: Any = field(default_factory=lambda: sys.stdout)
+    stdout: Any
 
     # Sequence of serial numbers for save objects
-    save_serials: Iterator[int] = field(default_factory=itertools.count)
+    save_serials: Iterator[int]
 
     # Output device
-    device: Device = field(default_factory=Device)
+    device: Device
 
-    def __post_init__(self) -> None:
+    def __init__(self, stdout=None) -> None:
         """Construct the initial data needed for execution."""
+        self.ostack = []
+        self.dstack = []
+        self.estack = []
+        self.sstack = []
+        self.gsaves = []
+
+        self.popped = []
+
+        self.stdout = stdout or sys.stdout
+        self.save_serials = itertools.count()
+        self.device = Device()
+
         self.new_save()
 
         systemdict = self.new_dict(value=SYSTEMDICT)
