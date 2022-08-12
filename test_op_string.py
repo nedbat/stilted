@@ -2,7 +2,6 @@
 
 import pytest
 
-from dtypes import Name
 from error import StiltedError
 from evaluate import evaluate
 from test_helpers import compare_stacks
@@ -13,14 +12,6 @@ from test_helpers import compare_stacks
     [
         # copy
         ("/s (.....) def (abc) s copy s s 1 88 put", ["aXc", "aXc.."]),
-        # cvn
-        ("(xyzzy) cvn", [Name(True, "xyzzy")]),
-        ("(xyzzy) cvx cvn", [Name(False, "xyzzy")]),
-        # cvs
-        ("123 (xyz) cvs", ["123"]),
-        ("5 string dup 123 exch cvs", ["123\0\0", "123"]),
-        ("/add load 5 string cvs", ["add"]),
-        ("[1 2 3] 15 string cvs", ["--nostringval--"]),
         # forall
         ("(hello) {} forall", [104, 101, 108, 108, 111]),
         ("0 (hello) { add } forall", [532]),
@@ -61,14 +52,6 @@ def test_evaluate(text, stack):
         # copy
         ("(abc) 3.5 copy", "typecheck"),
         ("(abc) (a) copy", "rangecheck"),
-        # cvn
-        ("cvn", "stackunderflow"),
-        ("123 cvn", "typecheck"),
-        # cvs
-        ("cvs", "stackunderflow"),
-        ("() cvs", "stackunderflow"),
-        ("123 123 cvs", "typecheck"),
-        ("123 (ab) cvs", "rangecheck"),
         # forall
         ("(hello) 123 forall", "typecheck"),
         # get

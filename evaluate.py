@@ -424,11 +424,11 @@ import op_gstate; assert op_gstate
 import op_math; assert op_math
 import op_matrix; assert op_matrix
 import op_misc; assert op_misc
-import op_object; assert op_object
 import op_output; assert op_output
 import op_paint; assert op_paint
 import op_path; assert op_path
 import op_relational; assert op_relational
 import op_stack; assert op_stack
 import op_string; assert op_string
+import op_type; assert op_type
 import op_vm; assert op_vm
