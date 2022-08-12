@@ -8,7 +8,8 @@ import io
 import cairo
 
 class Device:
-    def __init__(self):
+    def __init__(self, outfile):
+        self.outfile = outfile
         self.width = 612
         self.height = 792
         self.svgio = io.BytesIO()
@@ -20,7 +21,7 @@ class Device:
 
     def showpage(self):
         self.surface.finish()
-        with open("page.svg", "wb") as page_svg:
+        with open(self.outfile, "wb") as page_svg:
             page_svg.write(self.svgio.getvalue())
 
 

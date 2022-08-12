@@ -21,6 +21,10 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
         "-i", dest="interactive", action="store_true",
         help="Run an interactive prompt when code is finished",
     )
+    parser.add_argument(
+        "-o", dest="outfile", default="page.svg",
+        help="Output file name",
+    )
     parser.add_argument("args", nargs="*")
 
     args = parser.parse_args(argv)
@@ -36,7 +40,7 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
         args.interactive = True
         in_argv = [""]
 
-    engine = Engine()
+    engine = Engine(outfile=args.outfile)
 
     engine.exec_text("/argv [")
     for arg in in_argv:
