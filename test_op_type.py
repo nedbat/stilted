@@ -20,6 +20,14 @@ from test_helpers import compare_stacks
         # cvn
         ("(xyzzy) cvn", [Name(True, "xyzzy")]),
         ("(xyzzy) cvx cvn", [Name(False, "xyzzy")]),
+        # cvr
+        ("123 cvr", [123.0]),
+        ("(123.5) cvr", [123.5]),
+        # cvrs
+        ("123 10 10 string cvrs", ["123"]),
+        ("123.5 10 10 string cvrs", ["123.5"]),
+        ("123123123 36 10 string cvrs", ["21AYER"]),
+        ("-123 16 10 string cvrs", ["FFFFFF85"]),
         # cvs
         ("123 (xyz) cvs", ["123"]),
         ("5 string dup 123 exch cvs", ["123\0\0", "123"]),
@@ -62,6 +70,20 @@ def test_evaluate(text, stack):
         # cvn
         ("cvn", "stackunderflow"),
         ("123 cvn", "typecheck"),
+        # cvr
+        ("cvr", "stackunderflow"),
+        ("[] cvr", "typecheck"),
+        ("(xyz) cvr", "undefinedresult"),
+        # cvrs
+        ("cvrs", "stackunderflow"),
+        ("() cvrs", "stackunderflow"),
+        ("10 () cvrs", "stackunderflow"),
+        ("(a) 10 () cvrs", "typecheck"),
+        ("123 (a) () cvrs", "typecheck"),
+        ("123 10 [] cvrs", "typecheck"),
+        ("123 1 (.....) cvrs", "rangecheck"),
+        ("123 37 (.....) cvrs", "rangecheck"),
+        ("123 10 (.) cvrs", "rangecheck"),
         # cvs
         ("cvs", "stackunderflow"),
         ("() cvs", "stackunderflow"),

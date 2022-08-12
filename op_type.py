@@ -1,8 +1,13 @@
 """Built-in type/attribute/conversion operators for Stilted."""
 
+import string
+
 from error import Tilted
 from evaluate import operator, Engine
-from dtypes import from_py, rangecheck, typecheck, Integer, Name, Real, String
+from dtypes import (
+    from_py, rangecheck, typecheck,
+    Integer, Name, Number, Real, String,
+)
 
 @operator
 def cvi(engine: Engine) -> None:
@@ -25,6 +30,45 @@ def cvlit(engine: Engine) -> None:
 def cvn(engine: Engine) -> None:
     s = engine.opop(String)
     engine.opush(Name(literal=s.literal, value=s.str_value))
+
+@operator
+def cvr(engine: Engine) -> None:
+    obj = engine.opop()
+    match obj:
+        case Integer() | Real() | String():
+            try:
+                val = float(obj.value)
+            except ValueError:
+                raise Tilted("undefinedresult")
+            engine.opush(from_py(val))
+        case _:
+            raise Tilted("typecheck")
+
+DIGITS = (string.digits + string.ascii_uppercase).encode("ascii")
+
+@operator
+def cvrs(engine: Engine) -> None:
+    num, radix, s = engine.opopn(3)
+    typecheck(Number, num)
+    typecheck(Integer, radix)
+    typecheck(String, s)
+    radixv = radix.value
+    rangecheck(2, radixv, 36)
+    if radixv == 10:
+        res = num.op_eq().encode("ascii")
+    else:
+        n = int(num.value) % 2**32
+        res = []
+        while True:
+            n, digit = divmod(n, radixv)
+            res.append(DIGITS[digit])
+            if n == 0:
+                break
+        res = res[::-1]
+    rangecheck(len(res), s.length)
+    for i in range(len(res)):
+        s[i] = res[i]
+    engine.opush(s.new_sub(0, len(res)))
 
 @operator
 def cvs(engine: Engine) -> None:
