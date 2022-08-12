@@ -5,7 +5,7 @@ from typing import Any, Callable
 
 from error import Tilted
 from evaluate import operator, Engine
-from dtypes import from_py, Boolean, Integer, Name, Real, String
+from dtypes import from_py, typecheck, Boolean, Integer, Name, Real, String
 
 
 def eq_ne(engine: Engine, pyop: Callable[[Any, Any], bool]) -> None:
@@ -48,6 +48,17 @@ def bool_op(
 @operator("and")
 def and_(engine: Engine) -> None:
     bool_op(engine, lambda a, b: a and b, py_operator.and_)
+
+@operator
+def bitshift(engine: Engine) -> None:
+    i, s = engine.opopn(2)
+    typecheck(Integer, i, s)
+    shift = s.value
+    if shift >= 0:
+        res = i.value << shift
+    else:
+        res = i.value >> -shift
+    engine.opush(from_py(res))
 
 @operator
 def eq(engine: Engine) -> None:

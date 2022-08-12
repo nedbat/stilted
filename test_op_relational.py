@@ -16,6 +16,9 @@ from test_helpers import compare_stacks
         ("false false and", [False]),
         ("99 1 and", [1]),
         ("52 7 and", [4]),
+        # bitshift
+        ("7 3 bitshift", [56]),
+        ("142 -3 bitshift", [17]),
         # eq
         ("4.0 4 eq", [True]),
         ("4.0 5 eq", [False]),
@@ -95,7 +98,7 @@ def test_one_arg_errors(opname):
         evaluate(f"(a) {opname}")
 
 
-OP2 = ["and", "eq", "ge", "gt", "le", "lt", "ne", "or", "xor"]
+OP2 = ["and", "bitshift", "eq", "ge", "gt", "le", "lt", "ne", "or", "xor"]
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow1(opname):
