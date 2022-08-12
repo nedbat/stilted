@@ -4,7 +4,7 @@ import math
 
 from error import Tilted
 from evaluate import operator, Engine
-from dtypes import from_py, typecheck, Integer, Number
+from dtypes import from_py, Integer, Number
 
 
 @operator("abs")
@@ -14,8 +14,7 @@ def abs_(engine: Engine) -> None:
 
 @operator
 def add(engine: Engine) -> None:
-    a, b = engine.opopn(2)
-    typecheck(Number, a, b)
+    a, b = engine.opopn(2, Number)
     engine.opush(from_py(a.value + b.value))
 
 @operator
@@ -26,14 +25,12 @@ def ceiling(engine: Engine) -> None:
 
 @operator
 def div(engine: Engine) -> None:
-    a, b = engine.opopn(2)
-    typecheck(Number, a, b)
+    a, b = engine.opopn(2, Number)
     engine.opush(from_py(a.value / b.value))
 
 @operator
 def exp(engine: Engine) -> None:
-    base, exponent = engine.opopn(2)
-    typecheck(Number, base, exponent)
+    base, exponent = engine.opopn(2, Number)
     val = base.value ** exponent.value
     engine.opush(from_py(val))
 
@@ -45,22 +42,19 @@ def floor(engine: Engine) -> None:
 
 @operator
 def idiv(engine: Engine) -> None:
-    a, b = engine.opopn(2)
-    typecheck(Number, a, b)
+    a, b = engine.opopn(2, Number)
     engine.opush(from_py(int(a.value / b.value)))
 
 @operator
 def mod(engine: Engine) -> None:
-    a, b = engine.opopn(2)
-    typecheck(Number, a, b)
+    a, b = engine.opopn(2, Number)
     av, bv = a.value, b.value
     remainder = (-1 if av < 0 else 1) * (abs(av) % abs(bv))
     engine.opush(from_py(remainder))
 
 @operator
 def mul(engine: Engine) -> None:
-    a, b = engine.opopn(2)
-    typecheck(Number, a, b)
+    a, b = engine.opopn(2, Number)
     engine.opush(from_py(a.value * b.value))
 
 @operator
@@ -104,8 +98,7 @@ def srand(engine: Engine) -> None:
 
 @operator
 def sub(engine: Engine) -> None:
-    a, b = engine.opopn(2)
-    typecheck(Number, a, b)
+    a, b = engine.opopn(2, Number)
     engine.opush(from_py(a.value - b.value))
 
 @operator

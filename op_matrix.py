@@ -2,7 +2,7 @@
 
 import cairo
 
-from dtypes import from_py, typecheck, Array, Real, Integer, Number
+from dtypes import from_py, Array, Real, Integer, Number
 from error import Tilted
 from evaluate import operator, Engine
 from util import deg_to_rad
@@ -43,8 +43,7 @@ def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
             raise Tilted("undefinedresult")
 
     fn = mtx.transform_distance if distance else mtx.transform_point
-    x, y = engine.opopn(2)
-    typecheck(Number, x, y)
+    x, y = engine.opopn(2, Number)
     x, y = fn(x.value, y.value)
     engine.opush(from_py(x), from_py(y))
 
@@ -137,14 +136,12 @@ def scale(engine: Engine) -> None:
     match engine.otop():
         case Array():
             arr = pop_matrix(engine)
-            sx, sy = engine.opopn(2)
-            typecheck(Number, sx, sy)
+            sx, sy = engine.opopn(2, Number)
             matrix_to_array(cairo.Matrix(xx=sx.value, yy=sy.value), arr)
             engine.opush(arr)
 
         case Integer() | Real():
-            sx, sy = engine.opopn(2)
-            typecheck(Number, sx, sy)
+            sx, sy = engine.opopn(2, Number)
             engine.gctx.scale(sx.value, sy.value)
 
         case _:
@@ -164,14 +161,12 @@ def translate(engine: Engine) -> None:
     match engine.otop():
         case Array():
             arr = pop_matrix(engine)
-            tx, ty = engine.opopn(2)
-            typecheck(Number, tx, ty)
+            tx, ty = engine.opopn(2, Number)
             matrix_to_array(cairo.Matrix(x0=tx.value, y0=ty.value), arr)
             engine.opush(arr)
 
         case Integer() | Real():
-            tx, ty = engine.opopn(2)
-            typecheck(Number, tx, ty)
+            tx, ty = engine.opopn(2, Number)
             engine.gctx.translate(tx.value, ty.value)
 
         case _:

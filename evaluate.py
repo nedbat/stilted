@@ -227,14 +227,21 @@ class Engine:
             typecheck(a_type, obj)
         return obj
 
-    def opopn(self, n: int) -> list[Any]:
-        """Remove the top n operands and return them."""
+    def opopn(self, n: int, a_type=None) -> list[Any]:
+        """
+        Remove the top n operands and return them.
+
+        Optionally typecheck all the values with `a_type`.
+        """
         self.ohas(n)
         if n == 0:
             vals = []
-        else:
-            vals = self.ostack[-n:]
-            del self.ostack[-n:]
+            return []
+
+        vals = self.ostack[-n:]
+        if a_type is not None:
+            typecheck(a_type, *vals)
+        del self.ostack[-n:]
         self.popped.extend(vals[::-1])
         return vals
 

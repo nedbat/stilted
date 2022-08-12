@@ -4,7 +4,7 @@ import colorsys
 
 import cairo
 
-from dtypes import clamp, from_py, typecheck, Number
+from dtypes import clamp, from_py, Number
 from error import Tilted
 from evaluate import operator, Engine
 
@@ -74,8 +74,7 @@ def setgray(engine: Engine) -> None:
 
 @operator
 def sethsbcolor(engine: Engine) -> None:
-    h, s, v = engine.opopn(3)
-    typecheck(Number, h, s, v)
+    h, s, v = engine.opopn(3, Number)
     hv = clamp(0.0, h.value, 1.0)
     sv = clamp(0.0, s.value, 1.0)
     vv = clamp(0.0, v.value, 1.0)
@@ -108,8 +107,7 @@ def setmiterlimit(engine: Engine) -> None:
 
 @operator
 def setrgbcolor(engine: Engine) -> None:
-    r, g, b = engine.opopn(3)
-    typecheck(Number, r, g, b)
+    r, g, b = engine.opopn(3, Number)
     rv = clamp(0.0, r.value, 1.0)
     gv = clamp(0.0, g.value, 1.0)
     bv = clamp(0.0, b.value, 1.0)
