@@ -3,11 +3,24 @@
 from dtypes import from_py, typecheck, Number
 from error import Tilted
 from evaluate import operator, Engine
+from util import deg_to_rad
 
 def has_current_point(engine: Engine) -> None:
     """There must be a current point, or raise nocurrentpoint."""
     if not engine.gctx.has_current_point():
         raise Tilted("nocurrentpoint")
+
+@operator
+def arc(engine: Engine) -> None:
+    x, y, r, a1, a2 = engine.opopn(5)
+    typecheck(Number, x, y, r, a1, a2)
+    engine.gctx.arc(x.value, y.value, r.value, deg_to_rad(a1.value), deg_to_rad(a2.value))
+
+@operator
+def arcn(engine: Engine) -> None:
+    x, y, r, a1, a2 = engine.opopn(5)
+    typecheck(Number, x, y, r, a1, a2)
+    engine.gctx.arc_negative(x.value, y.value, r.value, deg_to_rad(a1.value), deg_to_rad(a2.value))
 
 @operator
 def clip(engine: Engine) -> None:

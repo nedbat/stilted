@@ -10,6 +10,10 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # arc
+        ("0 0 100 0 90 arc currentpoint", [0.0, 100.0]),
+        # arcn
+        ("0 0 100 90 0 arcn currentpoint", [100.0, 0.0]),
         # closepath
         ("1 2 moveto 1 3 lineto 3 1 lineto closepath currentpoint", [1.0, 2.0]),
         # currentpoint
@@ -62,3 +66,24 @@ def test_evaluate(text, stack):
 def test_evaluate_error(text, error):
     with pytest.raises(StiltedError, match=error):
         evaluate(text)
+
+
+@pytest.mark.parametrize("op", ["arc", "arcn"])
+@pytest.mark.parametrize(
+    "text, error",
+    [
+        ("@@", "stackunderflow"),
+        ("1 @@", "stackunderflow"),
+        ("1 1 @@", "stackunderflow"),
+        ("1 1 1 @@", "stackunderflow"),
+        ("1 1 1 1 @@", "stackunderflow"),
+        ("(a) 1 1 1 1 @@", "typecheck"),
+        ("1 (a) 1 1 1 @@", "typecheck"),
+        ("1 1 (a) 1 1 @@", "typecheck"),
+        ("1 1 1 (a) 1 @@", "typecheck"),
+        ("1 1 1 1 (a) @@", "typecheck"),
+    ],
+)
+def test_arc_errors(op, text, error):
+    with pytest.raises(StiltedError, match=error):
+        evaluate(text.replace("@@", op))

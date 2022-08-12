@@ -1,12 +1,11 @@
 """Built-in matrix and coordinate operators for stilted."""
 
-import math
-
 import cairo
 
 from dtypes import from_py, typecheck, Array, Real, Integer, Number
 from error import Tilted
 from evaluate import operator, Engine
+from util import deg_to_rad
 
 def pop_matrix(engine: Engine) -> Array:
     """Pop a matrix from the stack."""
@@ -24,10 +23,6 @@ def matrix_to_array(mtx: cairo.Matrix, arr: Array):
 def array_to_matrix(arr) -> cairo.Matrix:
     """Convert an Array into a Matrix."""
     return cairo.Matrix(*map(lambda o: o.value, arr))
-
-def deg_to_rad(degrees: float) -> float:
-    """Convert degrees to radians."""
-    return math.pi * degrees / 180
 
 def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
     """Code common to the four xxtransform operators."""
