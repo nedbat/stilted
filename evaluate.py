@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import random
 import sys
 from typing import Any, Iterable, Iterator, cast
 
@@ -43,6 +44,9 @@ class Engine:
     # for each gstate.
     gsaves: list[GstateExtras]
 
+    # Random number source
+    random: random.Random
+
     # The stdout file object
     stdout: Any
 
@@ -61,6 +65,8 @@ class Engine:
         self.gsaves = []
 
         self.popped = []
+
+        self.random = random.Random()
 
         self.stdout = stdout or sys.stdout
         self.save_serials = itertools.count()

@@ -47,6 +47,17 @@ from test_helpers import compare_stacks
         # neg
         ("4.5 neg", [-4.5]),
         ("-3 neg", [3]),
+        # rand, rrand, srand
+        ("17 srand rand rand rand rand", [1778837931, 1303193990, 1570340887, 1243931546]),
+        ("17 srand rand rand 17 srand rand rand", [1778837931, 1303193990, 1778837931, 1303193990]),
+        ("""
+            17 srand rand pop rand pop
+            /r rrand def
+            r srand rand rand
+            r srand rand rand
+            """,
+            [2102238088, 3827999, 2102238088, 3827999],
+        ),
         # round
         ("3.2 round", [3.0]),
         ("6.5 round", [7.0]),
@@ -68,7 +79,7 @@ def test_evaluate(text, stack):
     compare_stacks(evaluate(text).ostack, stack)
 
 
-OP1 = ["abs", "ceiling", "floor", "neg", "round", "sqrt", "truncate"]
+OP1 = ["abs", "ceiling", "floor", "neg", "round", "srand", "sqrt", "truncate"]
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_stackunderflow(opname):
@@ -110,6 +121,8 @@ def test_two_arg_typecheck2(opname):
         ("-1 1.5 exp", "undefinedresult"),
         # sqrt
         ("-1 sqrt", "rangecheck"),
+        # srand
+        ("1.1 srand", "typecheck"),
     ],
 )
 def test_evaluate_error(text, error):

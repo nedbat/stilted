@@ -4,7 +4,7 @@ import math
 
 from error import Tilted
 from evaluate import operator, Engine
-from dtypes import from_py, typecheck, Number
+from dtypes import from_py, typecheck, Integer, Number
 
 
 @operator("abs")
@@ -68,6 +68,10 @@ def neg(engine: Engine) -> None:
     a = engine.opop(Number)
     engine.opush(from_py(-a.value))
 
+@operator
+def rand(engine: Engine) -> None:
+    engine.opush(from_py(engine.random.randint(0, 2**31-1)))
+
 @operator("round")
 def round_(engine: Engine) -> None:
     a = engine.opop(Number)
@@ -79,6 +83,12 @@ def round_(engine: Engine) -> None:
     engine.opush(from_py(type(av)(r)))
 
 @operator
+def rrand(engine: Engine) -> None:
+    r = engine.random.randint(0, 2**31-1)
+    engine.random.seed(r)
+    engine.opush(from_py(r))
+
+@operator
 def sqrt(engine: Engine) -> None:
     num = engine.opop(Number)
     try:
@@ -86,6 +96,11 @@ def sqrt(engine: Engine) -> None:
     except ValueError:
         raise Tilted("rangecheck")
     engine.opush(from_py(res))
+
+@operator
+def srand(engine: Engine) -> None:
+    i = engine.opop(Integer)
+    engine.random.seed(i.value)
 
 @operator
 def sub(engine: Engine) -> None:
