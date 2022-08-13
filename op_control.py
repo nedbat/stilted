@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Iterator, Tuple
 
 from error import Tilted
-from evaluate import operator, Engine
+from evaluate import operator, Engine, Exitable
 from dtypes import (
     from_py, typecheck, typecheck_procedure,
     Array, Boolean, Dict, Integer, Name, Number, Object, String,
@@ -17,11 +17,6 @@ from util import rangecheck
 def exec_(engine: Engine) -> None:
     obj = engine.opop()
     engine.exec(obj)
-
-@dataclass
-class Exitable:
-    """An item on the execstack that can be `exit`ed."""
-    exitable = True
 
 @operator("exit")
 def exit_(engine: Engine) -> None:

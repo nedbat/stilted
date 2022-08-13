@@ -1,10 +1,13 @@
 """Built-in path construction operators for Stilted."""
 
+from dataclasses import dataclass
+from typing import Any, Iterator
+
 import cairo
 
-from dtypes import from_py, Number
+from dtypes import from_py, typecheck_procedure, Array, Number
 from error import Tilted
-from evaluate import operator, Engine
+from evaluate import operator, Engine, Exitable
 from util import deg_to_rad
 
 def has_current_point(engine: Engine) -> None:
@@ -61,6 +64,31 @@ def moveto(engine: Engine) -> None:
 @operator
 def newpath(engine: Engine) -> None:
     engine.gctx.new_path()
+
+@dataclass
+class PathforallExec(Exitable):
+    """Execstack item for implementing `pathforall`."""
+    segment_iter: Iterator[Any]
+    procs: list[Array]
+
+    def __call__(self, engine: Engine) -> None:
+        try:
+            kind, nums = next(self.segment_iter)
+        except StopIteration:
+            return
+        # Cairo always puts a moveto after a closepath, but PostScript does not.
+        # If we have a closepath, swallow the moveto after it.
+        if kind == 3:
+            next(self.segment_iter)
+        engine.opush(*map(from_py, nums))
+        engine.estack.append(self)
+        engine.exec(self.procs[kind])
+
+@operator
+def pathforall(engine: Engine) -> None:
+    procs = engine.opopn(4)
+    typecheck_procedure(*procs)
+    engine.estack.append(PathforallExec(iter(engine.gctx.copy_path()), procs))
 
 @operator
 def rcurveto(engine: Engine) -> None:

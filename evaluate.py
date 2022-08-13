@@ -5,6 +5,7 @@ from __future__ import annotations
 import itertools
 import random
 import sys
+from dataclasses import dataclass
 from typing import Any, Iterable, Iterator, cast
 
 from error import ERROR_NAMES, Tilted
@@ -365,6 +366,12 @@ class Engine:
                 self.gctx.restore()
                 self.gsaves.pop()
             self.gsaves[-1].restore_to_ctx(self.gctx)
+
+
+@dataclass
+class Exitable:
+    """An item on the execstack that can be `exit`ed."""
+    exitable = True
 
 
 def evaluate(text: str, stdout=None) -> Engine:

@@ -20,6 +20,25 @@ from test_helpers import compare_stacks
         ("101 202 moveto currentpoint", [101.0, 202.0]),
         ("101 202 moveto 303 404 moveto currentpoint", [303.0, 404.0]),
         ("101 202 moveto 303 404 lineto currentpoint", [303.0, 404.0]),
+        # pathforall
+        (
+            """
+            10 20 moveto 30 40 lineto 1 2 3 4 5 6 curveto closepath
+            {(M)} {(L)} {(C)} {(.)} pathforall
+            """,
+            [10.0, 20.0, "M", 30.0, 40.0, "L", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, "C", "."],
+        ),
+        (
+            """
+            10 20 moveto 30 40 lineto 1 2 3 4 5 6 curveto closepath
+            {(M)} {(L)} { (!) exit} {(.)} pathforall
+            """,
+            [10.0, 20.0, "M", 30.0, 40.0, "L", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, "!"],
+        ),
+        (
+            "10 20 moveto 30 40 lineto 100 200 translate {} {} {} {} pathforall",
+            [-90.0, -180.0, -70.0, -160.0],
+        ),
         # rlineto
         ("1 2 moveto 10 20 rlineto currentpoint", [11.0, 22.0]),
         # rmoveto
@@ -49,6 +68,15 @@ def test_evaluate(text, stack):
         ("1 (a) moveto", "typecheck"),
         # newpath
         ("10 10 moveto newpath currentpoint", "nocurrentpoint"),
+        # pathforall
+        ("pathforall", "stackunderflow"),
+        ("{} pathforall", "stackunderflow"),
+        ("{} {} pathforall", "stackunderflow"),
+        ("{} {} {} pathforall", "stackunderflow"),
+        ("12 {} {} {} pathforall", "typecheck"),
+        ("{} 12 {} {} pathforall", "typecheck"),
+        ("{} {} 12 {} pathforall", "typecheck"),
+        ("{} {} {} 12 pathforall", "typecheck"),
         # rcurveto
         ("1 1 1 1 1 1 rcurveto", "nocurrentpoint"),
         # rlineto
