@@ -6,21 +6,24 @@ from error import Tilted
 from evaluate import operator, Engine
 from dtypes import (
     from_py, rangecheck, typecheck,
-    Integer, Name, Number, Real, String,
+    Integer, Name, Number, Object, Real, String,
 )
+from lex import lexer
 
 @operator
 def cvi(engine: Engine) -> None:
     obj = engine.opop()
+    if isinstance(obj, String):
+        obj = next(iter(lexer.tokens(obj.str_value)))
     match obj:
-        case Integer() | Real() | String():
-            try:
-                val = int(float(obj.value))
-            except ValueError:
-                raise Tilted("undefinedresult")
-            engine.opush(from_py(val))
+        case Integer():
+            val: Object = obj
+        case Real():
+            val = from_py(int(obj.value))
         case _:
+            print(f"{obj=}")
             raise Tilted("typecheck")
+    engine.opush(val)
 
 @operator
 def cvlit(engine: Engine) -> None:

@@ -2,8 +2,9 @@
 
 import pytest
 
+from dtypes import Name
 from error import Tilted
-from lex import lexer, Name
+from lex import lexer
 from test_helpers import compare_stacks
 
 @pytest.mark.parametrize(
@@ -11,9 +12,13 @@ from test_helpers import compare_stacks
     [
         ("123", [123]),
         ("-123 +456", [-123, 456]),
+        ("8#1777 16#FFFE 2#1000 36#nedbat1", [1023, 65534, 8, 50934882421]),
+        ("2#123 8#123#2", [Name(False, "2#123"), Name(False, "8#123#2")]),
+        ("0#0 1#0 37#0", [Name(False, "0#0"), Name(False, "1#0"), Name(False, "37#0")]),
         ("(hello)", ["hello"]),
         ("(hello 5%)  % five", ["hello 5%"]),
         (".125 -3.125 +314.", [0.125, -3.125, 314.0]),
+        ("123.6e10 1E6 25e-3", [1236000000000., 1000000., .025]),
         ("% A comment\n123", [123]),
         ("()", [""]),
         (r"(\)) 123", [")", 123]),

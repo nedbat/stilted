@@ -15,6 +15,8 @@ from test_helpers import compare_stacks
         ("-1.1 cvi", [-1]),
         ("3.14 cvi", [3]),
         ("(3.14) cvi", [3]),
+        ("(8#1777) cvi (16#FFFE) cvi (2#1000) cvi (36#nedbat1) cvi", [1023, 65534, 8, 50934882421]),
+        ("(123 456) cvi (789 }) cvi", [123, 789]),
         # cvlit
         ("{hello} cvlit xcheck", [False]),
         # cvn
@@ -23,6 +25,7 @@ from test_helpers import compare_stacks
         # cvr
         ("123 cvr", [123.0]),
         ("(123.5) cvr", [123.5]),
+        ("(1e6) cvr (25e-3) cvr", [1000000.0, 0.025]),
         # cvrs
         ("123 10 10 string cvrs", ["123"]),
         ("123.5 10 10 string cvrs", ["123.5"]),
@@ -64,7 +67,8 @@ def test_evaluate(text, stack):
         # cvi
         ("cvi", "stackunderflow"),
         ("[] cvi", "typecheck"),
-        ("(xyz) cvi", "undefinedresult"), # gs and xpost disagree on this result.
+        ("(xyz) cvi", "typecheck"),
+        ("(2#123) cvi", "typecheck"),
         # cvlit
         ("cvlit", "stackunderflow"),
         # cvn

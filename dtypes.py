@@ -38,9 +38,21 @@ class Integer(Object):
     value: int
 
     @classmethod
-    def from_string(cls, s: str) -> Integer:
+    def from_string(cls, s: str) -> Integer | Name:
         """Convert a string into an Integer."""
-        return cls(True, int(s))
+        if "#" in s:
+            radix, _, digits = s.partition("#")
+            base = int(radix)
+            if not (2 <= base <= 36):
+                return Name(False, s)
+            try:
+                val = int(digits, base=base)
+            except ValueError:
+                # Can't parse a radix number, so it's a name.
+                return Name(False, s)
+        else:
+            val = int(s)
+        return cls(True, val)
 
     def op_eq(self) -> str:
         return str(self.value)

@@ -103,8 +103,10 @@ def error(text: str):
 DELIMITED = r"(?=[()<>\[\]{}/%\s]|\Z)"
 
 lexer = Lexer(
-    Token(r"[-+]?\d*(\d\.|\.\d)\d*" + DELIMITED, Real.from_string),
+    Token(r"[-+]?\d*(\d\.|\.\d)\d*([eE][-+]?\d+)?" + DELIMITED, Real.from_string),
+    Token(r"[-+]?\d+[eE][-+]?\d+" + DELIMITED, Real.from_string),
     Token(r"[-+]?\d+" + DELIMITED, Integer.from_string),
+    Token(r"\d+#[0-9a-zA-Z]+" + DELIMITED, Integer.from_string),
     Token(r"/?[\[\]{}]", Name.from_string),
     Token(r"/?[^()<>\[\]{}/%\s]+" + DELIMITED, Name.from_string),
     Token(r"\((?:\\\[0-7]{1,3}|\\.|\\\n|.|\n)*?\)", convert_string),
