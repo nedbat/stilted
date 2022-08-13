@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import copy
 import math
+from dataclasses import dataclass
 from types import UnionType
 from typing import (
     Any, Callable, ClassVar, Generic, Iterator, TypeVar, TYPE_CHECKING,
 )
-from dataclasses import dataclass
 
 from error import Tilted
+from util import rangecheck
 if TYPE_CHECKING:   # pragma: no cover
     from evaluate import Engine
 
@@ -429,20 +430,9 @@ def typecheck(a_type, *vals) -> None:
             raise Tilted("typecheck", f"expected {typename}, got {type(val).typename}")
 
 
-def rangecheck(lo: float, val: float, hi: float | None=None) -> None:
-    """Check that `lo <= val` and `val <= hi`."""
-    if not (lo <= val):
-        raise Tilted("rangecheck", f"need {lo} <= {val}")
-    if hi is not None:
-        if not (val <= hi):
-            raise Tilted("rangecheck", f"need {val} <= {hi}")
-
-
-def clamp(lo: float, val: float, hi: float) -> float:
-    """If `val` is outside `lo`..`hi`, set it to `lo` or `hi`."""
-    if val < lo:
-        return lo
-    elif val > hi:
-        return hi
-    else:
-        return val
+def typecheck_procedure(*objs):
+    """Type-check that all `objs` are procedures (executable arrays)."""
+    for obj in objs:
+        typecheck(Array, obj)
+        if obj.literal:
+            raise Tilted("typecheck")

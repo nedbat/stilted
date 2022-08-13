@@ -1,5 +1,7 @@
 """Built-in path construction operators for Stilted."""
 
+import cairo
+
 from dtypes import from_py, Number
 from error import Tilted
 from evaluate import operator, Engine
@@ -22,7 +24,8 @@ def arcn(engine: Engine) -> None:
 
 @operator
 def clip(engine: Engine) -> None:
-    engine.gctx.clip()
+    engine.gctx.set_fill_rule(cairo.FillRule.WINDING)
+    engine.gctx.clip_preserve()
 
 @operator
 def closepath(engine: Engine) -> None:
@@ -38,6 +41,11 @@ def currentpoint(engine: Engine) -> None:
 def curveto(engine: Engine) -> None:
     x1, y1, x2, y2, x3, y3 = engine.opopn(6, Number)
     engine.gctx.curve_to(x1.value, y1.value, x2.value, y2.value, x3.value, y3.value)
+
+@operator
+def eoclip(engine: Engine) -> None:
+    engine.gctx.set_fill_rule(cairo.FillRule.EVEN_ODD)
+    engine.gctx.clip_preserve()
 
 @operator
 def lineto(engine: Engine) -> None:

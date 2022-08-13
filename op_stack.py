@@ -3,9 +3,10 @@
 from error import Tilted
 from evaluate import operator, Engine
 from dtypes import (
-    from_py, rangecheck, typecheck,
+    from_py, typecheck,
     Array, Dict, Integer, MARK, String,
 )
+from util import rangecheck
 
 
 @operator

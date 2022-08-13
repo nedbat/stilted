@@ -4,13 +4,23 @@ import colorsys
 
 import cairo
 
-from dtypes import clamp, from_py, Number
+from dtypes import from_py, Number
 from error import Tilted
 from evaluate import operator, Engine
+from util import clamp
 
 @operator
 def currentcmykcolor(engine: Engine) -> None:
-    r, g, b, _ = engine.gctx.get_source().get_rgba()
+    rv, gv, bv, _ = engine.gctx.get_source().get_rgba()
+    kv = 1 - max(rv, gv, bv)
+    if kv > 0.999:
+        kv = 1
+        cv = mv = yv = 0
+    else:
+        cv = (1 - rv - kv) / (1 - kv)
+        mv = (1 - gv - kv) / (1 - kv)
+        yv = (1 - bv - kv) / (1 - kv)
+    engine.opush(from_py(cv), from_py(mv), from_py(yv), from_py(kv))
 
 @operator
 def currentgray(engine: Engine) -> None:
@@ -65,6 +75,18 @@ def grestoreall(engine: Engine) -> None:
 @operator
 def gsave(engine: Engine) -> None:
     engine.gsave(from_save=False)
+
+@operator
+def setcmykcolor(engine: Engine) -> None:
+    c, m, y, k = engine.opopn(4, Number)
+    cv = clamp(0.0, c.value, 1.0)
+    mv = clamp(0.0, m.value, 1.0)
+    yv = clamp(0.0, y.value, 1.0)
+    kv = clamp(0.0, k.value, 1.0)
+    rv = (1 - cv) * (1 - kv)
+    gv = (1 - mv) * (1 - kv)
+    bv = (1 - yv) * (1 - kv)
+    engine.gctx.set_source_rgb(rv, gv, bv)
 
 @operator
 def setgray(engine: Engine) -> None:

@@ -2,7 +2,8 @@
 
 from error import Tilted
 from evaluate import operator, Engine
-from dtypes import from_py, rangecheck, typecheck, Dict, Integer, Stringy
+from dtypes import from_py, typecheck, Dict, Integer, Stringy
+from util import rangecheck
 
 @operator
 def begin(engine: Engine) -> None:

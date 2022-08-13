@@ -5,10 +5,12 @@ import string
 from error import Tilted
 from evaluate import operator, Engine
 from dtypes import (
-    from_py, rangecheck, typecheck,
+    from_py, typecheck,
     Integer, Name, Number, Object, Real, String,
 )
 from lex import lexer
+from util import rangecheck
+
 
 @operator
 def cvi(engine: Engine) -> None:

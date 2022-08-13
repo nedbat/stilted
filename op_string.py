@@ -1,7 +1,9 @@
 """Built-in string operators for Stilted."""
 
 from evaluate import operator, Engine
-from dtypes import rangecheck, Integer, String
+from dtypes import Integer, String
+from util import rangecheck
+
 
 @operator
 def string(engine: Engine) -> None:

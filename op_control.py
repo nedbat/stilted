@@ -7,17 +7,11 @@ from typing import Iterator, Tuple
 from error import Tilted
 from evaluate import operator, Engine
 from dtypes import (
-    from_py, rangecheck, typecheck,
+    from_py, typecheck, typecheck_procedure,
     Array, Boolean, Dict, Integer, Name, Number, Object, String,
 )
+from util import rangecheck
 
-
-def typecheck_procedure(*objs):
-    """Type-check that all `objs` are procedures (executable arrays)."""
-    for obj in objs:
-        typecheck(Array, obj)
-        if obj.literal:
-            raise Tilted("typecheck")
 
 @operator("exec")
 def exec_(engine: Engine) -> None:

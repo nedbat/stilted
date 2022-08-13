@@ -1,7 +1,8 @@
 """Built-in array operators for stilted."""
 
 from evaluate import operator, Engine
-from dtypes import rangecheck, Array, Integer, MARK
+from dtypes import Array, Integer, MARK
+from util import rangecheck
 
 @operator("[")
 def mark_(engine: Engine) -> None:
