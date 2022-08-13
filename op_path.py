@@ -51,6 +51,10 @@ def eoclip(engine: Engine) -> None:
     engine.gctx.clip_preserve()
 
 @operator
+def initclip(engine: Engine) -> None:
+    engine.gctx.reset_clip()
+
+@operator
 def lineto(engine: Engine) -> None:
     x, y = engine.opopn(2, Number)
     has_current_point(engine)
