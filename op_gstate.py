@@ -4,7 +4,7 @@ import colorsys
 
 import cairo
 
-from dtypes import from_py, Number
+from dtypes import from_py, typecheck, Array, Number
 from error import Tilted
 from evaluate import operator, Engine
 from util import clamp
@@ -21,6 +21,12 @@ def currentcmykcolor(engine: Engine) -> None:
         mv = (1 - gv - kv) / (1 - kv)
         yv = (1 - bv - kv) / (1 - kv)
     engine.opush(from_py(cv), from_py(mv), from_py(yv), from_py(kv))
+
+@operator
+def currentdash(engine: Engine) -> None:
+    nums, offset = engine.gctx.get_dash()
+    engine.opush(engine.new_array(value=list(map(from_py, nums))))
+    engine.opush(from_py(offset))
 
 @operator
 def currentgray(engine: Engine) -> None:
@@ -87,6 +93,15 @@ def setcmykcolor(engine: Engine) -> None:
     gv = (1 - mv) * (1 - kv)
     bv = (1 - yv) * (1 - kv)
     engine.gctx.set_source_rgb(rv, gv, bv)
+
+@operator
+def setdash(engine: Engine) -> None:
+    arr, offset = engine.opopn(2)
+    typecheck(Array, arr)
+    typecheck(Number, *arr)
+    typecheck(Number, offset)
+    nums = [a.value for a in arr]
+    engine.gctx.set_dash(nums, offset.value)
 
 @operator
 def setgray(engine: Engine) -> None:

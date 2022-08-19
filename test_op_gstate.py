@@ -16,6 +16,9 @@ from test_helpers import compare_stacks
         (".75 setgray gsave .5 setgray currentgray grestore currentgray", [.5, .75]),
         ("-.1 setgray currentgray", [0.0]),
         ("1.1 setgray currentgray", [1.0]),
+        # currentdash / setdash
+        ("currentdash", "[] 0.0"),
+        ("[1 2 3] 11.5 setdash currentdash", "[1 2 3] 11.5"),
         # currenthsbcolor / sethsbcolor
         (".1 .2 .3 setrgbcolor currenthsbcolor", [.5833333333333, .666666666, .3]),
         (".1 .2 .3 sethsbcolor currenthsbcolor", [.1, .2, .3]),
@@ -67,6 +70,12 @@ def test_evaluate(text, stack):
     [
         # gsave
         ("gsave 10 10 moveto grestore currentpoint", "nocurrentpoint"),
+        # setdash
+        ("setdash", "stackunderflow"),
+        ("1 setdash", "stackunderflow"),
+        ("1 1 setdash", "typecheck"),
+        ("[1] (a) setdash", "typecheck"),
+        ("[1 (a)] 1 setdash", "typecheck"),
         # setgray
         ("setgray", "stackunderflow"),
         ("(a) setgray", "typecheck"),
