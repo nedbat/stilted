@@ -70,6 +70,13 @@ def test_evaluate(text, stack):
         # setgray
         ("setgray", "stackunderflow"),
         ("(a) setgray", "typecheck"),
+        # sethsbcolor
+        ("sethsbcolor", "stackunderflow"),
+        (".5 sethsbcolor", "stackunderflow"),
+        (".5 .5 sethsbcolor", "stackunderflow"),
+        ("(a) .5 .5 sethsbcolor", "typecheck"),
+        (".5 (a) .5 sethsbcolor", "typecheck"),
+        (".5 .5 (a) sethsbcolor", "typecheck"),
         # setlinecap
         ("setlinecap", "stackunderflow"),
         ("(a) setlinecap", "typecheck"),
@@ -84,13 +91,6 @@ def test_evaluate(text, stack):
         # setmiterlimit
         ("setmiterlimit", "stackunderflow"),
         ("(a) setmiterlimit", "typecheck"),
-        # sethsbcolor
-        ("sethsbcolor", "stackunderflow"),
-        (".5 sethsbcolor", "stackunderflow"),
-        (".5 .5 sethsbcolor", "stackunderflow"),
-        ("(a) .5 .5 sethsbcolor", "typecheck"),
-        (".5 (a) .5 sethsbcolor", "typecheck"),
-        (".5 .5 (a) sethsbcolor", "typecheck"),
         # setrgbcolor
         ("setrgbcolor", "stackunderflow"),
         (".5 setrgbcolor", "stackunderflow"),
