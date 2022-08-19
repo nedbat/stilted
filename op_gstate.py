@@ -14,8 +14,8 @@ def currentcmykcolor(engine: Engine) -> None:
     rv, gv, bv, _ = engine.gctx.get_source().get_rgba()
     kv = 1 - max(rv, gv, bv)
     if kv > 0.999:
-        kv = 1
-        cv = mv = yv = 0
+        kv = 1.0
+        cv = mv = yv = 0.0
     else:
         cv = (1 - rv - kv) / (1 - kv)
         mv = (1 - gv - kv) / (1 - kv)

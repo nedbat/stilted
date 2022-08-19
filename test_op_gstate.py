@@ -21,6 +21,8 @@ from test_helpers import compare_stacks
         # currentcmykcolor / setcmykcolor
         ("0 0 0 .25 setcmykcolor currentcmykcolor", [0.0, 0.0, 0.0, .25]),
         ("0 0 0 .25 setcmykcolor currentgray", [.75]),
+        ("0 0 0 1 setcmykcolor currentgray", [0.0]),
+        ("0 setgray currentcmykcolor", [0.0, 0.0, 0.0, 1.0]),
         ("1 0 0 0 setcmykcolor currentrgbcolor", [0.0, 1.0, 1.0]),
         ("0 .5 .5 0 setcmykcolor currentrgbcolor", [1.0, 0.5, 0.5]),
         # currentdash / setdash
