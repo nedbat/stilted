@@ -20,6 +20,8 @@ from test_helpers import compare_stacks
         ("101 202 moveto currentpoint", [101.0, 202.0]),
         ("101 202 moveto 303 404 moveto currentpoint", [303.0, 404.0]),
         ("101 202 moveto 303 404 lineto currentpoint", [303.0, 404.0]),
+        # curveto
+        ("0 0 moveto 101 202 303 404 505 606 curveto currentpoint", [505.0, 606.0]),
         # pathforall
         (
             """
@@ -39,6 +41,8 @@ from test_helpers import compare_stacks
             "10 20 moveto 30 40 lineto 100 200 translate {} {} {} {} pathforall",
             [-90.0, -180.0, -70.0, -160.0],
         ),
+        # rcurveto
+        ("100 100 moveto 1 2 3 4 5 6 rcurveto currentpoint", [105.0, 106.0]),
         # rlineto
         ("1 2 moveto 10 20 rlineto currentpoint", [11.0, 22.0]),
         # rmoveto
