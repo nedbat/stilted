@@ -16,6 +16,13 @@ from test_helpers import compare_stacks
         (".75 setgray gsave .5 setgray currentgray grestore currentgray", [.5, .75]),
         ("-.1 setgray currentgray", [0.0]),
         ("1.1 setgray currentgray", [1.0]),
+        (".25 setgray currentrgbcolor", [.25, .25, .25]),
+        (".25 setgray currentcmykcolor", [0.0, 0.0, 0.0, .75]),
+        # currentcmykcolor / setcmykcolor
+        ("0 0 0 .25 setcmykcolor currentcmykcolor", [0.0, 0.0, 0.0, .25]),
+        ("0 0 0 .25 setcmykcolor currentgray", [.75]),
+        ("1 0 0 0 setcmykcolor currentrgbcolor", [0.0, 1.0, 1.0]),
+        ("0 .5 .5 0 setcmykcolor currentrgbcolor", [1.0, 0.5, 0.5]),
         # currentdash / setdash
         ("currentdash", "[] 0.0"),
         ("[1 2 3] 11.5 setdash currentdash", "[1 2 3] 11.5"),
