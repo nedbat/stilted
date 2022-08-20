@@ -5,15 +5,10 @@ from typing import Any, Iterator
 
 import cairo
 
+from cairo_util import has_current_point
 from dtypes import from_py, typecheck_procedure, Array, Number
-from error import Tilted
 from evaluate import operator, Engine, Exitable
 from util import deg_to_rad
-
-def has_current_point(engine: Engine) -> None:
-    """There must be a current point, or raise nocurrentpoint."""
-    if not engine.gctx.has_current_point():
-        raise Tilted("nocurrentpoint")
 
 @operator
 def arc(engine: Engine) -> None:

@@ -427,6 +427,7 @@ import op_collections; assert op_collections
 import op_control; assert op_control
 import op_dict; assert op_dict
 import op_error; assert op_error
+import op_font; assert op_font
 import op_gstate; assert op_gstate
 import op_math; assert op_math
 import op_matrix; assert op_matrix
