@@ -2,6 +2,7 @@
 
 import cairo
 
+from cairo_util import array_to_cmatrix, cmatrix_to_array
 from dtypes import from_py, Array, Real, Integer, Number
 from error import Tilted
 from evaluate import operator, Engine
@@ -14,21 +15,11 @@ def pop_matrix(engine: Engine) -> Array:
         raise Tilted("rangecheck")
     return arr
 
-def matrix_to_array(mtx: cairo.Matrix, arr: Array):
-    """Assign mtx into arr."""
-    lmtx = list(mtx) # type: ignore
-    for i in range(6):
-        arr[i] = from_py(lmtx[i])
-
-def array_to_matrix(arr) -> cairo.Matrix:
-    """Convert an Array into a Matrix."""
-    return cairo.Matrix(*map(lambda o: o.value, arr))
-
 def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
     """Code common to the four xxtransform operators."""
     match engine.otop():
         case Array():
-            mtx = array_to_matrix(pop_matrix(engine))
+            mtx = array_to_cmatrix(pop_matrix(engine))
 
         case Integer() | Real():
             mtx = engine.gctx.get_matrix()
@@ -50,29 +41,29 @@ def transform_help(engine: Engine, *, invert: bool, distance: bool) -> None:
 
 @operator
 def concat(engine: Engine) -> None:
-    mtx = array_to_matrix(pop_matrix(engine))
+    mtx = array_to_cmatrix(pop_matrix(engine))
     mtx = mtx.multiply(engine.gctx.get_matrix())
     engine.gctx.set_matrix(mtx)
 
 @operator
 def concatmatrix(engine: Engine) -> None:
     arr3 = pop_matrix(engine)
-    mtx2 = array_to_matrix(pop_matrix(engine))
-    mtx1 = array_to_matrix(pop_matrix(engine))
+    mtx2 = array_to_cmatrix(pop_matrix(engine))
+    mtx1 = array_to_cmatrix(pop_matrix(engine))
     mtx3 = mtx1.multiply(mtx2)
-    matrix_to_array(mtx3, arr3)
+    cmatrix_to_array(mtx3, arr3)
     engine.opush(arr3)
 
 @operator
 def currentmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
-    matrix_to_array(engine.gctx.get_matrix(), arr)
+    cmatrix_to_array(engine.gctx.get_matrix(), arr)
     engine.opush(arr)
 
 @operator
 def defaultmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
-    matrix_to_array(engine.device.default_matrix, arr)
+    cmatrix_to_array(engine.device.default_matrix, arr)
     engine.opush(arr)
 
 @operator
@@ -82,7 +73,7 @@ def dtransform(engine: Engine) -> None:
 @operator
 def identmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
-    matrix_to_array(cairo.Matrix(), arr)
+    cmatrix_to_array(cairo.Matrix(), arr)
     engine.opush(arr)
 
 @operator
@@ -97,12 +88,12 @@ def initmatrix(engine: Engine) -> None:
 def invertmatrix(engine: Engine) -> None:
     arr2 = pop_matrix(engine)
     arr1 = pop_matrix(engine)
-    mtx1 = array_to_matrix(arr1)
+    mtx1 = array_to_cmatrix(arr1)
     try:
         mtx1.invert()
     except cairo.Error:
         raise Tilted("undefinedresult")
-    matrix_to_array(mtx1, arr2)
+    cmatrix_to_array(mtx1, arr2)
     engine.opush(arr2)
 
 @operator
@@ -112,7 +103,7 @@ def itransform(engine: Engine) -> None:
 @operator
 def matrix(engine: Engine) -> None:
     arr = engine.new_array(n=6)
-    matrix_to_array(cairo.Matrix(), arr)
+    cmatrix_to_array(cairo.Matrix(), arr)
     engine.opush(arr)
 
 @operator
@@ -121,7 +112,7 @@ def rotate(engine: Engine) -> None:
         case Array():
             arr = pop_matrix(engine)
             ang = engine.opop(Number)
-            matrix_to_array(cairo.Matrix.init_rotate(deg_to_rad(ang.value)), arr)
+            cmatrix_to_array(cairo.Matrix.init_rotate(deg_to_rad(ang.value)), arr)
             engine.opush(arr)
 
         case Integer() | Real():
@@ -137,7 +128,7 @@ def scale(engine: Engine) -> None:
         case Array():
             arr = pop_matrix(engine)
             sx, sy = engine.opopn(2, Number)
-            matrix_to_array(cairo.Matrix(xx=sx.value, yy=sy.value), arr)
+            cmatrix_to_array(cairo.Matrix(xx=sx.value, yy=sy.value), arr)
             engine.opush(arr)
 
         case Integer() | Real():
@@ -150,7 +141,7 @@ def scale(engine: Engine) -> None:
 @operator
 def setmatrix(engine: Engine) -> None:
     arr = pop_matrix(engine)
-    engine.gctx.set_matrix(array_to_matrix(arr))
+    engine.gctx.set_matrix(array_to_cmatrix(arr))
 
 @operator
 def transform(engine: Engine) -> None:
@@ -162,7 +153,7 @@ def translate(engine: Engine) -> None:
         case Array():
             arr = pop_matrix(engine)
             tx, ty = engine.opopn(2, Number)
-            matrix_to_array(cairo.Matrix(x0=tx.value, y0=ty.value), arr)
+            cmatrix_to_array(cairo.Matrix(x0=tx.value, y0=ty.value), arr)
             engine.opush(arr)
 
         case Integer() | Real():
