@@ -25,7 +25,7 @@ from test_helpers import compare_stacks
         # currentmatrix
         ("matrix currentmatrix length", [6]),
         ("matrix currentmatrix 1 get", [0.0]),
-        ("matrix currentmatrix dup 4 get exch 5 get", [0.0, 0.0]),
+        ("matrix currentmatrix dup 1 get exch 2 get", [0.0, 0.0]),
         # defaultmatrix
         ("10 10 scale matrix defaultmatrix", "matrix currentmatrix"),
         # dtransform
@@ -71,7 +71,13 @@ from test_helpers import compare_stacks
         ("matrix identmatrix setmatrix 2 3 scale 100 200 transform", [200.0, 600.0]),
         ("100 200 2 3 matrix scale transform", [200.0, 600.0]),
         # translate
-        ("17 42 translate matrix currentmatrix dup 4 get exch 5 get", [17.0, 42.0]),
+        (
+            """
+            /d matrix currentmatrix def /t 17 42 translate matrix currentmatrix def
+            t 4 get d 4 get sub abs  t 5 get d 5 get sub abs
+            """,
+            [17.0, 42.0],
+        ),
         ("17 42 matrix translate aload pop", [1.0, 0.0, 0.0, 1.0, 17.0, 42.0]),
     ],
 )

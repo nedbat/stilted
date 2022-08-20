@@ -44,7 +44,9 @@ def scalefont(engine: Engine) -> None:
 def setfont(engine: Engine) -> None:
     font_dict = engine.opop(Dict).value
     engine.gctx.select_font_face(font_dict["FontName"].str_value)
-    engine.gctx.set_font_matrix(array_to_cmatrix(font_dict["FontMatrix"]))
+    fmtx = array_to_cmatrix(font_dict["FontMatrix"])
+    fmtx.scale(1, -1)   # All our devices are flipped.
+    engine.gctx.set_font_matrix(fmtx)
 
 @operator
 def show(engine: Engine) -> None:

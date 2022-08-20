@@ -152,4 +152,4 @@ def setrgbcolor(engine: Engine) -> None:
 
 @operator
 def showpage(engine: Engine) -> None:
-    engine.device.showpage()
+    engine.device.show_page()

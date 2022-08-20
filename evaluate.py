@@ -71,7 +71,7 @@ class Engine:
 
         self.stdout = stdout or sys.stdout
         self.save_serials = itertools.count()
-        self.device = Device(outfile)
+        self.device = Device.from_filename(outfile)
 
         self.new_save()
 
