@@ -65,14 +65,7 @@ def currentrgbcolor(engine: Engine) -> None:
 
 @operator
 def grestore(engine: Engine) -> None:
-    if engine.gsaves:
-        engine.gctx.restore()
-        if engine.gsaves[-1].from_save:
-            engine.gctx.save()
-            gsx = engine.gsaves[-1]
-        else:
-            gsx = engine.gsaves.pop()
-        gsx.restore_to_ctx(engine.gctx)
+    engine.grestore()
 
 @operator
 def grestoreall(engine: Engine) -> None:

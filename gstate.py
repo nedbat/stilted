@@ -88,27 +88,56 @@ class PngDevice(Device):
 
 
 @dataclass
-class GstateExtras:
+class SavedGstate:
     """
-    Extra info to save with the gstate.
+    Graphics state for gsave/grestore
 
-    Most of the gstate is handled by PyCairo, but some information has to be
-    handled separately.
+    PyCairo can save/restore its graphics state, but we need more control, so
+    this is the full explicit graphics state.
+
+    PyCairo doesn't restore the current path, so we do it ourselves.
+    https://github.com/pygobject/pycairo/issues/273
+
     """
 
     # Was this gstate saved by `save` or `gsave`?
     from_save: bool
 
-    # PyCairo doesn't restore the current path, so we do it ourselves.
-    # https://github.com/pygobject/pycairo/issues/273
+    # The components of the PostScript graphics state.
+    ctm: cairo.Matrix
+    position: tuple[float, float]
     cur_path: cairo.Path
+    rgba: tuple[float, float, float, float]
+    line_width: float
+    line_cap: cairo.LineCap
+    line_join: cairo.LineJoin
+    miter_limit: float
+    dash: tuple[list[float], float]
 
     @classmethod
-    def from_ctx(cls, from_save: bool, ctx: cairo.Context) -> GstateExtras:
-        """Construct a GstateExtras from a ctx."""
-        return GstateExtras(from_save=from_save, cur_path=ctx.copy_path())
+    def from_ctx(cls, from_save: bool, ctx: cairo.Context) -> SavedGstate:
+        """Construct a SavedGstate from a ctx."""
+        return cls(
+            from_save=from_save,
+            ctm=ctx.get_matrix(),
+            position=ctx.get_current_point(),
+            cur_path=ctx.copy_path(),
+            rgba=ctx.get_source().get_rgba(),   # type: ignore
+            line_width=ctx.get_line_width(),
+            line_cap=ctx.get_line_cap(),
+            line_join=ctx.get_line_join(),
+            miter_limit=ctx.get_miter_limit(),
+            dash=ctx.get_dash(),
+        )
 
     def restore_to_ctx(self, ctx: cairo.Context) -> None:
-        """Restore data from the Extras to the context."""
+        """Restore data from the SavedGstate to the context."""
+        ctx.set_matrix(self.ctm)
         ctx.new_path()
         ctx.append_path(self.cur_path)
+        ctx.set_source_rgba(*self.rgba)
+        ctx.set_line_width(self.line_width)
+        ctx.set_line_cap(self.line_cap)
+        ctx.set_line_join(self.line_join)
+        ctx.set_miter_limit(self.miter_limit)
+        ctx.set_dash(*self.dash)

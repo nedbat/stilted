@@ -68,6 +68,7 @@ from test_helpers import compare_stacks
         ("1 2 moveto gsave 3 4 moveto save pop 5 6 moveto grestore grestore grestore currentpoint", [3.0, 4.0]),
         ("1 2 moveto gsave 3 4 moveto save 5 6 moveto gsave 7 8 moveto gsave restore currentpoint", [3.0, 4.0]),
         ("2.5 setlinewidth gsave 3.5 setlinewidth grestore currentlinewidth", [2.5]),
+        ("[1 2 3] 3.5 setdash gsave [4 5] 1 setdash grestore currentdash", "[1 2 3] 3.5"),
     ],
 )
 def test_evaluate(text, stack):

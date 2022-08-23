@@ -2,7 +2,7 @@
 
 import sys
 from dataclasses import dataclass
-from typing import Iterator, Tuple
+from typing import Iterator
 
 from error import Tilted
 from evaluate import operator, Engine, Exitable
@@ -76,7 +76,7 @@ class ForallArrayExec(Exitable):
 @dataclass
 class ForallDictExec(Exitable):
     """Execstack item for implementing `dict {} forall`."""
-    items_iter: Iterator[Tuple[str, Object]]
+    items_iter: Iterator[tuple[str, Object]]
     proc: Array
 
     def __call__(self, engine: Engine) -> None:

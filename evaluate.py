@@ -16,7 +16,7 @@ from dtypes import (
     MARK, Mark, Name, NULL, Null,
     Object, Operator, Real, Save, SaveableObject, String,
 )
-from gstate import Device, GstateExtras
+from gstate import Device, SavedGstate
 
 
 class Engine:
@@ -43,7 +43,7 @@ class Engine:
     # gsave stack
     # Most of the graphics state is in PyCairo, but we need other information
     # for each gstate.
-    gsaves: list[GstateExtras]
+    gstack: list[SavedGstate]
 
     # Random number source
     random: random.Random
@@ -63,7 +63,7 @@ class Engine:
         self.dstack = []
         self.estack = []
         self.sstack = []
-        self.gsaves = []
+        self.gstack = []
 
         self.popped = []
 
@@ -356,16 +356,21 @@ class Engine:
 
     def gsave(self, from_save: bool) -> None:
         """Add a new gstate to the gstack."""
-        self.gctx.save()
-        self.gsaves.append(GstateExtras.from_ctx(from_save=from_save, ctx=self.gctx))
+        self.gstack.append(SavedGstate.from_ctx(from_save=from_save, ctx=self.gctx))
+
+    def grestore(self) -> None:
+        if self.gstack:
+            gsx = self.gstack[-1]
+            if not gsx.from_save:
+                self.gstack.pop()
+            gsx.restore_to_ctx(self.gctx)
 
     def grestoreall(self) -> None:
         """Roll back the gstack to the last save."""
-        if self.gsaves:
-            while not self.gsaves[-1].from_save:
-                self.gctx.restore()
-                self.gsaves.pop()
-            self.gsaves[-1].restore_to_ctx(self.gctx)
+        if self.gstack:
+            while not self.gstack[-1].from_save:
+                self.gstack.pop()
+            self.gstack[-1].restore_to_ctx(self.gctx)
 
 
 @dataclass
