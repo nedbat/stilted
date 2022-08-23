@@ -17,6 +17,10 @@ def charpath(engine: Engine) -> None:
     engine.gctx.text_path(text.str_value)
 
 @operator
+def currentfont(engine: Engine) -> None:
+    engine.opush(engine.new_dict(value=engine.gextra.font_dict))
+
+@operator
 def findfont(engine: Engine) -> None:
     name = engine.opop(Name)
     arr = engine.new_array(n=6)
@@ -43,10 +47,7 @@ def scalefont(engine: Engine) -> None:
 @operator
 def setfont(engine: Engine) -> None:
     font_dict = engine.opop(Dict).value
-    engine.gctx.select_font_face(font_dict["FontName"].str_value)
-    fmtx = array_to_cmatrix(font_dict["FontMatrix"])
-    fmtx.scale(1, -1)   # All our devices are flipped.
-    engine.gctx.set_font_matrix(fmtx)
+    engine.set_font(font_dict)
 
 @operator
 def show(engine: Engine) -> None:

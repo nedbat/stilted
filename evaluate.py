@@ -16,7 +16,7 @@ from dtypes import (
     MARK, Mark, Name, NULL, Null,
     Object, Operator, Real, Save, SaveableObject, String,
 )
-from gstate import Device, SavedGstate
+from gstate import Device, GstateExtras, SavedGstate
 
 
 class Engine:
@@ -45,6 +45,9 @@ class Engine:
     # for each gstate.
     gstack: list[SavedGstate]
 
+    # Information for state beyond the Cairo gstate.
+    gextra: GstateExtras
+
     # Random number source
     random: random.Random
 
@@ -69,6 +72,7 @@ class Engine:
 
         self.random = random.Random()
 
+        self.gextra = GstateExtras(font_dict={})
         self.stdout = stdout or sys.stdout
         self.save_serials = itertools.count()
         self.device = Device.from_filename(outfile)
@@ -86,6 +90,7 @@ class Engine:
                 f"errordict /{err_name} {{ /{err_name} .error }} put"
             )
 
+        # More systemdict initialization.
         self.exec_text("""
             /=string 150 string def     % Not standardized, but expected.
             /languagelevel 1 def
@@ -96,6 +101,14 @@ class Engine:
         userdict = self.new_dict()
         systemdict["userdict"] = userdict
         self.dstack.append(userdict)
+
+        # More initialization.
+        self.exec_text("""
+            2 dict dup begin
+            /FontName (sans) def
+            /FontMatrix [1 0 0 1 0 0] def
+            end setfont
+            """)
 
     def add_text(self, text: str) -> None:
         """Consume text as Stilted tokens, and add for execution."""
@@ -356,21 +369,35 @@ class Engine:
 
     def gsave(self, from_save: bool) -> None:
         """Add a new gstate to the gstack."""
-        self.gstack.append(SavedGstate.from_ctx(from_save=from_save, ctx=self.gctx))
+        self.gstack.append(
+            SavedGstate.from_ctx(
+                from_save=from_save,
+                ctx=self.gctx,
+                extra=self.gextra,
+            )
+        )
 
     def grestore(self) -> None:
         if self.gstack:
             gsx = self.gstack[-1]
             if not gsx.from_save:
                 self.gstack.pop()
-            gsx.restore_to_ctx(self.gctx)
+            gsx.restore_to_ctx(self.gctx, self)
 
     def grestoreall(self) -> None:
         """Roll back the gstack to the last save."""
         if self.gstack:
             while not self.gstack[-1].from_save:
                 self.gstack.pop()
-            self.gstack[-1].restore_to_ctx(self.gctx)
+            self.gstack[-1].restore_to_ctx(self.gctx, self)
+
+    def set_font(self, font_dict: dict[str, Object]) -> None:
+        import cairo_util
+        self.gextra.font_dict = font_dict
+        self.gctx.select_font_face(cast(Name, font_dict["FontName"]).str_value)
+        fmtx = cairo_util.array_to_cmatrix(font_dict["FontMatrix"])
+        fmtx.scale(1, -1)   # All our devices are flipped.
+        self.gctx.set_font_matrix(fmtx)
 
 
 @dataclass

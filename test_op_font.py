@@ -13,22 +13,34 @@ from test_helpers import compare_stacks
         # findfont
         ("/f /Helvetica findfont def [/FontType /FontName] {f exch get} forall", "1 /Helvetica"),
         # multiple
-        ("""
+        (
+            """
             /f /sans findfont def /s (Hello) def
             f 100 scalefont setfont (Hello) stringwidth 0 ne {xyzzy} if
             f 200 scalefont setfont (Hello) stringwidth 0 ne {xyzzy} if
             2 div sub
-        """,
+            """,
             [0.0]
         ),
         ("/sans findfont 100 scalefont setfont () stringwidth", [0.0, 0.0]),
-        ("""
+        (
+            """
             /sans findfont 1000 scalefont setfont 0 0 moveto (Hello) show
             currentpoint 0 ne {xyzzy} if
             (Hello) stringwidth 0 ne {xyzzy} if
             sub
             """,
             [0.0]
+        ),
+        (
+            """
+            /sans findfont setfont currentfont /FontName get
+            gsave
+            /serif findfont setfont currentfont /FontName get
+            grestore
+            currentfont /FontName get
+            """,
+            "/sans /serif /sans",
         ),
     ],
 )

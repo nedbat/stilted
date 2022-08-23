@@ -1,11 +1,18 @@
 """Graphics state for Stilted."""
 
 from __future__ import annotations
+import dataclasses
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import io
 
 import cairo
+
+from dtypes import Object
+
+if TYPE_CHECKING:   # pragma: no cover
+    from evaluate import Engine
 
 class Device:
 
@@ -88,6 +95,21 @@ class PngDevice(Device):
 
 
 @dataclass
+class GstateExtras:
+    """
+    Extra information needed beyond the Cairo graphics state.
+
+    Most current graphics state is in the Cairo state
+    """
+    # The font dict.
+    font_dict: dict[str, Object]
+
+    def copy(self) -> GstateExtras:
+        """Make a copy of this object."""
+        return dataclasses.replace(self)
+
+
+@dataclass
 class SavedGstate:
     """
     Graphics state for gsave/grestore
@@ -114,8 +136,11 @@ class SavedGstate:
     miter_limit: float
     dash: tuple[list[float], float]
 
+    # The GstateExtras.
+    gextra: GstateExtras
+
     @classmethod
-    def from_ctx(cls, from_save: bool, ctx: cairo.Context) -> SavedGstate:
+    def from_ctx(cls, from_save: bool, ctx: cairo.Context, extra=GstateExtras) -> SavedGstate:
         """Construct a SavedGstate from a ctx."""
         return cls(
             from_save=from_save,
@@ -128,9 +153,10 @@ class SavedGstate:
             line_join=ctx.get_line_join(),
             miter_limit=ctx.get_miter_limit(),
             dash=ctx.get_dash(),
+            gextra=extra.copy(),
         )
 
-    def restore_to_ctx(self, ctx: cairo.Context) -> None:
+    def restore_to_ctx(self, ctx: cairo.Context, engine: Engine) -> None:
         """Restore data from the SavedGstate to the context."""
         ctx.set_matrix(self.ctm)
         ctx.new_path()
@@ -141,3 +167,5 @@ class SavedGstate:
         ctx.set_line_join(self.line_join)
         ctx.set_miter_limit(self.miter_limit)
         ctx.set_dash(*self.dash)
+        engine.gextra = self.gextra
+        engine.set_font(self.gextra.font_dict)
