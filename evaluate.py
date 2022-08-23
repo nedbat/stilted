@@ -10,13 +10,14 @@ from typing import Any, Iterable, Iterator, cast
 
 from error import ERROR_NAMES, Tilted
 from lex import lexer
+from device import Device
 from dtypes import (
     from_py, typecheck,
     Array, ArrayStorage, Boolean, Dict, DictStorage, Integer,
     MARK, Mark, Name, NULL, Null,
     Object, Operator, Real, Save, SaveableObject, String,
 )
-from gstate import Device, GstateExtras, SavedGstate
+from gstate import GstateExtras, SavedGstate
 
 
 class Engine:
