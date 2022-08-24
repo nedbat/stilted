@@ -121,3 +121,10 @@ def test_file_input(file_text, output, capsys, tmp_path):
     fname = str(foo_ps)
     main([fname, "abc"])
     assert capsys.readouterr().out == output.format(fname=fname)
+
+
+def test_help(capsys):
+    with pytest.raises(SystemExit):
+        main(["--help"])
+    help_text = capsys.readouterr().out
+    assert "Output file name. %d will be the page number" in help_text

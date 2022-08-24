@@ -23,7 +23,7 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
     )
     parser.add_argument(
         "-o", dest="outfile", default="page.svg",
-        help="Output file name",
+        help="Output file name. %%d will be the page number.",
     )
     parser.add_argument("args", nargs="*")
 
