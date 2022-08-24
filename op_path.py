@@ -70,15 +70,21 @@ class PathforallExec(Exitable):
     segment_iter: Iterator[Any]
     procs: list[Array]
 
+    def __init__(self, engine: Engine, procs: list[Array]) -> None:
+        self.segment_iter = iter(enumerate(engine.gctx.copy_path()))
+        self.procs = procs
+
     def __call__(self, engine: Engine) -> None:
         try:
-            kind, nums = next(self.segment_iter)
+            iseg, (kind, nums) = next(self.segment_iter)
         except StopIteration:
             return
         # Cairo always puts a moveto after a closepath, but PostScript does not.
-        # If we have a closepath, swallow the moveto after it.
+        # If we have a closepath and it wasn't made by charpath, swallow the
+        # moveto after it.
         if kind == 3:
-            next(self.segment_iter)
+            if all(not (begin <= iseg < end) for begin, end in engine.gextra.charpath_segments):
+                next(self.segment_iter)
         engine.opush(*map(from_py, nums))
         engine.estack.append(self)
         engine.exec(self.procs[kind])
@@ -87,7 +93,7 @@ class PathforallExec(Exitable):
 def pathforall(engine: Engine) -> None:
     procs = engine.opopn(4)
     typecheck_procedure(*procs)
-    engine.estack.append(PathforallExec(iter(engine.gctx.copy_path()), procs))
+    engine.estack.append(PathforallExec(engine, procs))
 
 @operator
 def rcurveto(engine: Engine) -> None:

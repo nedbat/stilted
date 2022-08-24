@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import cairo
@@ -17,10 +17,17 @@ class GstateExtras:
     """
     Extra information needed beyond the Cairo graphics state.
 
-    Most current graphics state is in the Cairo state
+    Most current graphics state is in the Cairo state.
     """
     # The font dict.
-    font_dict: dict[str, Object]
+    font_dict: dict[str, Object] = field(default_factory=dict)
+
+    # Really esoteric: Cairo adds a moveto after a closepath. I don't want to
+    # see that moveto when doing pathforall.  But it doesn't add a moveto
+    # when the path is from charpath. This is a list of begin/end pairs of the
+    # path segments from charpath, so we can properly skip the synthetic
+    # movetos.
+    charpath_segments: list[tuple[int, int]] = field(default_factory=list)
 
     def copy(self) -> GstateExtras:
         """Make a copy of this object."""

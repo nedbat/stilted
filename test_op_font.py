@@ -10,6 +10,19 @@ from test_helpers import compare_stacks
 @pytest.mark.parametrize(
     "text, stack",
     [
+        # charpath
+        (
+            """
+            /sans findfont 1000 scalefont setfont
+            0 0 moveto (Hello) false charpath
+            {/my exch def /mx exch def} { clear } { clear } { clear } pathforall
+            my 0 eq
+            (Hello) stringwidth
+            0 eq exch
+            mx sub abs .001 lt
+            """,
+            [True, True, True],
+        ),
         # findfont
         ("/f /Helvetica findfont def [/FontType /FontName] {f exch get} forall", "1 /Helvetica"),
         # multiple

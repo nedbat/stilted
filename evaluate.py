@@ -73,7 +73,7 @@ class Engine:
 
         self.random = random.Random()
 
-        self.gextra = GstateExtras(font_dict={})
+        self.gextra = GstateExtras()
         self.stdout = stdout or sys.stdout
         self.save_serials = itertools.count()
         self.device = Device.from_filename(outfile)

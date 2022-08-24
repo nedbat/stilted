@@ -14,7 +14,11 @@ def charpath(engine: Engine) -> None:
     if stroke_or_fill.value:
         raise Tilted("undefinedresult")
     has_current_point(engine)
+    # Find the indexes of the segments we are adding.
+    before_len = len(list(engine.gctx.copy_path()))
     engine.gctx.text_path(text.str_value)
+    after_len = len(list(engine.gctx.copy_path()))
+    engine.gextra.charpath_segments.append((before_len, after_len))
 
 @operator
 def currentfont(engine: Engine) -> None:

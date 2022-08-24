@@ -24,6 +24,7 @@ from test_helpers import compare_stacks
         ("0 0 moveto 101 202 303 404 505 606 curveto currentpoint", [505.0, 606.0]),
         # pathforall
         (
+            # The basics work, and there isn't a moveto after a closepath.
             """
             10 20 moveto 30 40 lineto 1 2 3 4 5 6 curveto closepath
             {(M)} {(L)} {(C)} {(.)} pathforall
@@ -31,6 +32,7 @@ from test_helpers import compare_stacks
             [10.0, 20.0, "M", 30.0, 40.0, "L", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, "C", "."],
         ),
         (
+            # `exit` works.
             """
             10 20 moveto 30 40 lineto 1 2 3 4 5 6 curveto closepath
             {(M)} {(L)} { (!) exit} {(.)} pathforall
@@ -38,6 +40,7 @@ from test_helpers import compare_stacks
             [10.0, 20.0, "M", 30.0, 40.0, "L", 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, "!"],
         ),
         (
+            # Coordinates are in the current coord system.
             "10 20 moveto 30 40 lineto 100 200 translate {} {} {} {} pathforall",
             [-90.0, -180.0, -70.0, -160.0],
         ),
