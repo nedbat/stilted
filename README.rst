@@ -13,3 +13,8 @@ Some things are just wrong:
 
     null dup cvx xcheck exch xcheck  -->  true false    % PostScript
     null dup cvx xcheck exch xcheck  -->  true true     % Stilted
+
+
+I've written a bit about `Stilted on my blog`__.
+
+__ https://nedbatchelder.com/blog/202208/stilted.html
