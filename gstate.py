@@ -29,9 +29,24 @@ class GstateExtras:
     # movetos.
     charpath_segments: list[tuple[int, int]] = field(default_factory=list)
 
+    # Cairo isn't good about giving back the clip path, so we store all the
+    # paths that have been clipped to. When we need to restore the clip path,
+    # we can re-create it by clipping to each of them in turn.
+    clip_stack: list[
+        tuple[
+            cairo.FillRule,
+            cairo.Matrix,
+            cairo.Path,
+            ]
+        ] = field(default_factory=list)
+
     def copy(self) -> GstateExtras:
         """Make a copy of this object."""
-        return dataclasses.replace(self)
+        return dataclasses.replace(
+            self,
+            charpath_segments=list(self.charpath_segments),
+            clip_stack=list(self.clip_stack),
+            )
 
 
 @dataclass
@@ -83,6 +98,14 @@ class SavedGstate:
 
     def restore_to_ctx(self, ctx: cairo.Context, engine: Engine) -> None:
         """Restore data from the SavedGstate to the context."""
+        ctx.reset_clip()
+        for fill_rule, mtx, path in self.gextra.clip_stack:
+            ctx.set_matrix(mtx)
+            ctx.new_path()
+            ctx.append_path(path)
+            ctx.set_fill_rule(fill_rule)
+            ctx.clip()
+
         ctx.set_matrix(self.ctm)
         ctx.new_path()
         ctx.append_path(self.cur_path)
@@ -92,5 +115,6 @@ class SavedGstate:
         ctx.set_line_join(self.line_join)
         ctx.set_miter_limit(self.miter_limit)
         ctx.set_dash(*self.dash)
+
         engine.gextra = self.gextra
         engine.set_font(self.gextra.font_dict)

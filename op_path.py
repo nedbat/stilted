@@ -20,10 +20,17 @@ def arcn(engine: Engine) -> None:
     x, y, r, a1, a2 = engine.opopn(5, Number)
     engine.gctx.arc_negative(x.value, y.value, r.value, deg_to_rad(a1.value), deg_to_rad(a2.value))
 
+def clip_help(engine: Engine, fill_rule: cairo.FillRule) -> None:
+    """Implement clipping, with a fill_rule."""
+    path = engine.gctx.copy_path()
+    mtx = engine.gctx.get_matrix()
+    engine.gextra.clip_stack.append((fill_rule, mtx, path))
+    engine.gctx.set_fill_rule(fill_rule)
+    engine.gctx.clip_preserve()
+
 @operator
 def clip(engine: Engine) -> None:
-    engine.gctx.set_fill_rule(cairo.FillRule.WINDING)
-    engine.gctx.clip_preserve()
+    clip_help(engine, cairo.FillRule.WINDING)
 
 @operator
 def closepath(engine: Engine) -> None:
@@ -42,11 +49,11 @@ def curveto(engine: Engine) -> None:
 
 @operator
 def eoclip(engine: Engine) -> None:
-    engine.gctx.set_fill_rule(cairo.FillRule.EVEN_ODD)
-    engine.gctx.clip_preserve()
+    clip_help(engine, cairo.FillRule.EVEN_ODD)
 
 @operator
 def initclip(engine: Engine) -> None:
+    engine.gextra.clip_stack = []
     engine.gctx.reset_clip()
 
 @operator
