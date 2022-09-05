@@ -67,7 +67,6 @@ def test_evaluate(text, stack):
         # charpath
         ("charpath", "stackunderflow"),
         ("true charpath", "stackunderflow"),
-        ("(a) true charpath", "undefinedresult"),
         ("(a) false charpath", "nocurrentpoint"),
         # findfont
         ("findfont", "stackunderflow"),

@@ -4,15 +4,12 @@ import cairo
 
 from cairo_util import array_to_cmatrix, cmatrix_to_array, has_current_point
 from dtypes import Boolean, Dict, Name, Number, String, from_py
-from error import Tilted
 from evaluate import operator, Engine
 
 @operator
 def charpath(engine: Engine) -> None:
-    stroke_or_fill = engine.opop(Boolean)
+    engine.opop(Boolean)
     text = engine.opop(String)
-    if stroke_or_fill.value:
-        raise Tilted("undefinedresult")
     has_current_point(engine)
     # Find the indexes of the segments we are adding.
     before_len = len(list(engine.gctx.copy_path()))
