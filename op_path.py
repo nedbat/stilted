@@ -33,6 +33,14 @@ def clip(engine: Engine) -> None:
     clip_help(engine, cairo.FillRule.WINDING)
 
 @operator
+def clippath(engine: Engine) -> None:
+    ctx = engine.gctx
+    rects = ctx.copy_clip_rectangle_list()
+    ctx.new_path()
+    for rect in rects:
+        ctx.rectangle(rect.x, rect.y, rect.width, rect.height)
+
+@operator
 def closepath(engine: Engine) -> None:
     engine.gctx.close_path()
 
@@ -50,6 +58,12 @@ def curveto(engine: Engine) -> None:
 @operator
 def eoclip(engine: Engine) -> None:
     clip_help(engine, cairo.FillRule.EVEN_ODD)
+
+@operator
+def flattenpath(engine: Engine) -> None:
+    flatpath = engine.gctx.copy_path_flat()
+    engine.gctx.new_path()
+    engine.gctx.append_path(flatpath)
 
 @operator
 def initclip(engine: Engine) -> None:

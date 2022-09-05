@@ -29,6 +29,11 @@ def currentdash(engine: Engine) -> None:
     engine.opush(from_py(offset))
 
 @operator
+def currentflat(engine: Engine) -> None:
+    flat = engine.gctx.get_tolerance()
+    engine.opush(from_py(flat))
+
+@operator
 def currentgray(engine: Engine) -> None:
     r, g, b, _ = engine.gctx.get_source().get_rgba()
     gray = 0.3 * r + 0.59 * g + 0.11 * b
@@ -95,6 +100,12 @@ def setdash(engine: Engine) -> None:
     typecheck(Number, offset)
     nums = [a.value for a in arr]
     engine.gctx.set_dash(nums, offset.value)
+
+@operator
+def setflat(engine: Engine) -> None:
+    flat = engine.opop(Number)
+    flat = clamp(0.2, flat.value, 100.0)
+    engine.gctx.set_tolerance(flat)
 
 @operator
 def setgray(engine: Engine) -> None:

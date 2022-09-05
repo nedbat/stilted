@@ -28,6 +28,9 @@ from test_helpers import compare_stacks
         # currentdash / setdash
         ("currentdash", "[] 0.0"),
         ("[1 2 3] 11.5 setdash currentdash", "[1 2 3] 11.5"),
+        # currentflat / setflat
+        ("currentflat", [0.1]),
+        ("2.25 setflat currentflat", [2.25]),
         # currenthsbcolor / sethsbcolor
         (".1 .2 .3 setrgbcolor currenthsbcolor", [.5833333333333, .666666666, .3]),
         (".1 .2 .3 sethsbcolor currenthsbcolor", [.1, .2, .3]),
