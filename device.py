@@ -72,7 +72,7 @@ class PngDevice(Device):
 
         self.ctx = cairo.Context(self.surface)
         self.ctx.translate(0, self.surface.get_height())
-        self.ctx.scale(1, -1)
+        self.ctx.scale(pix_per_pt, -pix_per_pt)
 
         self.ctx.set_source_rgb(1, 1, 1)
         self.ctx.rectangle(0, 0, self.surface.get_width(), self.surface.get_height())
