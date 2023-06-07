@@ -8,10 +8,9 @@ import cairo
 
 class Device:
 
-    def __init__(self, outfile) -> None:
+    def __init__(self, outfile, size=None) -> None:
         self.outfile = outfile
-        self.width = 612
-        self.height = 792
+        self.width, self.height = size or (612, 792)
 
         # Give subclasses a chance to do their things.
         self.ctx: cairo.Context
@@ -25,11 +24,11 @@ class Device:
         self.page_nums = itertools.count(start=1)
 
     @classmethod
-    def from_filename(cls, outfile) -> Device:
+    def from_filename(cls, outfile, size=None) -> Device:
         if outfile.endswith(".svg"):
-            return SvgDevice(outfile)
+            return SvgDevice(outfile, size)
         elif outfile.endswith(".png"):
-            return PngDevice(outfile)
+            return PngDevice(outfile, size)
         else:
             raise Exception(f"Don't know how to write to {outfile!r}")
 
@@ -71,6 +70,7 @@ class PngDevice(Device):
             int(self.height * pix_per_pt),
         )
 
+        self.ctx = cairo.Context(self.surface)
         self.ctx.translate(0, self.surface.get_height())
         self.ctx.scale(1, -1)
 

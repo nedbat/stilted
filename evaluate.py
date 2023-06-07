@@ -61,7 +61,7 @@ class Engine:
     # Output device
     device: Device
 
-    def __init__(self, stdout=None, outfile="page.svg") -> None:
+    def __init__(self, stdout=None, outfile="page.svg", size=None) -> None:
         """Construct the initial data needed for execution."""
         self.ostack = []
         self.dstack = []
@@ -76,7 +76,7 @@ class Engine:
         self.gextra = GstateExtras()
         self.stdout = stdout or sys.stdout
         self.save_serials = itertools.count()
-        self.device = Device.from_filename(outfile)
+        self.device = Device.from_filename(outfile, size)
 
         self.new_save()
 

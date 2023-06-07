@@ -25,6 +25,10 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
         "-o", dest="outfile", default="page.svg",
         help="Output file name. %%d will be the page number.",
     )
+    parser.add_argument(
+        "-s", dest="size", metavar="WxH", default="612x792",
+        help="The size of the output, WIDTHxHEIGHT, in points",
+    )
     parser.add_argument("args", nargs="*")
 
     args = parser.parse_args(argv)
@@ -40,7 +44,11 @@ def main(argv: list[str], input_fn: Callable[[str], str]=input) -> int:
         args.interactive = True
         in_argv = [""]
 
-    engine = Engine(outfile=args.outfile)
+    size = None
+    if args.size:
+        size = tuple(map(int, args.size.split("x")))
+
+    engine = Engine(outfile=args.outfile, size=size)
 
     engine.exec_text("/argv [")
     for arg in in_argv:
