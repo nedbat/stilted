@@ -18,10 +18,22 @@ from test_helpers import compare_stacks
         ("3 4 add", [7]),
         ("3 4.5 add", [7.5]),
         ("3.5 4.5 add", [8.0]),
+        # atan
+        ("0 1 atan", [0.0]),
+        ("1 0 atan", [90.0]),
+        ("-100 0 atan", [270.0]),
+        ("4 4 atan", [45.0]),
+        ("-4 4 atan", [315.0]),
+        ("-4 -4 atan", [225.0]),
+        ("4 -4 atan", [135.0]),
         # ceiling
         ("3.2 ceiling", [4.0]),
         ("-4.8 ceiling", [-4.0]),
         ("99 ceiling", [99]),
+        # cos
+        ("0 cos", [1.0]),
+        ("90 cos 0.0 _isclose", [True]),
+        ("135 cos -1 2 sqrt div _isclose", [True]),
         # div
         ("3 2 div", [1.5]),
         ("4 2 div", [2.0]),
@@ -64,6 +76,10 @@ from test_helpers import compare_stacks
         ("-4.8 round", [-5.0]),
         ("-6.5 round", [-6.0]),
         ("99 round", [99]),
+        # sin
+        ("0 sin", [0.0]),
+        ("90 sin 1.0 _isclose", [True]),
+        ("-45 sin -1 2 sqrt div _isclose", [True]),
         # sqrt
         ("150.0625 sqrt", [12.25]),
         # sub
@@ -79,7 +95,7 @@ def test_evaluate(text, stack):
     compare_stacks(evaluate(text).ostack, stack)
 
 
-OP1 = ["abs", "ceiling", "floor", "neg", "round", "srand", "sqrt", "truncate"]
+OP1 = ["abs", "ceiling", "cos", "floor", "neg", "round", "sin", "srand", "sqrt", "truncate"]
 
 @pytest.mark.parametrize("opname", OP1)
 def test_one_arg_stackunderflow(opname):
@@ -91,7 +107,7 @@ def test_one_arg_errors(opname):
     with pytest.raises(StiltedError, match="typecheck"):
         evaluate(f"(a) {opname}")
 
-OP2 = ["add", "div", "exp", "idiv", "mod", "mul", "sub"]
+OP2 = ["add", "atan", "div", "exp", "idiv", "mod", "mul", "sub"]
 
 @pytest.mark.parametrize("opname", OP2)
 def test_two_arg_stackunderflow1(opname):
@@ -117,6 +133,8 @@ def test_two_arg_typecheck2(opname):
 @pytest.mark.parametrize(
     "text, error",
     [
+        # # atan, meh let it be zero.
+        # ("0 0 atan", "undefinedresult"),
         # exp
         ("-1 1.5 exp", "undefinedresult"),
         # sqrt

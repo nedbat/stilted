@@ -18,10 +18,23 @@ def add(engine: Engine) -> None:
     engine.opush(from_py(a.value + b.value))
 
 @operator
+def atan(engine: Engine) -> None:
+    num, den = engine.opopn(2, Number)
+    rads = math.atan2(num.value, den.value)
+    degs = (rads * 180/math.pi + 360) % 360
+    engine.opush(from_py(degs))
+
+@operator
 def ceiling(engine: Engine) -> None:
     a = engine.opop(Number)
     av = a.value
     engine.opush(from_py(type(av)(math.ceil(av))))
+
+@operator
+def cos(engine: Engine) -> None:
+    a = engine.opop(Number)
+    rads = a.value / 180 * math.pi
+    engine.opush(from_py(math.cos(rads)))
 
 @operator
 def div(engine: Engine) -> None:
@@ -44,6 +57,12 @@ def floor(engine: Engine) -> None:
 def idiv(engine: Engine) -> None:
     a, b = engine.opopn(2, Number)
     engine.opush(from_py(int(a.value / b.value)))
+
+@operator
+def _isclose(engine: Engine) -> None:
+    a, b = engine.opopn(2, Number)
+    print(f"{a.value = }, {b.value = }")
+    engine.opush(from_py(math.isclose(a.value, b.value, abs_tol=1e-15)))
 
 @operator
 def mod(engine: Engine) -> None:
@@ -81,6 +100,12 @@ def rrand(engine: Engine) -> None:
     r = engine.random.randint(0, 2**31-1)
     engine.random.seed(r)
     engine.opush(from_py(r))
+
+@operator
+def sin(engine: Engine) -> None:
+    a = engine.opop(Number)
+    rads = a.value / 180 * math.pi
+    engine.opush(from_py(math.sin(rads)))
 
 @operator
 def sqrt(engine: Engine) -> None:
