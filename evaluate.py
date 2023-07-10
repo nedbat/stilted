@@ -426,7 +426,7 @@ def operator(arg):
     or:
 
     @operator("[")
-    def mark(...):
+    def mark_(...):
         ...
 
     Returns None: the decorated function is only available through execution,

@@ -384,7 +384,7 @@ class Operator(Object):
     A built-in operator.
 
     `value` is a Python function implementing the operator. `name` is the name
-    of the operator, which can differ than the name of the Python function.
+    of the operator, which can differ from the name of the Python function.
 
     """
     typename: ClassVar[str] = "operator"
